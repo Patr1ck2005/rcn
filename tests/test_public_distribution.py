@@ -32,3 +32,27 @@ def test_public_metadata():
     assert metadata["project"]["version"] == "0.15.0a1"
     assert metadata["project"]["license"]["text"] == "MIT"
     assert "MIT License" in (ROOT / "LICENSE").read_text(encoding="utf-8")
+
+
+def test_runtime_sanitization_preserves_code_and_interpreter(tmp_path):
+    import csv
+    from research_compute_network.member_client_installer import _sanitize_public_runtime
+    python = tmp_path / "python"
+    package = python / "Lib/site-packages/example"
+    package.mkdir(parents=True)
+    (package / "module.py").write_text("value = 1\n")
+    (package / "module.pyc").write_bytes(b"build-path-bytecode")
+    metadata = package.parent / "example-1.dist-info"
+    metadata.mkdir()
+    (metadata / "direct_url.json").write_text('{"url":"file:///private-build"}')
+    (python / "Scripts").mkdir()
+    (python / "Scripts/example.exe").write_bytes(b"temporary-interpreter-launcher")
+    (python / "python.exe").write_bytes(b"real-interpreter")
+    (metadata / "RECORD").write_text("example/module.py,,\nexample/module.pyc,,\nexample-1.dist-info/direct_url.json,,\n../../Scripts/example.exe,,\n")
+    assert _sanitize_public_runtime(python) == 3
+    assert (package / "module.py").is_file() and (python / "python.exe").is_file()
+    assert not list(python.rglob("*.pyc")) and not list(python.rglob("direct_url.json"))
+    assert not (python / "Scripts").exists()
+    assert all(any(path.iterdir()) for path in python.rglob("*") if path.is_dir())
+    with (metadata / "RECORD").open(newline="") as stream:
+        assert list(csv.reader(stream)) == [["example/module.py", "", ""]]

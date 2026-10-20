@@ -6,6 +6,7 @@ Members unpack the same verified snapshot; installation never runs pip online.
 from __future__ import annotations
 
 import argparse
+import csv
 from contextlib import contextmanager, ExitStack
 import hashlib
 import json
@@ -255,6 +256,33 @@ def verify_snapshot(root, *, expected_payload_id=None):
         return manifest
 
 
+def _sanitize_public_runtime(python):
+    """Remove build-host bytecode, direct URLs and non-relocatable pip launchers.
+
+    This is called only on the builder's newly created temporary interpreter.
+    Member entry points invoke python[w] with -m, rather than these launchers.
+    """
+    python = Path(python)
+    removed = {path for path in python.rglob("*.pyc") if path.is_file()}
+    removed.update(path for path in (python / "Lib/site-packages").glob("*.dist-info/direct_url.json"))
+    removed.update(path for path in (python / "Scripts").glob("*.exe"))
+    for path in removed:
+        path.unlink()
+    for record in (python / "Lib/site-packages").glob("*.dist-info/RECORD"):
+        with record.open(encoding="utf-8", newline="") as stream:
+            rows = list(csv.reader(stream))
+        rows = [row for row in rows if (record.parent.parent / row[0]).resolve() not in removed]
+        with record.open("w", encoding="utf-8", newline="") as stream:
+            csv.writer(stream, lineterminator="\n").writerows(rows)
+    # The snapshot contract inventories directories through their files.
+    # Removed bytecode and launchers must not leave unmanifested empty folders.
+    for directory in sorted((path for path in python.rglob("*") if path.is_dir()),
+                            key=lambda path: len(path.parts), reverse=True):
+        if not any(directory.iterdir()):
+            directory.rmdir()
+    return len(removed)
+
+
 def build_member_client_installer(*, wheel_path, wheelhouse_dir, embeddable_zip, output_exe,
                                   expected_wheel_sha256, makensis=None):
     wheel_path, wheelhouse_dir, embeddable_zip, output_exe = map(lambda value: Path(value).absolute(),
@@ -305,7 +333,7 @@ def build_member_client_installer(*, wheel_path, wheelhouse_dir, embeddable_zip,
             if result.returncode:
                 raise RuntimeError("member_offline_runtime_validation_failed: " + result.stdout[-2000:] + result.stderr[-2000:])
             return result.stdout
-        run([str(bootstrap), "--no-index", "--find-links", str(wheelhouse_dir), "--no-warn-script-location"])
+        run([str(bootstrap), "--no-index", "--find-links", str(wheelhouse_dir), "--no-warn-script-location", "--no-compile"])
         run(["-m", "pip", "install", "--no-index", "--find-links", str(wheelhouse_dir), "--no-compile", str(wheel_path)])
         run(["-m", "pip", "check"])
         probe = run(["-c", "import json,sys;from pathlib import Path;import fastapi,sqlalchemy,greenlet;from research_compute_network.member_client import create_member_app;root=Path(sys.executable).parent;modules=[fastapi,sqlalchemy,greenlet];assert sys.flags.no_site and all(Path(x.__file__).resolve().is_relative_to(root) for x in modules),'dependency escaped offline closure';print(json.dumps({'module_paths':{x.__name__:Path(x.__file__).relative_to(root).as_posix() for x in modules},'no_user_site':True,'distribution':'public-client-only'}))"])
@@ -319,6 +347,7 @@ def build_member_client_installer(*, wheel_path, wheelhouse_dir, embeddable_zip,
             raise RuntimeError("member_offline_runtime_provenance_failed")
         if any(path.suffix.lower() in {".mph", ".zip"} for path in (python / "Lib/site-packages/research_compute_network").rglob("*")):
             raise ValueError("public_client_contains_scientific_asset")
+        _sanitize_public_runtime(python)
         files = {path.relative_to(runtime).as_posix(): _sha(path) for path in sorted(runtime.rglob("*")) if path.is_file()}
         payload_id = "member-" + hashlib.sha256(json.dumps(files, sort_keys=True, separators=(",", ":")).encode()).hexdigest()[:24]
         manifest = {"schema_version": 1, "kind": "rcn-public-member-client-v1", "payload_id": payload_id,

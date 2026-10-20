@@ -4,11 +4,11 @@
   "version": "0.15.0a1",
   "license": "MIT",
   "python_source_tests": {
-    "passed": 147,
+    "passed": 148,
     "failed": 0
   },
   "python_installed_wheel_tests": {
-    "passed": 147,
+    "passed": 148,
     "failed": 0,
     "source_directory_on_import_path": false
   },
@@ -33,7 +33,12 @@
     "payload_hash_validation": true,
     "installed_member_login_page": true,
     "page_errors": 0,
-    "signature": "unsigned"
+    "signature": "unsigned",
+    "build_host_metadata_removed": true,
+    "bytecode_files_shipped": 0,
+    "nonrelocatable_launchers_shipped": 0,
+    "source_url_metadata_shipped": 0,
+    "runtime_files": 2762
   },
   "scientific_assets_in_public_distributions": 0,
   "scientific_runtime_included": false,
