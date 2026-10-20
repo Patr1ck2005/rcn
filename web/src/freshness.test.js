@@ -1,0 +1,40 @@
+import { afterEach, describe, expect, it, vi } from "vitest";
+import { watchPageReturn } from "./freshness";
+afterEach(() => vi.useRealTimers());
+describe("page return refresh", () => {
+  it("ignores the initial pageshow but refreshes a restored page", async () => {
+    vi.useFakeTimers();
+    const win = new EventTarget(), doc = new EventTarget(); doc.visibilityState = "visible";
+    const refresh = vi.fn(), stop = watchPageReturn(refresh, win, doc);
+    win.dispatchEvent(new Event("pageshow"));
+    await vi.advanceTimersByTimeAsync(200);
+    expect(refresh).not.toHaveBeenCalled();
+    const restored = new Event("pageshow"); Object.defineProperty(restored, "persisted", { value: true });
+    win.dispatchEvent(restored);
+    await vi.advanceTimersByTimeAsync(200);
+    expect(refresh).toHaveBeenCalledTimes(1);
+    stop();
+  });
+  it("coalesces return events, ignores hidden pages, and cleans up", async () => {
+    vi.useFakeTimers();
+    const win = new EventTarget(), doc = new EventTarget();
+    doc.visibilityState = "hidden";
+    const refresh = vi.fn();
+    const stop = watchPageReturn(refresh, win, doc);
+    win.dispatchEvent(new Event("focus"));
+    await vi.advanceTimersByTimeAsync(200);
+    expect(refresh).not.toHaveBeenCalled();
+    doc.visibilityState = "visible";
+    const returnedAt = Date.now();
+    doc.dispatchEvent(new Event("visibilitychange"));
+    win.dispatchEvent(new Event("focus"));
+    win.dispatchEvent(new Event("pageshow"));
+    win.dispatchEvent(new Event("online"));
+    await vi.advanceTimersByTimeAsync(200);
+    expect(refresh).toHaveBeenCalledTimes(1);
+    expect(refresh).toHaveBeenLastCalledWith({ since: returnedAt });
+    win.dispatchEvent(new Event("focus")); stop();
+    await vi.advanceTimersByTimeAsync(200);
+    expect(refresh).toHaveBeenCalledTimes(1);
+  });
+});

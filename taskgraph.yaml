@@ -1,0 +1,9 @@
+schema_version: 1
+project: rcn-public-platform
+release: 0.15.0a1
+tasks:
+  - id: public-platform-preview
+    status: accepted_locally
+    scope: Generic platform source, synthetic demo, MIT license, public distributions
+    evidence: docs/releases/0.15.0a1-validation.json
+    external_scientific_acceptance: not_performed

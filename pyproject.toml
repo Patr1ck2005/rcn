@@ -1,0 +1,65 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "research-compute-network"
+version = "0.15.0a1"
+description = "Multi-submitter shared research compute network"
+readme = "README.md"
+license = {text = "MIT"}
+authors = [{name = "Patr1ck2005"}]
+requires-python = ">=3.11"
+classifiers = ["Development Status :: 3 - Alpha", "License :: OSI Approved :: MIT License", "Programming Language :: Python :: 3"]
+dependencies = [
+    "fastapi>=0.116,<1",
+    "markdown-it-py>=4,<5",
+    "pydantic>=2.13,<3",
+    "PyYAML>=6,<7",
+    "SQLAlchemy>=2.0,<3",
+    "psutil>=6,<8",
+    "tzdata>=2024.1; sys_platform == 'win32'",
+    "uvicorn>=0.35,<1",
+]
+
+[project.urls]
+Homepage = "https://github.com/Patr1ck2005/rcn"
+Repository = "https://github.com/Patr1ck2005/rcn"
+Issues = "https://github.com/Patr1ck2005/rcn/issues"
+
+[project.optional-dependencies]
+acceptance = [
+    "numpy>=2,<3",
+    "scipy>=1.16,<2",
+]
+dev = [
+    "httpx>=0.28,<1",
+    "pytest>=8",
+]
+owner-ui = [
+    "Pillow>=11,<13",
+    "pystray>=0.19,<1",
+]
+
+[project.scripts]
+rcn = "research_compute_network.cli:main"
+rcn-pilot = "research_compute_network.cli:main"
+rcn-agent = "research_compute_network.agent_access:main"
+rcn-member = "research_compute_network.member_client_lifecycle:main"
+
+[tool.setuptools.package-data]
+research_compute_network = [
+    "help_content/**/*.md",
+    "web_dist/**/*",
+    "build_identity.json",
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+markers = [
+    "workbench_integration: requires an explicitly selected Workbench source tree or installed adapter",
+]

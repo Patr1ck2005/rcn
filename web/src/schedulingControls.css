@@ -1,0 +1,21 @@
+.scheduling-controls { margin-block: 1rem; }
+.scheduling-strategies { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 1rem; padding: .5rem 0 1rem; }
+.scheduling-strategies label { display: flex; align-items: flex-start; gap: .65rem; padding: 1rem; border: 1px solid var(--line); border-radius: 8px; cursor: pointer; background: var(--surface); }
+.scheduling-strategies label.selected { border-color: var(--green); background: var(--green-soft); }
+.scheduling-strategies label span { display: grid; gap: .4rem; }
+.scheduling-strategies small, .scheduling-controls > p { color: var(--muted); font-size: var(--type-body); }
+.scheduling-limits { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 1rem; }
+.scheduling-limits label,.scheduling-reason { display: grid; gap: .5rem; min-width: 0; }
+.scheduling-controls input[type="number"],.scheduling-reason input { width: 100%; min-width: 0; padding: .6rem; background: var(--surface); border: 1px solid var(--line); border-radius: 6px; }
+.scheduling-reason { margin: 1rem 0; }
+.scheduling-preview { padding: 1rem; border-left: 3px solid var(--cyan); background: var(--cyan-soft); margin: 1rem 0; line-height: 1.65; }
+.scheduling-controls footer { display: flex; gap: .75rem; flex-wrap: wrap; }
+.distribution-identities { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 1rem; }
+.distribution-identities > div { padding: .8rem; background: var(--surface-2); border: 1px solid var(--line); border-radius: 6px; min-width: 0; }
+.distribution-identities dt { color: var(--muted); margin-bottom: .4rem; }
+.distribution-identities dd { margin: 0; overflow-wrap: anywhere; }
+.distribution-boundaries { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 1rem; }
+.distribution-status p { overflow-wrap: anywhere; }
+.distribution-status footer { display: flex; gap: .75rem; flex-wrap: wrap; }
+@media(max-width: 900px) { .distribution-identities,.distribution-boundaries { grid-template-columns: 1fr; } }
+@media(max-width: 900px) { .scheduling-strategies,.scheduling-limits { grid-template-columns: 1fr; } }

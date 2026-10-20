@@ -1,0 +1,47 @@
+{
+  "schema": "rcn-public-preview-acceptance-v1",
+  "verified_date": "2026-10-20",
+  "version": "0.15.0a1",
+  "license": "MIT",
+  "python_source_tests": {
+    "passed": 147,
+    "failed": 0
+  },
+  "python_installed_wheel_tests": {
+    "passed": 147,
+    "failed": 0,
+    "source_directory_on_import_path": false
+  },
+  "frontend_unit_tests": {
+    "passed": 304,
+    "failed": 0
+  },
+  "browser_demo": {
+    "pages": 6,
+    "page_errors": 0,
+    "viewports": [
+      "desktop",
+      "mobile"
+    ],
+    "data": "synthetic"
+  },
+  "windows_installer": {
+    "mode": "silent-isolated-current-user",
+    "exit_code": 0,
+    "desktop_entry_created": false,
+    "logon_entry_created": false,
+    "payload_hash_validation": true,
+    "installed_member_login_page": true,
+    "page_errors": 0,
+    "signature": "unsigned"
+  },
+  "scientific_assets_in_public_distributions": 0,
+  "scientific_runtime_included": false,
+  "external_lab_scientific_acceptance": false,
+  "production_changed": false,
+  "notes": [
+    "Source and installed-wheel tests cover the same regression population; do not add their counts.",
+    "A configured formal control plane scheduled a synthetic fixed worker, executed it in a real child process and collected the original Attempt result. This was local, not remote SSH or COMSOL.",
+    "Windows standard-account/UAC/reboot and external-member scientific trials were not performed."
+  ]
+}

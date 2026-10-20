@@ -1,0 +1,23 @@
+# Local environments, state and generated artifacts
+.venv/
+node_modules/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.scratch/
+.local/
+.state/
+.runtime/
+*.sqlite3
+*.db
+*.db-*
+build/
+dist/
+web/test-results/
+web/playwright-report/
+src/research_compute_network/web_dist/
+src/research_compute_network/build_identity.json
+src/research_compute_network/acceptance_fixtures/*.zip
+*.mph
+.env

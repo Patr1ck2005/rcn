@@ -1,0 +1,19 @@
+.member-invitations { overflow-wrap: anywhere; }
+.member-invitation-form { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; padding: 18px 0; }
+.member-invitation-form label { display: flex; flex-direction: column; gap: 7px; min-width: 0; }
+.member-invitation-form input, .member-invitation-form select { width: 100%; min-width: 0; box-sizing: border-box; }
+.member-invitation-form .member-invitation-option { flex-direction: row; align-items: center; }
+.member-invitation-option input { width: auto; flex: 0 0 auto; }
+.member-invitation-delivery { border: 1px solid currentColor; border-radius: 10px; padding: 16px; margin: 12px 0; }
+.member-invitation-delivery button { margin: 10px 10px 0 0; }
+.member-invitation-delivery code { display: block; }
+.member-invitation-actions { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; margin: 16px 0; }
+.member-invitation-records article { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 14px 0; border-top: 1px solid currentColor; }
+.member-invitation-records article > div { display: grid; gap: 6px; min-width: 0; }
+.member-invitation-records button { flex: 0 0 auto; }
+.member-admission-fields { grid-column: 1 / -1; min-width: 0; padding: 16px; border: 1px solid currentColor; border-radius: 8px; }
+.member-admission-projects { display: grid; gap: 12px; margin-bottom: 16px; }
+.member-admission-projects fieldset { min-width: 0; padding: 12px; }
+.member-admission-projects label { margin: 8px 0; }
+.member-admission-resources { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 16px; }
+@media (max-width: 640px) { .member-invitation-form { grid-template-columns: 1fr; } .member-invitation-records article { align-items: flex-start; flex-direction: column; } }

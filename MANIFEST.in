@@ -1,0 +1,14 @@
+include README.md README.zh-CN.md LICENSE
+recursive-include docs *.md *.svg
+recursive-include scripts *.py
+recursive-include web *.json *.js *.jsx *.css *.html *.svg
+prune web/node_modules
+prune web/test-results
+prune web/playwright-report
+prune tests/.runtime
+prune src/research_compute_network/tests
+prune .scratch
+prune .local
+recursive-include src/research_compute_network/web_dist *
+recursive-exclude src/research_compute_network/acceptance_fixtures *.zip
+global-exclude *.mph *.db *.sqlite3 *.pyc *.zip *.exe
