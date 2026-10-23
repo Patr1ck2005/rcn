@@ -291,6 +291,28 @@ def _sqlite_table_definition_parts(sql: str) -> tuple[str, list[str], str]:
     raise ValueError("unrecognized additive table definition")
 
 
+# Reviewed startup-only storage objects. Exact SQL prevents a same-name view or
+# trigger from silently broadening the additive release contract. The view only
+# reads immutable custody evidence; the trigger writes a new derived table.
+_STORAGE_RESTORE_VIEW = """CREATE VIEW storage_restore_receipt_evidence AS
+                  SELECT receipt_id,payload,job_id,unit_id,attempt_id,revoked_at FROM storage_lifecycle_receipts
+                  UNION ALL
+                  SELECT c.receipt_id,json_patch(c.payload,json_object(
+                    'project_id',json_extract(a.payload,'$.project_id'),
+                    'job_id',a.job_id,'work_unit_id',a.unit_id,'producer_attempt_id',a.attempt_id,
+                    'manifest_sha256',json_extract(a.payload,'$.manifest_sha256'))),
+                    a.job_id,a.unit_id,a.attempt_id,COALESCE(c.revoked_at,a.revoked_at)
+                  FROM scientific_export_custody c JOIN scientific_export_acceptances a ON a.acceptance_id=c.acceptance_id"""
+_STORAGE_INVENTORY_TRIGGER = """CREATE TRIGGER storage_inventory_science_intent
+                AFTER INSERT ON storage_lifecycle_intents WHEN NEW.operation_kind<>'relay_copy'
+                BEGIN INSERT INTO storage_inventory_dirty
+                  SELECT NEW.job_id,NEW.unit_id,NEW.attempt_id,project_id,1 FROM storage_inventory_files
+                  WHERE job_id=NEW.job_id AND unit_id=NEW.unit_id AND attempt_id=NEW.attempt_id
+                  GROUP BY project_id
+                  ON CONFLICT(job_id,unit_id,attempt_id) DO UPDATE SET revision=revision+1;
+                END"""
+
+
 def _additive_schema_compatibility(before: dict, after: dict) -> dict:
     old_tables, new_tables = before["tables"], after["tables"]
     added_columns = {}
@@ -340,9 +362,17 @@ def _additive_schema_compatibility(before: dict, after: dict) -> dict:
             "operational_read_revisions", "reconciliation_projection_state",
             "reconciliation_job_generations",
         }
-        if (any(row[2] != "jobs" for row in triggers)
-                or {row[1]: row[3] for row in triggers} != _TRIGGERS
-                or not projection_tables.issubset(set(new_tables) - set(old_tables))):
+        projection_triggers = [row for row in triggers if row[1] in _TRIGGERS]
+        storage_triggers = [row for row in triggers if row[1] == "storage_inventory_science_intent"]
+        new_table_names = set(new_tables) - set(old_tables)
+        if (len(projection_triggers) + len(storage_triggers) != len(triggers)
+                or (projection_triggers and (any(row[2] != "jobs" for row in projection_triggers)
+                    or {row[1]: row[3] for row in projection_triggers} != _TRIGGERS
+                    or not projection_tables.issubset(new_table_names)))
+                or (storage_triggers and (len(storage_triggers) != 1
+                    or storage_triggers[0][2] != "storage_lifecycle_intents"
+                    or storage_triggers[0][3] != _STORAGE_INVENTORY_TRIGGER
+                    or not {"storage_inventory_dirty", "storage_inventory_files"}.issubset(new_table_names)))):
             raise ValueError(
                 "additive schema permits only new tables, columns, and indexes or the exact "
                 "approved projection triggers writing exclusively to new projection tables"
@@ -351,13 +381,19 @@ def _additive_schema_compatibility(before: dict, after: dict) -> dict:
             row[1]: hashlib.sha256(row[3].encode("utf-8")).hexdigest()
             for row in triggers
         }
-    if any(row[0] not in {"table", "index", "trigger"} for row in added):
+    views = [row for row in added if row[0] == "view"]
+    if views and (len(views) != 1 or views[0][1:3] != ["storage_restore_receipt_evidence"] * 2
+                  or views[0][3] != _STORAGE_RESTORE_VIEW):
+        raise ValueError("additive schema permits only the exact approved read-only storage view")
+    approved_read_only_views = {row[1]: hashlib.sha256(row[3].encode("utf-8")).hexdigest() for row in views}
+    if any(row[0] not in {"table", "index", "trigger", "view"} for row in added):
         raise ValueError("additive schema permits only new tables, columns, and indexes")
     return {
         "tables": sorted(set(new_tables) - set(old_tables)),
         "columns": added_columns,
         "indexes": sorted(row[1] for row in added if row[0] == "index"),
         "approved_projection_triggers": approved_projection_triggers,
+        "approved_read_only_views": approved_read_only_views,
     }
 
 
@@ -411,20 +447,28 @@ def _validate_additive_schema(python_executable: Path, database_backup: Path) ->
     scratch = database_backup.with_name(database_backup.name + f".additive-{uuid.uuid4().hex}")
     shutil.copy2(database_backup, scratch)
     environment = os.environ.copy()
-    for variable in ("PYTHONPATH", "RCN_TOKEN", "RCN_DATABASE_URL", "RCN_PILOT_DATABASE_URL"):
+    for variable in ("PYTHONPATH", "RCN_TOKEN", "DATABASE_URL", "RCN_DATABASE_URL", "RCN_PILOT_DATABASE_URL"):
         environment.pop(variable, None)
     environment["RCN_HOME"] = str(scratch.parent)
     # Service.initialize also bootstraps people/audit events. Those business
     # writes are not schema migrations; register the same additional Base
-    # models and run only the candidate repository's schema initialization.
+    # models and exercise the repository plus actual storage startup schema.
+    # No center binding, data path validation, GC or service bootstrap runs.
     initialize_schema = (
         "import sys\n"
         "import research_compute_network.submission_policy\n"
         "import research_compute_network.compute_credits\n"
+        "from pathlib import Path\n"
         "from research_compute_network.repository import MetadataRepository\n"
+        "from research_compute_network.storage_lifecycle import StorageLifecycle\n"
+        "from research_compute_network.restore_sources import RegisteredResultSources\n"
         "repository = MetadataRepository(sys.argv[1])\n"
         "try:\n"
         "    repository.init_schema()\n"
+        "    lifecycle = StorageLifecycle(repository, Path(repository.engine.url.database).with_name('schema-only-origin-spool'))\n"
+        "    RegisteredResultSources(lifecycle)\n"
+        "    with lifecycle._connect() as connection:\n"
+        "        connection.execute('SELECT * FROM storage_restore_receipt_evidence LIMIT 0')\n"
         "finally:\n"
         "    repository.engine.dispose()\n"
     )
@@ -457,6 +501,7 @@ def _validate_additive_schema(python_executable: Path, database_backup: Path) ->
             "verified": True, "existing_definitions_preserved": True,
             "original_column_data_unchanged": True,
             "approved_projection_triggers": added["approved_projection_triggers"],
+            "approved_read_only_views": added["approved_read_only_views"],
             "data_hash_algorithm": "sha256-typed-length-prefixed-values-binary-row-order-v1",
             "table_data_before": data_before, "table_data_after": data_after,
         },
