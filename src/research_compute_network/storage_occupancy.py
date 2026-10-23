@@ -155,7 +155,10 @@ class OccupancyInventory:
                               (cursor, max_files)).fetchall()
         roots, processed = {}, 0
         for row in rows:
-            if (clock()-started)*1000 >= time_budget_ms:
+            # Metadata admission can itself exhaust the slice. Allow one file
+            # after the foreground checkpoints so repeated slow setup cannot
+            # starve this cursor; the time budget prevents additional work.
+            if processed and (clock()-started)*1000 >= time_budget_ms:
                 break
             budget.checkpoint()
             measured = {"state": "unregistered_path"}

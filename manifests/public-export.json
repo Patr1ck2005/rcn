@@ -100,7 +100,9 @@
     "docs/evidence/storage-algorithms-20261024/run-1.json",
     "docs/evidence/storage-algorithms-20261024/run-3.json",
     "docs/evidence/storage-algorithms-20261024/run-4.json",
-    "docs/evidence/storage-algorithms-20261024/variance-and-throughput.json"
+    "docs/evidence/storage-algorithms-20261024/variance-and-throughput.json",
+    "docs/evidence/storage-algorithms-20261024/occupancy-progress-native-boundaries.json",
+    "docs/evidence/storage-algorithms-20261024/occupancy-progress-verification.json"
   ],
   "required_files": [
     "docs/member-task-package-guide.zh.md",

@@ -1,4 +1,6 @@
 import os
+import time
+from contextlib import contextmanager
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
@@ -25,10 +27,6 @@ def test_exact_path_cursor_bounds_probes_and_deduplicates_native_hardlinks(custo
         probes.append(path)
         return native_allocation(path)
     inventory = OccupancyInventory(h.lifecycle)
-    # Time budget expires before touching even the first registered data file.
-    ticks = iter([0, 1, 2])
-    assert inventory.advance(clock=lambda: next(ticks), probe=probe)["processed"] == 0
-    assert not probes
     assert inventory.advance(max_files=1, time_budget_ms=1000, probe=probe)["processed"] == 1
     partial = h.lifecycle.inventory.snapshot()["projects"][0]
     assert partial["physical_bytes"] is None and partial["measured_files"] == 1
@@ -46,6 +44,71 @@ def test_exact_path_cursor_bounds_probes_and_deduplicates_native_hardlinks(custo
     # Removing the first hardlink's reference transfers attribution to its alias.
     assert h.lifecycle.inventory.snapshot()["projects"][0]["physical_bytes"] == sum(original.values())
     assert h.lifecycle.inventory.snapshot(now=datetime.now(timezone.utc)+timedelta(days=2))["projects"][0]["physical_bytes"] is None
+
+
+def test_repeated_slow_metadata_setup_still_advances_one_native_file(custody, monkeypatch):
+    h = custody
+    original = h.lifecycle._connect
+    setup_delays, probes = [], []
+    @contextmanager
+    def slow_metadata():
+        with original() as db:
+            yield db
+        started = time.perf_counter()
+        time.sleep(.012)
+        setup_delays.append(time.perf_counter()-started)
+    monkeypatch.setattr(h.lifecycle, "_connect", slow_metadata)
+    def probe(path):
+        probes.append(path)
+        return native_allocation(path)
+    inventory = OccupancyInventory(h.lifecycle)
+    batches = [inventory.advance(probe=probe) for _ in h.manifest.files]
+    assert all(delay >= .011 for delay in setup_delays)
+    assert [batch["processed"] for batch in batches] == [1]*len(h.manifest.files)
+    assert len(set(probes)) == len(h.manifest.files)
+    assert not batches[0]["pass_complete"] and batches[-1]["pass_complete"]
+    with original() as db:
+        assert db.execute("SELECT COUNT(*) FROM storage_occupancy_observations").fetchone()[0] == len(h.manifest.files)
+
+
+def test_foreground_after_slow_metadata_prevents_first_probe_and_write(custody, monkeypatch):
+    original = custody.lifecycle._connect
+    guard = io_priority.foreground()
+    @contextmanager
+    def slow_metadata():
+        with original() as db:
+            yield db
+        time.sleep(.012)
+        guard.__enter__()
+    monkeypatch.setattr(custody.lifecycle, "_connect", slow_metadata)
+    def forbidden_probe(_):
+        pytest.fail("foreground arrival must precede the first native probe")
+    def forbidden_write():
+        pytest.fail("foreground arrival must precede any projection write")
+    monkeypatch.setattr(custody.lifecycle, "_transaction", forbidden_write)
+    try:
+        with pytest.raises(BackgroundDeferred):
+            OccupancyInventory(custody.lifecycle).advance(probe=forbidden_probe)
+        with original() as db:
+            assert db.execute("SELECT COUNT(*) FROM storage_occupancy_observations").fetchone()[0] == 0
+            assert db.execute("SELECT value FROM storage_inventory_state WHERE key='occupancy_cursor'").fetchone() is None
+    finally:
+        guard.__exit__(None, None, None)
+
+
+def test_one_file_exceeding_time_budget_does_not_start_second(custody):
+    probes, elapsed = [], [0.0]
+    def probe(path):
+        probes.append(path)
+        measured = native_allocation(path)
+        elapsed[0] += .011
+        return measured
+    result = OccupancyInventory(custody.lifecycle).advance(clock=lambda: elapsed[0], probe=probe)
+    assert result["processed"] == 1 and not result["pass_complete"]
+    assert len(probes) == 1 and result["elapsed_ms"] >= 11
+    with custody.lifecycle._connect() as db:
+        assert db.execute("SELECT COUNT(*) FROM storage_occupancy_observations").fetchone()[0] == 1
+        assert db.execute("SELECT value FROM storage_inventory_state WHERE key='occupancy_cursor'").fetchone()[0] == str(result["cursor"])
 
 
 def test_occupancy_unknowns_and_foreground_yield_do_not_fabricate_physical_bytes(custody):

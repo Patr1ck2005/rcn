@@ -1,0 +1,50 @@
+{
+  "schema": 1,
+  "generated_at": "2026-10-23T18:39:32.398765+00:00",
+  "parent_commit": "5437973804b8726a6d379e8ac6c655142d636b12",
+  "source_change": "Only occupancy time budget break is conditional on processed > 0; all admission checkpoints and max_files=8 retained.",
+  "sha256": {
+    "src/research_compute_network/storage_occupancy.py": "c55398cd956bf2e44318772af91f564ed70f08e3fd268fcb90749bff5e5c1090",
+    "tests/test_storage_occupancy.py": "6db992d00c6fef678bb655b0282c43348d17d80f4e6f26b2fd41d6b2dd38c51c",
+    "tools/benchmark_storage_algorithms.py": "454026e8f601936d01b30ec9d17152835e36f21692a14bd36e59d17aa02cccab"
+  },
+  "raw_sha256": "cade59951e6db29eadd9bd1b0ba7ea4764c81ac8f0d46c76946a71265491f785",
+  "benchmark_runs": 1,
+  "fixture_changed": false,
+  "samples_per_variant": 50,
+  "overlap_samples": 200,
+  "sha_samples_with_actual_bytes": 100,
+  "inventory_samples_with_native_calls": 100,
+  "deferred_samples": 200,
+  "preflight_count": 0,
+  "background_target_passed": false,
+  "case_statistics": {
+    "foreground_read": {
+      "median_extra_ms": -1.7624500000000012,
+      "aggregate_rate_ratio": 1.0907213455886111,
+      "p95_ratio": 0.858686587080325
+    },
+    "dispatch_with_background": {
+      "median_extra_ms": 0.4853500000000004,
+      "aggregate_rate_ratio": 0.8865307872267625,
+      "p95_ratio": 1.2260703302706495
+    },
+    "foreground_read_with_inventory": {
+      "median_extra_ms": 3.3703000000000003,
+      "aggregate_rate_ratio": 0.9891107656400945,
+      "p95_ratio": 0.8846793409181901
+    },
+    "dispatch_with_inventory": {
+      "median_extra_ms": 1.2905500000000014,
+      "aggregate_rate_ratio": 0.9213975181182196,
+      "p95_ratio": 1.053086820196778
+    }
+  },
+  "regressions": {
+    "passed": 26,
+    "receipt": ".scratch/occupancy-progress-tests/results-fixed.xml",
+    "seconds": 9.459,
+    "initial_setup_error": "scratch parent absent; one test passed and 25 fixture setup errors; original results.xml retained; no behavior assertion failed"
+  },
+  "interpretation": "Changed occupancy path satisfies foreground throughput and dispatch P95 gates in this run. Unchanged SHA case fails dispatch P95 1.226; overall gate remains false. This case does not call OccupancyInventory.advance. No rerun or broader performance pass claimed. Not a production or natural full-load measurement."
+}

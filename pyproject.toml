@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "research-compute-network"
-version = "0.15.0a3"
+version = "0.15.0a4"
 description = "Multi-submitter shared research compute network"
 readme = "README.md"
 license = {text = "MIT"}

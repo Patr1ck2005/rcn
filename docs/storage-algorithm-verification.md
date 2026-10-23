@@ -230,6 +230,7 @@ dispatch sorting against lifecycle SHA/native inventory work; real archive HTTP
 concurrency is covered by functional tests, not a separate 50-pair HTTP throughput
 measurement.
 
+
 ## Confirmed release decision — 2026-10-24
 
 The user accepted approximately 2 ms additional typical latency per 256-Job scan,
@@ -240,3 +241,61 @@ and all four P95 ratios are at most 0.990. This decision does not erase the earl
 failed receipts, establish a blanket <=10% dispatch-cost claim, or constitute
 natural production full-load acceptance. No additional component or dynamic
 slot/priority rule was introduced to pursue sub-millisecond differences.
+
+## Occupancy first-file progress correction (2026-10-24)
+
+The released 10 ms slice started before ledger admission and the metadata page
+read. If those steps repeatedly consumed the slice, every maintenance call broke
+before its first file and never advanced the cursor. A scratch diagnostic reproduced
+three consecutive zero-work calls with an injected 11 ms metadata setup cost;
+this proves the condition, not that it was the only cause of the live zero coverage.
+An unfinished logical backfill does not itself gate occupancy. Earlier maintenance
+stages can still legitimately defer the whole accounting block for foreground work.
+
+The correction adds only `processed > 0` to the elapsed-budget break. An admitted
+first file can progress despite slow setup; the budget prevents additional files.
+All foreground checkpoints and the maximum of 8 files remain. The 10 ms slice is
+cooperative, not a hard end-to-end deadline: one file's native calls/transaction
+can exceed it. Foreground arrival can still cause zero completed work, and a
+yielded probe still leaves its cursor and projection unchanged.
+
+Targeted occupancy/algorithm tests: **26 passed** in 9.459 seconds. New regressions
+use the actual database/native-file implementation with at least 12 ms slept after
+each metadata page and verify repeated progress over distinct files; foreground
+arrival after that slow page permits zero probes/writes; a file exceeding the
+slice prevents a second file. Existing native-handle close, post-probe deferral,
+exact path/hardlink and metadata-only snapshot checks remain. The first invocation
+had a missing scratch parent and produced 25 fixture-setup errors; its receipt is
+retained, then the directory was created and the successful run recorded separately.
+
+One unchanged-harness run retained **50 alternating pairs per case**, 200 actual
+background overlaps and zero no-work preflights. New source fingerprints and all
+samples are in `occupancy-progress-verification.json` and
+`occupancy-progress-native-boundaries.json` in the existing evidence directory.
+
+| Case | Alone p50 ms | Background p50 ms | Alone P95 ms | Background P95 ms | P95 ratio |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Foreground read, SHA | 62.347 | 60.584 | 117.508 | 100.902 | 0.859 |
+| Dispatch, SHA | 10.012 | 10.497 | 21.234 | 26.034 | **1.226** |
+| Foreground read, native inventory | 70.369 | 73.740 | 128.634 | 113.799 | 0.885 |
+| Dispatch, native inventory | 9.471 | 10.762 | 17.573 | 18.506 | 1.053 |
+
+Foreground byte-throughput ratios were 1.0907 for SHA and 0.9891 for inventory.
+The changed inventory path satisfies the declared 10% throughput/P95 limits in
+this receipt; its dispatch median increased 1.291 ms. **The full harness gate
+remains false**, because SHA dispatch P95 rose 22.61%. That case never calls
+`OccupancyInventory.advance`, so its failure is not execution of the modified
+branch; it still prevents claiming that every original performance gate passed
+this run. No identical rerun, fixture change, broader optimization, production
+pressure test or natural-load guarantee is used to erase this result. Production
+cursor progress and the release decision remain the parent's responsibility.
+
+### Confirmed correction release decision — 2026-10-24
+
+The user explicitly accepted this observed SHA-path dispatch P95 increase from
+21.234 ms to 26.034 ms (approximately 4.8 ms / 22.61%) and authorized the correction
+release. This is a recorded exception for this measurement, not a rewritten pass
+of the original 10% predicate or a permanent relaxation of unrelated performance
+requirements. The changed occupancy path's throughput/P95 passed its existing
+limits. All 50-pair samples and the false full-harness predicate remain intact;
+no rerun was selected to conceal the outlying case.
