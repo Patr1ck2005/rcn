@@ -47,9 +47,12 @@ def collection_failure_state(exc):
         return 'paused'
     if getattr(exc, 'reason_code', None) in {'origin_result_disk_reserve', 'storage_capacity_unavailable',
         'storage_holder_busy', 'storage_budget_busy', 'storage_ledger_busy', 'storage_metadata_busy',
-        'collection_owner_active', 'collection_volume_busy'}:
+        'collection_owner_active', 'collection_volume_busy', 'storage_background_deferred', 'restore_source_unavailable'}:
         return 'retry_wait'
     status = getattr(exc, 'status', None)
+    if status == 409 and getattr(exc, 'reason_code', None) in {
+        'preparation_expired', 'preparation_process_restarted', 'preparation_process_stopped'}:
+        return 'retry_wait'
     if status in {401, 403}:
         return 'credentials_required'
     if isinstance(exc, (CollectionConflict, ValueError)) or status in {400, 404, 409, 410, 422}:
@@ -142,7 +145,7 @@ def _ledger_root():
 
 class CollectionRunner:
     def __init__(self, transfer, job, manifests, spool_root, *, operation_id=None,
-                 reserve_free_bytes=0, progress=None, capabilities=None, cancel_event=None):
+                 reserve_free_bytes=0, progress=None, capabilities=None, cancel_event=None, local_sources=None):
         if type(reserve_free_bytes) is not int or reserve_free_bytes < 0:
             raise ValueError('result disk reserve must be a nonnegative integer')
         self.transfer, self.job = transfer, job
@@ -172,6 +175,7 @@ class CollectionRunner:
         self.progress = progress
         self.capabilities = capabilities
         self.cancel_event = cancel_event
+        self.local_sources = local_sources
         self.state = None
         self.budget = None
         self.claim = None
@@ -255,6 +259,12 @@ class CollectionRunner:
             if contract.get('binding') != self.binding:
                 raise CollectionConflict('frozen collection contract changed')
             index = contract['index']
+            if self.local_sources is not None and not local_only:
+                # One current authorization/producer check per resumed local request,
+                # shared by all files. Frozen state alone does not authorize new reads.
+                with self.transfer._open(f'/v1/jobs/{self.job_id}/origin-results', timeout=60) as response:
+                    index = self.transfer._read_json(response)
+                self._validate_index(index)
         else:
             if local_only:
                 raise CollectionConflict('local finalization requires a frozen real result contract')
@@ -366,6 +376,11 @@ class CollectionRunner:
             phase = ticket.get('state', ticket.get('status'))
             if phase == 'ready':
                 return path + '/content'
+            if phase == 'restore_pending' and ticket.get('reason_code') in {'storage_background_deferred', 'restore_source_unavailable'}:
+                from .client import RcnApiError
+                # Release destination admission, retain prefix and original
+                # ticket identity; the existing retry mechanism re-POSTs it.
+                raise RcnApiError(503, 'registered archive temporarily unavailable', reason_code=ticket['reason_code'])
             if phase in {'failed', 'cancelled', 'conflict'}:
                 from .client import RcnApiError
                 raise RcnApiError(ticket.get('http_status', 409), 'result preparation rejected',
@@ -377,7 +392,7 @@ class CollectionRunner:
                         headers={'Content-Type': 'application/json'}, method='POST', timeout=60) as response:
                     ticket = self.transfer._read_json(response)
                 continue
-            self._save('preparing', preparation={'ticket_id': ticket_id,
+            self._save('restore_pending' if phase == 'restore_pending' else 'preparing', preparation={'ticket_id': ticket_id,
                 'checked_bytes': ticket.get('checked_bytes', 0), 'total_bytes': record.size_bytes})
             delay = min(5, max(0.1, float(ticket.get('retry_after', 2))))
             if self.cancel_event is not None:
@@ -387,6 +402,50 @@ class CollectionRunner:
                 time.sleep(delay)
             with self.transfer._open(path, timeout=60) as response:
                 ticket = self.transfer._read_json(response)
+
+    @contextmanager
+    def _source_response(self, entry, record, key, offset, headers):
+        opened = None
+        if self.local_sources is not None:
+            from .storage_lifecycle import LifecycleError
+            from .origin_transfer_api import open_verified_result
+            from .storage_io import BackgroundBudget, BACKGROUND_CHUNK_BYTES
+            background = BackgroundBudget(self.local_sources.lifecycle.database,
+                ignore_token=self.claim.token if self.claim is not None else None)
+            if self.local_sources.allowed_kind != 'requester_local':
+                raise CollectionConflict('client restore sources must be requester-local')
+            try:
+                self._save('restore_pending')
+                opened = self.local_sources.open_verified(self.job_id, entry['work_unit_id'], entry['attempt_id'],
+                    entry['manifest_sha256'], record, checkpoint=background.checkpoint, opener=lambda source_path: open_verified_result(
+                        source_path, record.size_bytes, record.sha256,
+                        cancelled=lambda: bool(self.cancel_event and self.cancel_event.is_set()), background_budget=background))
+            except LifecycleError as exc:
+                if exc.reason_code not in {'restore_source_unavailable', 'restore_source_unregistered'}:
+                    raise
+        if opened is not None:
+            from types import SimpleNamespace
+            source, pin, _target, stream, _stat = opened
+            try:
+                stream.seek(offset)
+                response_headers = {'X-RCN-SHA256': record.sha256, 'Content-Length': str(record.size_bytes-offset)}
+                if offset:
+                    response_headers['Content-Range'] = f'bytes {offset}-{record.size_bytes-1}/{record.size_bytes}'
+                def read(amount):
+                    background.checkpoint()
+                    return stream.read(min(amount, BACKGROUND_CHUNK_BYTES))
+                yield SimpleNamespace(status=206 if offset else 200, headers=response_headers, read=read)
+            finally:
+                if stream is not None:
+                    stream.close()
+                pin.release()
+            return
+        caps = self.capabilities or {}
+        path = self._prepare(entry, record, key) if caps.get('result_preparations') is True else (
+            f'/v1/jobs/{self.job_id}/origin-results/{entry["work_unit_id"]}/{entry["attempt_id"]}?'
+            + urlencode({'file': record.relative_path}))
+        with self.transfer._open(path, headers=headers, timeout=180) as response:
+            yield response
 
     def _download(self, entry, record, target, key):
         partial = managed_path(self.directory, key + '.partial')
@@ -414,15 +473,10 @@ class CollectionRunner:
                 checksum.update(chunk)
                 remaining -= len(chunk)
             if offset != record.size_bytes:
-                caps = self.capabilities or {}
-                prepared = caps.get('result_preparations') is True
-                path = self._prepare(entry, record, key) if prepared else (
-                    f'/v1/jobs/{self.job_id}/origin-results/{entry["work_unit_id"]}/{entry["attempt_id"]}?'
-                    + urlencode({'file': record.relative_path}))
                 headers = {'If-Range': '"' + record.sha256 + '"'}
                 if offset:
                     headers['Range'] = f'bytes={offset}-'
-                with self.transfer._open(path, headers=headers, timeout=180) as response:
+                with self._source_response(entry, record, key, offset, headers) as response:
                     expected_status = 206 if offset else 200
                     if response.status == 200 and offset:
                         # A legacy server may ignore Range: explicitly restart
@@ -482,6 +536,9 @@ class CollectionRunner:
         partial.unlink(missing_ok=True)
 
     def run(self):
+        if self.local_sources is None:
+            from .restore_sources import requester_sources_from_existing_home
+            self.local_sources = requester_sources_from_existing_home()
         self.directory.mkdir(parents=True, exist_ok=True)
         with collection_lock(self.directory / 'writer.lock'), self._volume_slot():
             try:

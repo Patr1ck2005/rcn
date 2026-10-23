@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { mutateAndRecover, operationActions, operationLabel, requiresUnitCount, validateUnitCount } from "./memberClientModel";
+import { mutateAndRecover, operationActions, operationLabel, collectionProgress, requiresUnitCount, validateUnitCount } from "./memberClientModel";
 
 describe("durable member submission", () => {
   it("recovers the same operation after an accepted confirmation response is lost", async () => {
@@ -43,5 +43,19 @@ describe("durable member submission", () => {
     expect(operationLabel(paused)).toBe("结果下载已暂停");
     expect(operationActions(paused)).toMatchObject({ canCollect: true, canPauseCollection: false, verified: false });
     expect(operationLabel({ ...operation, collection_control: { state: "fault_paused" } })).toBe("下载需要处理");
+  });
+  it("shows archive retrieval while retaining pause and recovery precedence", () => {
+    const operation = { phase: "collecting", job_id: "job-one", collection: { state: "downloading", stage: "restore_pending" }, collection_control: { state: "active" } };
+    expect(operationLabel(operation)).toBe("等待归档取回");
+    expect(operationActions(operation).canPauseCollection).toBe(true);
+    expect(operationLabel({ ...operation, collection_control: { state: "user_paused" } })).toBe("结果下载已暂停");
+    expect(operationLabel({ ...operation, collection_control: { state: "retry_wait" } })).toBe("等待自动续传");
+    expect(operationLabel({ phase: "collection-waiting" })).toBe("等待结果下载");
+    expect(operationLabel({ ...operation, phase: "collection-waiting" })).toBe("等待结果下载");
+    expect(operationLabel({ ...operation, collection_control: { state: "waiting" } })).toBe("等待结果下载");
+    for (const [state, stage] of [["user_paused", "paused"], ["retry_wait", "retry_wait"], ["fault_paused", "conflict"], ["waiting", "waiting"]]) {
+      expect(collectionProgress({ ...operation, collection_control: { state } })).toMatchObject({ stage, message: "" });
+    }
+    expect(collectionProgress({ ...operation, phase: "collection-waiting" }).stage).toBe("waiting");
   });
 });

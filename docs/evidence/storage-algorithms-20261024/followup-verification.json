@@ -1,0 +1,26 @@
+{
+  "origin": "ai:gpt-6-astra-codex",
+  "base_commit": "ba31e7d8998bdfce197e59ccddde828764b9bb48",
+  "scope": "isolated targeted backend tests; no production or natural-load acceptance",
+  "suite": [
+    {
+      "name": "pytest",
+      "errors": "0",
+      "failures": "0",
+      "skipped": "1",
+      "tests": "232",
+      "time": "141.155"
+    }
+  ],
+  "evidence_sha256": {
+    "final-controlled-overlap.json": "aeed610dcb793c2d243b843195df850ac3dab81681929751b3956a910dc489e5",
+    "followup-bounded-preflight.json": "cc0fa0730a5100e2cd5a8a36951252d548338bf34e591da3b350a4af0bb3f665",
+    "followup-incomplete.json": "b5439c1fd410d50ed8394b14d9638e2098f287ce3c32d285b55bfc7fddc95fe8",
+    "followup-native-boundaries.json": "593284cf3d2b0671205c8d4b9516ced3182631830033ea92c3091371dd8eb0da",
+    "native-profile-comparison.json": "f366d51dfc635523356f6503b82f6a1a4825816b4ab85457246fd609ab451728",
+    "run-1.json": "60ed25b5e959c7d53ace5f2d49d1fd17f7d29a021383658df9bea0213a28f7e4",
+    "run-3.json": "aaad08a1ff1cdd9848586e8c2661294d6234c42211c1b568ae20da4bd3ed4504",
+    "run-4.json": "b0e37ef297a022ac7d9e254b98e95b9a5779ce03ef0407b650435d78f44be9af",
+    "variance-and-throughput.json": "567be5ecb1d19eac6b1e85778ff4509876bdb7f3c643afa4c607a87ccde4a7a0"
+  }
+}

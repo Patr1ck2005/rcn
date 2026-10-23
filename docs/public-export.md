@@ -2,6 +2,8 @@
 
 `manifests/public-export.json` is the reviewed common-file allowlist. It records
 exact shared collection, volume-budget, result-preparation, member, help code and UI
+including incremental inventory, registered restore sources, event-driven transfer
+queue, bounded physical inventory and release-version verification
 files, plus intentional version, deployment and scientific-approval differences.
 Unlisted files are outside this tool's copy scope. In particular, a service/API
 change needs a separate public review; this tool never copies whole directories.

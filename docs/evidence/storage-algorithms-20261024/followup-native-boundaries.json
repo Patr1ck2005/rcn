@@ -1,0 +1,7029 @@
+{
+  "schema": 1,
+  "generated_at": "2026-10-23T17:16:47.981836+00:00",
+  "scope": "isolated warm-cache local fixture; no production or natural full-load acceptance",
+  "background_chunk_bytes": 4096,
+  "inventory_max_files": 8,
+  "inventory_time_budget_ms": 10,
+  "overlap_protocol": "one background chunk or native OS call admitted immediately before foreground arrival; actual work recorded per sample; Windows probe can yield between OS calls",
+  "fixtures": {
+    "dispatch_jobs": 256,
+    "unique_users": 8,
+    "manifest_files": 8192,
+    "file_bytes": 33554432
+  },
+  "summary": {
+    "dispatch_sort/before": {
+      "n": 50,
+      "p50_ms": 77.947,
+      "p95_ms": 94.2004
+    },
+    "dispatch_sort/after": {
+      "n": 50,
+      "p50_ms": 9.09525,
+      "p95_ms": 17.0366
+    },
+    "inventory_query/before_reference_full_metadata_reduce": {
+      "n": 50,
+      "p50_ms": 28.287,
+      "p95_ms": 35.4719
+    },
+    "inventory_query/after": {
+      "n": 50,
+      "p50_ms": 4.7531,
+      "p95_ms": 7.4005
+    },
+    "waiting_work/before_callback_model": {
+      "n": 50,
+      "p50_ms": 1.03975,
+      "p95_ms": 1.2897
+    },
+    "waiting_work/after_event_queue": {
+      "n": 50,
+      "p50_ms": 0.7574,
+      "p95_ms": 0.9783
+    },
+    "foreground_read/foreground_only": {
+      "n": 50,
+      "p50_ms": 88.24815,
+      "p95_ms": 228.5941
+    },
+    "foreground_read/background_enabled": {
+      "n": 50,
+      "p50_ms": 95.85375,
+      "p95_ms": 213.7673
+    },
+    "dispatch_with_background/foreground_only": {
+      "n": 50,
+      "p50_ms": 7.7974499999999995,
+      "p95_ms": 21.4298
+    },
+    "dispatch_with_background/background_enabled": {
+      "n": 50,
+      "p50_ms": 9.67185,
+      "p95_ms": 18.6649
+    },
+    "foreground_read_with_inventory/foreground_only": {
+      "n": 50,
+      "p50_ms": 119.96585,
+      "p95_ms": 216.6237
+    },
+    "foreground_read_with_inventory/background_enabled": {
+      "n": 50,
+      "p50_ms": 128.8523,
+      "p95_ms": 202.2934
+    },
+    "dispatch_with_inventory/foreground_only": {
+      "n": 50,
+      "p50_ms": 7.5038,
+      "p95_ms": 14.4407
+    },
+    "dispatch_with_inventory/background_enabled": {
+      "n": 50,
+      "p50_ms": 9.39725,
+      "p95_ms": 14.2946
+    }
+  },
+  "background_p95_ratios": {
+    "foreground_read": 0.9351391833822483,
+    "dispatch_with_background": 0.8709787305527816,
+    "foreground_read_with_inventory": 0.9338470352043658,
+    "dispatch_with_inventory": 0.9898827619159737
+  },
+  "background_target_passed": true,
+  "measurement_error": null,
+  "preflight": [
+    {
+      "case": "foreground_read_with_inventory",
+      "sample": 0,
+      "attempt": 0,
+      "bytes_read": 0,
+      "native_probes": 0,
+      "native_calls": 0,
+      "deferred": false,
+      "inventory_batch": {
+        "processed": 0,
+        "pass_complete": false,
+        "cursor": 0,
+        "elapsed_ms": 27.040500001021428
+      }
+    },
+    {
+      "case": "foreground_read_with_inventory",
+      "sample": 14,
+      "attempt": 0,
+      "bytes_read": 0,
+      "native_probes": 0,
+      "native_calls": 0,
+      "deferred": false,
+      "inventory_batch": {
+        "processed": 0,
+        "pass_complete": false,
+        "cursor": 0,
+        "elapsed_ms": 10.821199997735675
+      }
+    }
+  ],
+  "samples": [
+    {
+      "case": "dispatch_sort",
+      "variant": "before",
+      "sample": 0,
+      "elapsed_ms": 67.7159,
+      "policy_reads": 256,
+      "foreground_cpu_ms": 62.5
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "after",
+      "sample": 0,
+      "elapsed_ms": 6.066,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 15.625
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "after",
+      "sample": 1,
+      "elapsed_ms": 6.3276,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 0.0
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "before",
+      "sample": 1,
+      "elapsed_ms": 78.1294,
+      "policy_reads": 256,
+      "foreground_cpu_ms": 78.125
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "before",
+      "sample": 2,
+      "elapsed_ms": 65.0324,
+      "policy_reads": 256,
+      "foreground_cpu_ms": 62.5
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "after",
+      "sample": 2,
+      "elapsed_ms": 6.8443,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 15.625
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "after",
+      "sample": 3,
+      "elapsed_ms": 9.0227,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 0.0
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "before",
+      "sample": 3,
+      "elapsed_ms": 67.0005,
+      "policy_reads": 256,
+      "foreground_cpu_ms": 78.125
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "before",
+      "sample": 4,
+      "elapsed_ms": 63.4286,
+      "policy_reads": 256,
+      "foreground_cpu_ms": 62.5
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "after",
+      "sample": 4,
+      "elapsed_ms": 8.1285,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 0.0
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "after",
+      "sample": 5,
+      "elapsed_ms": 9.0938,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 0.0
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "before",
+      "sample": 5,
+      "elapsed_ms": 76.6549,
+      "policy_reads": 256,
+      "foreground_cpu_ms": 78.125
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "before",
+      "sample": 6,
+      "elapsed_ms": 77.7646,
+      "policy_reads": 256,
+      "foreground_cpu_ms": 78.125
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "after",
+      "sample": 6,
+      "elapsed_ms": 9.5553,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 15.625
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "after",
+      "sample": 7,
+      "elapsed_ms": 19.1805,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 0.0
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "before",
+      "sample": 7,
+      "elapsed_ms": 90.6338,
+      "policy_reads": 256,
+      "foreground_cpu_ms": 93.75
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "before",
+      "sample": 8,
+      "elapsed_ms": 91.9305,
+      "policy_reads": 256,
+      "foreground_cpu_ms": 78.125
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "after",
+      "sample": 8,
+      "elapsed_ms": 8.8618,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 0.0
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "after",
+      "sample": 9,
+      "elapsed_ms": 9.0164,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 15.625
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "before",
+      "sample": 9,
+      "elapsed_ms": 75.4041,
+      "policy_reads": 256,
+      "foreground_cpu_ms": 78.125
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "before",
+      "sample": 10,
+      "elapsed_ms": 64.2585,
+      "policy_reads": 256,
+      "foreground_cpu_ms": 46.875
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "after",
+      "sample": 10,
+      "elapsed_ms": 10.2797,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 15.625
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "after",
+      "sample": 11,
+      "elapsed_ms": 11.2126,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 15.625
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "before",
+      "sample": 11,
+      "elapsed_ms": 81.7298,
+      "policy_reads": 256,
+      "foreground_cpu_ms": 78.125
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "before",
+      "sample": 12,
+      "elapsed_ms": 86.3181,
+      "policy_reads": 256,
+      "foreground_cpu_ms": 93.75
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "after",
+      "sample": 12,
+      "elapsed_ms": 11.3492,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 0.0
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "after",
+      "sample": 13,
+      "elapsed_ms": 10.9762,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 15.625
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "before",
+      "sample": 13,
+      "elapsed_ms": 73.8611,
+      "policy_reads": 256,
+      "foreground_cpu_ms": 78.125
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "before",
+      "sample": 14,
+      "elapsed_ms": 78.3236,
+      "policy_reads": 256,
+      "foreground_cpu_ms": 78.125
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "after",
+      "sample": 14,
+      "elapsed_ms": 13.2113,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 15.625
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "after",
+      "sample": 15,
+      "elapsed_ms": 9.0967,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 0.0
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "before",
+      "sample": 15,
+      "elapsed_ms": 79.4182,
+      "policy_reads": 256,
+      "foreground_cpu_ms": 78.125
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "before",
+      "sample": 16,
+      "elapsed_ms": 81.5115,
+      "policy_reads": 256,
+      "foreground_cpu_ms": 78.125
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "after",
+      "sample": 16,
+      "elapsed_ms": 8.7205,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 0.0
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "after",
+      "sample": 17,
+      "elapsed_ms": 5.8173,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 15.625
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "before",
+      "sample": 17,
+      "elapsed_ms": 66.8659,
+      "policy_reads": 256,
+      "foreground_cpu_ms": 62.5
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "before",
+      "sample": 18,
+      "elapsed_ms": 82.2185,
+      "policy_reads": 256,
+      "foreground_cpu_ms": 62.5
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "after",
+      "sample": 18,
+      "elapsed_ms": 7.1501,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 15.625
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "after",
+      "sample": 19,
+      "elapsed_ms": 10.3362,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 15.625
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "before",
+      "sample": 19,
+      "elapsed_ms": 74.3903,
+      "policy_reads": 256,
+      "foreground_cpu_ms": 62.5
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "before",
+      "sample": 20,
+      "elapsed_ms": 67.1464,
+      "policy_reads": 256,
+      "foreground_cpu_ms": 62.5
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "after",
+      "sample": 20,
+      "elapsed_ms": 7.0758,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 0.0
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "after",
+      "sample": 21,
+      "elapsed_ms": 7.7952,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 15.625
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "before",
+      "sample": 21,
+      "elapsed_ms": 65.5859,
+      "policy_reads": 256,
+      "foreground_cpu_ms": 62.5
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "before",
+      "sample": 22,
+      "elapsed_ms": 68.3843,
+      "policy_reads": 256,
+      "foreground_cpu_ms": 62.5
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "after",
+      "sample": 22,
+      "elapsed_ms": 9.3396,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 0.0
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "after",
+      "sample": 23,
+      "elapsed_ms": 10.4283,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 15.625
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "before",
+      "sample": 23,
+      "elapsed_ms": 83.9756,
+      "policy_reads": 256,
+      "foreground_cpu_ms": 78.125
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "before",
+      "sample": 24,
+      "elapsed_ms": 89.4723,
+      "policy_reads": 256,
+      "foreground_cpu_ms": 93.75
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "after",
+      "sample": 24,
+      "elapsed_ms": 9.6922,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 15.625
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "after",
+      "sample": 25,
+      "elapsed_ms": 7.0403,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 0.0
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "before",
+      "sample": 25,
+      "elapsed_ms": 58.7954,
+      "policy_reads": 256,
+      "foreground_cpu_ms": 62.5
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "before",
+      "sample": 26,
+      "elapsed_ms": 65.5027,
+      "policy_reads": 256,
+      "foreground_cpu_ms": 62.5
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "after",
+      "sample": 26,
+      "elapsed_ms": 8.0226,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 15.625
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "after",
+      "sample": 27,
+      "elapsed_ms": 5.9729,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 0.0
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "before",
+      "sample": 27,
+      "elapsed_ms": 74.8303,
+      "policy_reads": 256,
+      "foreground_cpu_ms": 78.125
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "before",
+      "sample": 28,
+      "elapsed_ms": 64.402,
+      "policy_reads": 256,
+      "foreground_cpu_ms": 62.5
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "after",
+      "sample": 28,
+      "elapsed_ms": 5.1633,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 0.0
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "after",
+      "sample": 29,
+      "elapsed_ms": 5.7299,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 15.625
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "before",
+      "sample": 29,
+      "elapsed_ms": 63.0582,
+      "policy_reads": 256,
+      "foreground_cpu_ms": 62.5
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "before",
+      "sample": 30,
+      "elapsed_ms": 83.0392,
+      "policy_reads": 256,
+      "foreground_cpu_ms": 78.125
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "after",
+      "sample": 30,
+      "elapsed_ms": 7.951,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 15.625
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "after",
+      "sample": 31,
+      "elapsed_ms": 6.6811,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 0.0
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "before",
+      "sample": 31,
+      "elapsed_ms": 69.3048,
+      "policy_reads": 256,
+      "foreground_cpu_ms": 78.125
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "before",
+      "sample": 32,
+      "elapsed_ms": 88.2265,
+      "policy_reads": 256,
+      "foreground_cpu_ms": 93.75
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "after",
+      "sample": 32,
+      "elapsed_ms": 17.1785,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 15.625
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "after",
+      "sample": 33,
+      "elapsed_ms": 13.1756,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 15.625
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "before",
+      "sample": 33,
+      "elapsed_ms": 150.3041,
+      "policy_reads": 256,
+      "foreground_cpu_ms": 125.0
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "before",
+      "sample": 34,
+      "elapsed_ms": 126.1151,
+      "policy_reads": 256,
+      "foreground_cpu_ms": 125.0
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "after",
+      "sample": 34,
+      "elapsed_ms": 11.5156,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 0.0
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "after",
+      "sample": 35,
+      "elapsed_ms": 14.0717,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 15.625
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "before",
+      "sample": 35,
+      "elapsed_ms": 83.1246,
+      "policy_reads": 256,
+      "foreground_cpu_ms": 93.75
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "before",
+      "sample": 36,
+      "elapsed_ms": 70.6269,
+      "policy_reads": 256,
+      "foreground_cpu_ms": 62.5
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "after",
+      "sample": 36,
+      "elapsed_ms": 7.1737,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 15.625
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "after",
+      "sample": 37,
+      "elapsed_ms": 7.1076,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 0.0
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "before",
+      "sample": 37,
+      "elapsed_ms": 66.3656,
+      "policy_reads": 256,
+      "foreground_cpu_ms": 62.5
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "before",
+      "sample": 38,
+      "elapsed_ms": 71.1846,
+      "policy_reads": 256,
+      "foreground_cpu_ms": 62.5
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "after",
+      "sample": 38,
+      "elapsed_ms": 10.9726,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 15.625
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "after",
+      "sample": 39,
+      "elapsed_ms": 11.6388,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 15.625
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "before",
+      "sample": 39,
+      "elapsed_ms": 73.5466,
+      "policy_reads": 256,
+      "foreground_cpu_ms": 62.5
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "before",
+      "sample": 40,
+      "elapsed_ms": 90.3248,
+      "policy_reads": 256,
+      "foreground_cpu_ms": 78.125
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "after",
+      "sample": 40,
+      "elapsed_ms": 9.974,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 15.625
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "after",
+      "sample": 41,
+      "elapsed_ms": 10.6843,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 15.625
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "before",
+      "sample": 41,
+      "elapsed_ms": 94.2004,
+      "policy_reads": 256,
+      "foreground_cpu_ms": 93.75
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "before",
+      "sample": 42,
+      "elapsed_ms": 84.8538,
+      "policy_reads": 256,
+      "foreground_cpu_ms": 78.125
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "after",
+      "sample": 42,
+      "elapsed_ms": 17.0366,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 15.625
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "after",
+      "sample": 43,
+      "elapsed_ms": 14.9153,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 15.625
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "before",
+      "sample": 43,
+      "elapsed_ms": 83.4352,
+      "policy_reads": 256,
+      "foreground_cpu_ms": 78.125
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "before",
+      "sample": 44,
+      "elapsed_ms": 86.1348,
+      "policy_reads": 256,
+      "foreground_cpu_ms": 78.125
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "after",
+      "sample": 44,
+      "elapsed_ms": 9.746,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 0.0
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "after",
+      "sample": 45,
+      "elapsed_ms": 12.8836,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 15.625
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "before",
+      "sample": 45,
+      "elapsed_ms": 88.4002,
+      "policy_reads": 256,
+      "foreground_cpu_ms": 93.75
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "before",
+      "sample": 46,
+      "elapsed_ms": 86.4715,
+      "policy_reads": 256,
+      "foreground_cpu_ms": 93.75
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "after",
+      "sample": 46,
+      "elapsed_ms": 8.7249,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 0.0
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "after",
+      "sample": 47,
+      "elapsed_ms": 8.0429,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 15.625
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "before",
+      "sample": 47,
+      "elapsed_ms": 85.513,
+      "policy_reads": 256,
+      "foreground_cpu_ms": 78.125
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "before",
+      "sample": 48,
+      "elapsed_ms": 79.0411,
+      "policy_reads": 256,
+      "foreground_cpu_ms": 78.125
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "after",
+      "sample": 48,
+      "elapsed_ms": 7.8433,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 15.625
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "after",
+      "sample": 49,
+      "elapsed_ms": 10.0655,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 15.625
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "before",
+      "sample": 49,
+      "elapsed_ms": 66.5999,
+      "policy_reads": 256,
+      "foreground_cpu_ms": 62.5
+    },
+    {
+      "case": "inventory_query",
+      "variant": "before_reference_full_metadata_reduce",
+      "sample": 0,
+      "elapsed_ms": 22.9959,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 0.0
+    },
+    {
+      "case": "inventory_query",
+      "variant": "after",
+      "sample": 0,
+      "elapsed_ms": 3.6318,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 15.625
+    },
+    {
+      "case": "inventory_query",
+      "variant": "after",
+      "sample": 1,
+      "elapsed_ms": 3.3335,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 0.0
+    },
+    {
+      "case": "inventory_query",
+      "variant": "before_reference_full_metadata_reduce",
+      "sample": 1,
+      "elapsed_ms": 21.9957,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 15.625
+    },
+    {
+      "case": "inventory_query",
+      "variant": "before_reference_full_metadata_reduce",
+      "sample": 2,
+      "elapsed_ms": 31.0017,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 31.25
+    },
+    {
+      "case": "inventory_query",
+      "variant": "after",
+      "sample": 2,
+      "elapsed_ms": 6.1895,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 0.0
+    },
+    {
+      "case": "inventory_query",
+      "variant": "after",
+      "sample": 3,
+      "elapsed_ms": 4.6612,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 0.0
+    },
+    {
+      "case": "inventory_query",
+      "variant": "before_reference_full_metadata_reduce",
+      "sample": 3,
+      "elapsed_ms": 21.2566,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 31.25
+    },
+    {
+      "case": "inventory_query",
+      "variant": "before_reference_full_metadata_reduce",
+      "sample": 4,
+      "elapsed_ms": 28.4425,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 31.25
+    },
+    {
+      "case": "inventory_query",
+      "variant": "after",
+      "sample": 4,
+      "elapsed_ms": 3.8857,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 0.0
+    },
+    {
+      "case": "inventory_query",
+      "variant": "after",
+      "sample": 5,
+      "elapsed_ms": 6.7481,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 0.0
+    },
+    {
+      "case": "inventory_query",
+      "variant": "before_reference_full_metadata_reduce",
+      "sample": 5,
+      "elapsed_ms": 26.8062,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 31.25
+    },
+    {
+      "case": "inventory_query",
+      "variant": "before_reference_full_metadata_reduce",
+      "sample": 6,
+      "elapsed_ms": 28.3524,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 31.25
+    },
+    {
+      "case": "inventory_query",
+      "variant": "after",
+      "sample": 6,
+      "elapsed_ms": 6.1806,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 15.625
+    },
+    {
+      "case": "inventory_query",
+      "variant": "after",
+      "sample": 7,
+      "elapsed_ms": 4.2572,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 0.0
+    },
+    {
+      "case": "inventory_query",
+      "variant": "before_reference_full_metadata_reduce",
+      "sample": 7,
+      "elapsed_ms": 26.2118,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 31.25
+    },
+    {
+      "case": "inventory_query",
+      "variant": "before_reference_full_metadata_reduce",
+      "sample": 8,
+      "elapsed_ms": 36.1078,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 15.625
+    },
+    {
+      "case": "inventory_query",
+      "variant": "after",
+      "sample": 8,
+      "elapsed_ms": 4.7525,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 0.0
+    },
+    {
+      "case": "inventory_query",
+      "variant": "after",
+      "sample": 9,
+      "elapsed_ms": 3.4505,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 0.0
+    },
+    {
+      "case": "inventory_query",
+      "variant": "before_reference_full_metadata_reduce",
+      "sample": 9,
+      "elapsed_ms": 23.4126,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 15.625
+    },
+    {
+      "case": "inventory_query",
+      "variant": "before_reference_full_metadata_reduce",
+      "sample": 10,
+      "elapsed_ms": 29.5184,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 31.25
+    },
+    {
+      "case": "inventory_query",
+      "variant": "after",
+      "sample": 10,
+      "elapsed_ms": 5.0394,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 15.625
+    },
+    {
+      "case": "inventory_query",
+      "variant": "after",
+      "sample": 11,
+      "elapsed_ms": 3.5571,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 0.0
+    },
+    {
+      "case": "inventory_query",
+      "variant": "before_reference_full_metadata_reduce",
+      "sample": 11,
+      "elapsed_ms": 26.182,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 31.25
+    },
+    {
+      "case": "inventory_query",
+      "variant": "before_reference_full_metadata_reduce",
+      "sample": 12,
+      "elapsed_ms": 34.6481,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 31.25
+    },
+    {
+      "case": "inventory_query",
+      "variant": "after",
+      "sample": 12,
+      "elapsed_ms": 6.7537,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 0.0
+    },
+    {
+      "case": "inventory_query",
+      "variant": "after",
+      "sample": 13,
+      "elapsed_ms": 4.6834,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 0.0
+    },
+    {
+      "case": "inventory_query",
+      "variant": "before_reference_full_metadata_reduce",
+      "sample": 13,
+      "elapsed_ms": 25.3896,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 31.25
+    },
+    {
+      "case": "inventory_query",
+      "variant": "before_reference_full_metadata_reduce",
+      "sample": 14,
+      "elapsed_ms": 35.4719,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 31.25
+    },
+    {
+      "case": "inventory_query",
+      "variant": "after",
+      "sample": 14,
+      "elapsed_ms": 6.9487,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 0.0
+    },
+    {
+      "case": "inventory_query",
+      "variant": "after",
+      "sample": 15,
+      "elapsed_ms": 6.5788,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 15.625
+    },
+    {
+      "case": "inventory_query",
+      "variant": "before_reference_full_metadata_reduce",
+      "sample": 15,
+      "elapsed_ms": 32.6803,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 31.25
+    },
+    {
+      "case": "inventory_query",
+      "variant": "before_reference_full_metadata_reduce",
+      "sample": 16,
+      "elapsed_ms": 33.7512,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 15.625
+    },
+    {
+      "case": "inventory_query",
+      "variant": "after",
+      "sample": 16,
+      "elapsed_ms": 4.989,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 15.625
+    },
+    {
+      "case": "inventory_query",
+      "variant": "after",
+      "sample": 17,
+      "elapsed_ms": 12.5655,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 15.625
+    },
+    {
+      "case": "inventory_query",
+      "variant": "before_reference_full_metadata_reduce",
+      "sample": 17,
+      "elapsed_ms": 26.2217,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 15.625
+    },
+    {
+      "case": "inventory_query",
+      "variant": "before_reference_full_metadata_reduce",
+      "sample": 18,
+      "elapsed_ms": 24.5226,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 31.25
+    },
+    {
+      "case": "inventory_query",
+      "variant": "after",
+      "sample": 18,
+      "elapsed_ms": 4.2732,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 0.0
+    },
+    {
+      "case": "inventory_query",
+      "variant": "after",
+      "sample": 19,
+      "elapsed_ms": 3.6396,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 15.625
+    },
+    {
+      "case": "inventory_query",
+      "variant": "before_reference_full_metadata_reduce",
+      "sample": 19,
+      "elapsed_ms": 24.0659,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 15.625
+    },
+    {
+      "case": "inventory_query",
+      "variant": "before_reference_full_metadata_reduce",
+      "sample": 20,
+      "elapsed_ms": 27.1126,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 31.25
+    },
+    {
+      "case": "inventory_query",
+      "variant": "after",
+      "sample": 20,
+      "elapsed_ms": 6.1246,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 0.0
+    },
+    {
+      "case": "inventory_query",
+      "variant": "after",
+      "sample": 21,
+      "elapsed_ms": 9.668,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 0.0
+    },
+    {
+      "case": "inventory_query",
+      "variant": "before_reference_full_metadata_reduce",
+      "sample": 21,
+      "elapsed_ms": 31.7801,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 31.25
+    },
+    {
+      "case": "inventory_query",
+      "variant": "before_reference_full_metadata_reduce",
+      "sample": 22,
+      "elapsed_ms": 48.4514,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 46.875
+    },
+    {
+      "case": "inventory_query",
+      "variant": "after",
+      "sample": 22,
+      "elapsed_ms": 5.4188,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 0.0
+    },
+    {
+      "case": "inventory_query",
+      "variant": "after",
+      "sample": 23,
+      "elapsed_ms": 6.2133,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 0.0
+    },
+    {
+      "case": "inventory_query",
+      "variant": "before_reference_full_metadata_reduce",
+      "sample": 23,
+      "elapsed_ms": 30.1819,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 31.25
+    },
+    {
+      "case": "inventory_query",
+      "variant": "before_reference_full_metadata_reduce",
+      "sample": 24,
+      "elapsed_ms": 31.8898,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 31.25
+    },
+    {
+      "case": "inventory_query",
+      "variant": "after",
+      "sample": 24,
+      "elapsed_ms": 4.2657,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 0.0
+    },
+    {
+      "case": "inventory_query",
+      "variant": "after",
+      "sample": 25,
+      "elapsed_ms": 3.3686,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 0.0
+    },
+    {
+      "case": "inventory_query",
+      "variant": "before_reference_full_metadata_reduce",
+      "sample": 25,
+      "elapsed_ms": 31.2341,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 31.25
+    },
+    {
+      "case": "inventory_query",
+      "variant": "before_reference_full_metadata_reduce",
+      "sample": 26,
+      "elapsed_ms": 27.397,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 31.25
+    },
+    {
+      "case": "inventory_query",
+      "variant": "after",
+      "sample": 26,
+      "elapsed_ms": 3.48,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 0.0
+    },
+    {
+      "case": "inventory_query",
+      "variant": "after",
+      "sample": 27,
+      "elapsed_ms": 5.2851,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 15.625
+    },
+    {
+      "case": "inventory_query",
+      "variant": "before_reference_full_metadata_reduce",
+      "sample": 27,
+      "elapsed_ms": 28.0929,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 0.0
+    },
+    {
+      "case": "inventory_query",
+      "variant": "before_reference_full_metadata_reduce",
+      "sample": 28,
+      "elapsed_ms": 33.4899,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 31.25
+    },
+    {
+      "case": "inventory_query",
+      "variant": "after",
+      "sample": 28,
+      "elapsed_ms": 3.5033,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 0.0
+    },
+    {
+      "case": "inventory_query",
+      "variant": "after",
+      "sample": 29,
+      "elapsed_ms": 6.0658,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 0.0
+    },
+    {
+      "case": "inventory_query",
+      "variant": "before_reference_full_metadata_reduce",
+      "sample": 29,
+      "elapsed_ms": 31.772,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 31.25
+    },
+    {
+      "case": "inventory_query",
+      "variant": "before_reference_full_metadata_reduce",
+      "sample": 30,
+      "elapsed_ms": 27.1202,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 15.625
+    },
+    {
+      "case": "inventory_query",
+      "variant": "after",
+      "sample": 30,
+      "elapsed_ms": 4.551,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 0.0
+    },
+    {
+      "case": "inventory_query",
+      "variant": "after",
+      "sample": 31,
+      "elapsed_ms": 6.12,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 0.0
+    },
+    {
+      "case": "inventory_query",
+      "variant": "before_reference_full_metadata_reduce",
+      "sample": 31,
+      "elapsed_ms": 25.3738,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 31.25
+    },
+    {
+      "case": "inventory_query",
+      "variant": "before_reference_full_metadata_reduce",
+      "sample": 32,
+      "elapsed_ms": 29.2767,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 31.25
+    },
+    {
+      "case": "inventory_query",
+      "variant": "after",
+      "sample": 32,
+      "elapsed_ms": 3.9518,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 0.0
+    },
+    {
+      "case": "inventory_query",
+      "variant": "after",
+      "sample": 33,
+      "elapsed_ms": 4.7537,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 15.625
+    },
+    {
+      "case": "inventory_query",
+      "variant": "before_reference_full_metadata_reduce",
+      "sample": 33,
+      "elapsed_ms": 28.4726,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 31.25
+    },
+    {
+      "case": "inventory_query",
+      "variant": "before_reference_full_metadata_reduce",
+      "sample": 34,
+      "elapsed_ms": 23.3976,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 15.625
+    },
+    {
+      "case": "inventory_query",
+      "variant": "after",
+      "sample": 34,
+      "elapsed_ms": 7.3048,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 15.625
+    },
+    {
+      "case": "inventory_query",
+      "variant": "after",
+      "sample": 35,
+      "elapsed_ms": 5.2181,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 0.0
+    },
+    {
+      "case": "inventory_query",
+      "variant": "before_reference_full_metadata_reduce",
+      "sample": 35,
+      "elapsed_ms": 32.0898,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 31.25
+    },
+    {
+      "case": "inventory_query",
+      "variant": "before_reference_full_metadata_reduce",
+      "sample": 36,
+      "elapsed_ms": 34.1366,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 31.25
+    },
+    {
+      "case": "inventory_query",
+      "variant": "after",
+      "sample": 36,
+      "elapsed_ms": 3.9469,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 15.625
+    },
+    {
+      "case": "inventory_query",
+      "variant": "after",
+      "sample": 37,
+      "elapsed_ms": 4.8563,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 0.0
+    },
+    {
+      "case": "inventory_query",
+      "variant": "before_reference_full_metadata_reduce",
+      "sample": 37,
+      "elapsed_ms": 26.1883,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 31.25
+    },
+    {
+      "case": "inventory_query",
+      "variant": "before_reference_full_metadata_reduce",
+      "sample": 38,
+      "elapsed_ms": 24.4554,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 15.625
+    },
+    {
+      "case": "inventory_query",
+      "variant": "after",
+      "sample": 38,
+      "elapsed_ms": 7.4005,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 0.0
+    },
+    {
+      "case": "inventory_query",
+      "variant": "after",
+      "sample": 39,
+      "elapsed_ms": 5.625,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 15.625
+    },
+    {
+      "case": "inventory_query",
+      "variant": "before_reference_full_metadata_reduce",
+      "sample": 39,
+      "elapsed_ms": 35.1632,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 31.25
+    },
+    {
+      "case": "inventory_query",
+      "variant": "before_reference_full_metadata_reduce",
+      "sample": 40,
+      "elapsed_ms": 31.1767,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 31.25
+    },
+    {
+      "case": "inventory_query",
+      "variant": "after",
+      "sample": 40,
+      "elapsed_ms": 6.7807,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 0.0
+    },
+    {
+      "case": "inventory_query",
+      "variant": "after",
+      "sample": 41,
+      "elapsed_ms": 4.3553,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 0.0
+    },
+    {
+      "case": "inventory_query",
+      "variant": "before_reference_full_metadata_reduce",
+      "sample": 41,
+      "elapsed_ms": 29.2634,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 31.25
+    },
+    {
+      "case": "inventory_query",
+      "variant": "before_reference_full_metadata_reduce",
+      "sample": 42,
+      "elapsed_ms": 30.3817,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 31.25
+    },
+    {
+      "case": "inventory_query",
+      "variant": "after",
+      "sample": 42,
+      "elapsed_ms": 4.4962,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 0.0
+    },
+    {
+      "case": "inventory_query",
+      "variant": "after",
+      "sample": 43,
+      "elapsed_ms": 4.9765,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 15.625
+    },
+    {
+      "case": "inventory_query",
+      "variant": "before_reference_full_metadata_reduce",
+      "sample": 43,
+      "elapsed_ms": 34.4402,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 31.25
+    },
+    {
+      "case": "inventory_query",
+      "variant": "before_reference_full_metadata_reduce",
+      "sample": 44,
+      "elapsed_ms": 26.705,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 31.25
+    },
+    {
+      "case": "inventory_query",
+      "variant": "after",
+      "sample": 44,
+      "elapsed_ms": 3.2355,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 0.0
+    },
+    {
+      "case": "inventory_query",
+      "variant": "after",
+      "sample": 45,
+      "elapsed_ms": 4.8562,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 0.0
+    },
+    {
+      "case": "inventory_query",
+      "variant": "before_reference_full_metadata_reduce",
+      "sample": 45,
+      "elapsed_ms": 27.0642,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 31.25
+    },
+    {
+      "case": "inventory_query",
+      "variant": "before_reference_full_metadata_reduce",
+      "sample": 46,
+      "elapsed_ms": 17.4628,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 15.625
+    },
+    {
+      "case": "inventory_query",
+      "variant": "after",
+      "sample": 46,
+      "elapsed_ms": 4.0346,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 0.0
+    },
+    {
+      "case": "inventory_query",
+      "variant": "after",
+      "sample": 47,
+      "elapsed_ms": 3.9545,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 15.625
+    },
+    {
+      "case": "inventory_query",
+      "variant": "before_reference_full_metadata_reduce",
+      "sample": 47,
+      "elapsed_ms": 28.2216,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 31.25
+    },
+    {
+      "case": "inventory_query",
+      "variant": "before_reference_full_metadata_reduce",
+      "sample": 48,
+      "elapsed_ms": 27.6037,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 15.625
+    },
+    {
+      "case": "inventory_query",
+      "variant": "after",
+      "sample": 48,
+      "elapsed_ms": 3.2839,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 15.625
+    },
+    {
+      "case": "inventory_query",
+      "variant": "after",
+      "sample": 49,
+      "elapsed_ms": 2.7489,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 0.0
+    },
+    {
+      "case": "inventory_query",
+      "variant": "before_reference_full_metadata_reduce",
+      "sample": 49,
+      "elapsed_ms": 25.6619,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 15.625
+    },
+    {
+      "case": "waiting_work",
+      "variant": "before_callback_model",
+      "sample": 0,
+      "elapsed_ms": 0.7661,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 0.0,
+      "waiting_callbacks": 30720
+    },
+    {
+      "case": "waiting_work",
+      "variant": "after_event_queue",
+      "sample": 0,
+      "elapsed_ms": 0.9008,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 0.0,
+      "waiting_callbacks": 0
+    },
+    {
+      "case": "waiting_work",
+      "variant": "before_callback_model",
+      "sample": 1,
+      "elapsed_ms": 1.0876,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 0.0,
+      "waiting_callbacks": 30720
+    },
+    {
+      "case": "waiting_work",
+      "variant": "after_event_queue",
+      "sample": 1,
+      "elapsed_ms": 0.6695,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 0.0,
+      "waiting_callbacks": 0
+    },
+    {
+      "case": "waiting_work",
+      "variant": "before_callback_model",
+      "sample": 2,
+      "elapsed_ms": 0.8585,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 0.0,
+      "waiting_callbacks": 30720
+    },
+    {
+      "case": "waiting_work",
+      "variant": "after_event_queue",
+      "sample": 2,
+      "elapsed_ms": 0.6642,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 0.0,
+      "waiting_callbacks": 0
+    },
+    {
+      "case": "waiting_work",
+      "variant": "before_callback_model",
+      "sample": 3,
+      "elapsed_ms": 0.8698,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 0.0,
+      "waiting_callbacks": 30720
+    },
+    {
+      "case": "waiting_work",
+      "variant": "after_event_queue",
+      "sample": 3,
+      "elapsed_ms": 0.6367,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 0.0,
+      "waiting_callbacks": 0
+    },
+    {
+      "case": "waiting_work",
+      "variant": "before_callback_model",
+      "sample": 4,
+      "elapsed_ms": 0.9736,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 0.0,
+      "waiting_callbacks": 30720
+    },
+    {
+      "case": "waiting_work",
+      "variant": "after_event_queue",
+      "sample": 4,
+      "elapsed_ms": 0.6533,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 0.0,
+      "waiting_callbacks": 0
+    },
+    {
+      "case": "waiting_work",
+      "variant": "before_callback_model",
+      "sample": 5,
+      "elapsed_ms": 0.7385,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 0.0,
+      "waiting_callbacks": 30720
+    },
+    {
+      "case": "waiting_work",
+      "variant": "after_event_queue",
+      "sample": 5,
+      "elapsed_ms": 0.4264,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 0.0,
+      "waiting_callbacks": 0
+    },
+    {
+      "case": "waiting_work",
+      "variant": "before_callback_model",
+      "sample": 6,
+      "elapsed_ms": 1.1807,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 0.0,
+      "waiting_callbacks": 30720
+    },
+    {
+      "case": "waiting_work",
+      "variant": "after_event_queue",
+      "sample": 6,
+      "elapsed_ms": 1.098,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 0.0,
+      "waiting_callbacks": 0
+    },
+    {
+      "case": "waiting_work",
+      "variant": "before_callback_model",
+      "sample": 7,
+      "elapsed_ms": 1.0676,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 0.0,
+      "waiting_callbacks": 30720
+    },
+    {
+      "case": "waiting_work",
+      "variant": "after_event_queue",
+      "sample": 7,
+      "elapsed_ms": 0.7627,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 0.0,
+      "waiting_callbacks": 0
+    },
+    {
+      "case": "waiting_work",
+      "variant": "before_callback_model",
+      "sample": 8,
+      "elapsed_ms": 1.6665,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 0.0,
+      "waiting_callbacks": 30720
+    },
+    {
+      "case": "waiting_work",
+      "variant": "after_event_queue",
+      "sample": 8,
+      "elapsed_ms": 0.7799,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 0.0,
+      "waiting_callbacks": 0
+    },
+    {
+      "case": "waiting_work",
+      "variant": "before_callback_model",
+      "sample": 9,
+      "elapsed_ms": 1.0167,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 0.0,
+      "waiting_callbacks": 30720
+    },
+    {
+      "case": "waiting_work",
+      "variant": "after_event_queue",
+      "sample": 9,
+      "elapsed_ms": 0.8333,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 0.0,
+      "waiting_callbacks": 0
+    },
+    {
+      "case": "waiting_work",
+      "variant": "before_callback_model",
+      "sample": 10,
+      "elapsed_ms": 1.345,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 0.0,
+      "waiting_callbacks": 30720
+    },
+    {
+      "case": "waiting_work",
+      "variant": "after_event_queue",
+      "sample": 10,
+      "elapsed_ms": 0.7741,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 0.0,
+      "waiting_callbacks": 0
+    },
+    {
+      "case": "waiting_work",
+      "variant": "before_callback_model",
+      "sample": 11,
+      "elapsed_ms": 1.1603,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 0.0,
+      "waiting_callbacks": 30720
+    },
+    {
+      "case": "waiting_work",
+      "variant": "after_event_queue",
+      "sample": 11,
+      "elapsed_ms": 0.8997,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 0.0,
+      "waiting_callbacks": 0
+    },
+    {
+      "case": "waiting_work",
+      "variant": "before_callback_model",
+      "sample": 12,
+      "elapsed_ms": 1.2761,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 0.0,
+      "waiting_callbacks": 30720
+    },
+    {
+      "case": "waiting_work",
+      "variant": "after_event_queue",
+      "sample": 12,
+      "elapsed_ms": 0.4526,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 0.0,
+      "waiting_callbacks": 0
+    },
+    {
+      "case": "waiting_work",
+      "variant": "before_callback_model",
+      "sample": 13,
+      "elapsed_ms": 0.6269,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 0.0,
+      "waiting_callbacks": 30720
+    },
+    {
+      "case": "waiting_work",
+      "variant": "after_event_queue",
+      "sample": 13,
+      "elapsed_ms": 0.435,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 0.0,
+      "waiting_callbacks": 0
+    },
+    {
+      "case": "waiting_work",
+      "variant": "before_callback_model",
+      "sample": 14,
+      "elapsed_ms": 0.866,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 0.0,
+      "waiting_callbacks": 30720
+    },
+    {
+      "case": "waiting_work",
+      "variant": "after_event_queue",
+      "sample": 14,
+      "elapsed_ms": 0.8453,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 0.0,
+      "waiting_callbacks": 0
+    },
+    {
+      "case": "waiting_work",
+      "variant": "before_callback_model",
+      "sample": 15,
+      "elapsed_ms": 0.9792,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 0.0,
+      "waiting_callbacks": 30720
+    },
+    {
+      "case": "waiting_work",
+      "variant": "after_event_queue",
+      "sample": 15,
+      "elapsed_ms": 0.6795,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 0.0,
+      "waiting_callbacks": 0
+    },
+    {
+      "case": "waiting_work",
+      "variant": "before_callback_model",
+      "sample": 16,
+      "elapsed_ms": 0.9176,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 0.0,
+      "waiting_callbacks": 30720
+    },
+    {
+      "case": "waiting_work",
+      "variant": "after_event_queue",
+      "sample": 16,
+      "elapsed_ms": 0.6598,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 0.0,
+      "waiting_callbacks": 0
+    },
+    {
+      "case": "waiting_work",
+      "variant": "before_callback_model",
+      "sample": 17,
+      "elapsed_ms": 0.8573,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 0.0,
+      "waiting_callbacks": 30720
+    },
+    {
+      "case": "waiting_work",
+      "variant": "after_event_queue",
+      "sample": 17,
+      "elapsed_ms": 0.6435,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 15.625,
+      "waiting_callbacks": 0
+    },
+    {
+      "case": "waiting_work",
+      "variant": "before_callback_model",
+      "sample": 18,
+      "elapsed_ms": 0.8505,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 0.0,
+      "waiting_callbacks": 30720
+    },
+    {
+      "case": "waiting_work",
+      "variant": "after_event_queue",
+      "sample": 18,
+      "elapsed_ms": 0.6527,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 0.0,
+      "waiting_callbacks": 0
+    },
+    {
+      "case": "waiting_work",
+      "variant": "before_callback_model",
+      "sample": 19,
+      "elapsed_ms": 1.217,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 0.0,
+      "waiting_callbacks": 30720
+    },
+    {
+      "case": "waiting_work",
+      "variant": "after_event_queue",
+      "sample": 19,
+      "elapsed_ms": 0.8224,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 0.0,
+      "waiting_callbacks": 0
+    },
+    {
+      "case": "waiting_work",
+      "variant": "before_callback_model",
+      "sample": 20,
+      "elapsed_ms": 0.6386,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 0.0,
+      "waiting_callbacks": 30720
+    },
+    {
+      "case": "waiting_work",
+      "variant": "after_event_queue",
+      "sample": 20,
+      "elapsed_ms": 0.5196,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 0.0,
+      "waiting_callbacks": 0
+    },
+    {
+      "case": "waiting_work",
+      "variant": "before_callback_model",
+      "sample": 21,
+      "elapsed_ms": 1.2897,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 0.0,
+      "waiting_callbacks": 30720
+    },
+    {
+      "case": "waiting_work",
+      "variant": "after_event_queue",
+      "sample": 21,
+      "elapsed_ms": 0.905,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 0.0,
+      "waiting_callbacks": 0
+    },
+    {
+      "case": "waiting_work",
+      "variant": "before_callback_model",
+      "sample": 22,
+      "elapsed_ms": 1.251,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 0.0,
+      "waiting_callbacks": 30720
+    },
+    {
+      "case": "waiting_work",
+      "variant": "after_event_queue",
+      "sample": 22,
+      "elapsed_ms": 0.8992,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 15.625,
+      "waiting_callbacks": 0
+    },
+    {
+      "case": "waiting_work",
+      "variant": "before_callback_model",
+      "sample": 23,
+      "elapsed_ms": 1.0677,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 0.0,
+      "waiting_callbacks": 30720
+    },
+    {
+      "case": "waiting_work",
+      "variant": "after_event_queue",
+      "sample": 23,
+      "elapsed_ms": 0.7092,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 0.0,
+      "waiting_callbacks": 0
+    },
+    {
+      "case": "waiting_work",
+      "variant": "before_callback_model",
+      "sample": 24,
+      "elapsed_ms": 1.0369,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 0.0,
+      "waiting_callbacks": 30720
+    },
+    {
+      "case": "waiting_work",
+      "variant": "after_event_queue",
+      "sample": 24,
+      "elapsed_ms": 1.3069,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 0.0,
+      "waiting_callbacks": 0
+    },
+    {
+      "case": "waiting_work",
+      "variant": "before_callback_model",
+      "sample": 25,
+      "elapsed_ms": 1.129,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 0.0,
+      "waiting_callbacks": 30720
+    },
+    {
+      "case": "waiting_work",
+      "variant": "after_event_queue",
+      "sample": 25,
+      "elapsed_ms": 0.9178,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 0.0,
+      "waiting_callbacks": 0
+    },
+    {
+      "case": "waiting_work",
+      "variant": "before_callback_model",
+      "sample": 26,
+      "elapsed_ms": 1.1122,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 0.0,
+      "waiting_callbacks": 30720
+    },
+    {
+      "case": "waiting_work",
+      "variant": "after_event_queue",
+      "sample": 26,
+      "elapsed_ms": 0.8357,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 0.0,
+      "waiting_callbacks": 0
+    },
+    {
+      "case": "waiting_work",
+      "variant": "before_callback_model",
+      "sample": 27,
+      "elapsed_ms": 0.8218,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 0.0,
+      "waiting_callbacks": 30720
+    },
+    {
+      "case": "waiting_work",
+      "variant": "after_event_queue",
+      "sample": 27,
+      "elapsed_ms": 0.5042,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 0.0,
+      "waiting_callbacks": 0
+    },
+    {
+      "case": "waiting_work",
+      "variant": "before_callback_model",
+      "sample": 28,
+      "elapsed_ms": 0.9467,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 0.0,
+      "waiting_callbacks": 30720
+    },
+    {
+      "case": "waiting_work",
+      "variant": "after_event_queue",
+      "sample": 28,
+      "elapsed_ms": 0.7143,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 15.625,
+      "waiting_callbacks": 0
+    },
+    {
+      "case": "waiting_work",
+      "variant": "before_callback_model",
+      "sample": 29,
+      "elapsed_ms": 0.6665,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 0.0,
+      "waiting_callbacks": 30720
+    },
+    {
+      "case": "waiting_work",
+      "variant": "after_event_queue",
+      "sample": 29,
+      "elapsed_ms": 0.614,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 0.0,
+      "waiting_callbacks": 0
+    },
+    {
+      "case": "waiting_work",
+      "variant": "before_callback_model",
+      "sample": 30,
+      "elapsed_ms": 1.0426,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 0.0,
+      "waiting_callbacks": 30720
+    },
+    {
+      "case": "waiting_work",
+      "variant": "after_event_queue",
+      "sample": 30,
+      "elapsed_ms": 0.8196,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 0.0,
+      "waiting_callbacks": 0
+    },
+    {
+      "case": "waiting_work",
+      "variant": "before_callback_model",
+      "sample": 31,
+      "elapsed_ms": 1.2611,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 0.0,
+      "waiting_callbacks": 30720
+    },
+    {
+      "case": "waiting_work",
+      "variant": "after_event_queue",
+      "sample": 31,
+      "elapsed_ms": 0.7743,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 0.0,
+      "waiting_callbacks": 0
+    },
+    {
+      "case": "waiting_work",
+      "variant": "before_callback_model",
+      "sample": 32,
+      "elapsed_ms": 1.2146,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 0.0,
+      "waiting_callbacks": 30720
+    },
+    {
+      "case": "waiting_work",
+      "variant": "after_event_queue",
+      "sample": 32,
+      "elapsed_ms": 0.7645,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 0.0,
+      "waiting_callbacks": 0
+    },
+    {
+      "case": "waiting_work",
+      "variant": "before_callback_model",
+      "sample": 33,
+      "elapsed_ms": 1.2218,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 0.0,
+      "waiting_callbacks": 30720
+    },
+    {
+      "case": "waiting_work",
+      "variant": "after_event_queue",
+      "sample": 33,
+      "elapsed_ms": 0.7621,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 0.0,
+      "waiting_callbacks": 0
+    },
+    {
+      "case": "waiting_work",
+      "variant": "before_callback_model",
+      "sample": 34,
+      "elapsed_ms": 1.0046,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 0.0,
+      "waiting_callbacks": 30720
+    },
+    {
+      "case": "waiting_work",
+      "variant": "after_event_queue",
+      "sample": 34,
+      "elapsed_ms": 0.7559,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 0.0,
+      "waiting_callbacks": 0
+    },
+    {
+      "case": "waiting_work",
+      "variant": "before_callback_model",
+      "sample": 35,
+      "elapsed_ms": 1.1075,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 0.0,
+      "waiting_callbacks": 30720
+    },
+    {
+      "case": "waiting_work",
+      "variant": "after_event_queue",
+      "sample": 35,
+      "elapsed_ms": 0.7657,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 0.0,
+      "waiting_callbacks": 0
+    },
+    {
+      "case": "waiting_work",
+      "variant": "before_callback_model",
+      "sample": 36,
+      "elapsed_ms": 1.1358,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 0.0,
+      "waiting_callbacks": 30720
+    },
+    {
+      "case": "waiting_work",
+      "variant": "after_event_queue",
+      "sample": 36,
+      "elapsed_ms": 0.737,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 0.0,
+      "waiting_callbacks": 0
+    },
+    {
+      "case": "waiting_work",
+      "variant": "before_callback_model",
+      "sample": 37,
+      "elapsed_ms": 1.0636,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 0.0,
+      "waiting_callbacks": 30720
+    },
+    {
+      "case": "waiting_work",
+      "variant": "after_event_queue",
+      "sample": 37,
+      "elapsed_ms": 0.7679,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 0.0,
+      "waiting_callbacks": 0
+    },
+    {
+      "case": "waiting_work",
+      "variant": "before_callback_model",
+      "sample": 38,
+      "elapsed_ms": 1.0988,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 0.0,
+      "waiting_callbacks": 30720
+    },
+    {
+      "case": "waiting_work",
+      "variant": "after_event_queue",
+      "sample": 38,
+      "elapsed_ms": 0.7574,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 0.0,
+      "waiting_callbacks": 0
+    },
+    {
+      "case": "waiting_work",
+      "variant": "before_callback_model",
+      "sample": 39,
+      "elapsed_ms": 1.119,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 0.0,
+      "waiting_callbacks": 30720
+    },
+    {
+      "case": "waiting_work",
+      "variant": "after_event_queue",
+      "sample": 39,
+      "elapsed_ms": 0.7563,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 0.0,
+      "waiting_callbacks": 0
+    },
+    {
+      "case": "waiting_work",
+      "variant": "before_callback_model",
+      "sample": 40,
+      "elapsed_ms": 1.0832,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 0.0,
+      "waiting_callbacks": 30720
+    },
+    {
+      "case": "waiting_work",
+      "variant": "after_event_queue",
+      "sample": 40,
+      "elapsed_ms": 0.7574,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 0.0,
+      "waiting_callbacks": 0
+    },
+    {
+      "case": "waiting_work",
+      "variant": "before_callback_model",
+      "sample": 41,
+      "elapsed_ms": 0.947,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 0.0,
+      "waiting_callbacks": 30720
+    },
+    {
+      "case": "waiting_work",
+      "variant": "after_event_queue",
+      "sample": 41,
+      "elapsed_ms": 0.6961,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 0.0,
+      "waiting_callbacks": 0
+    },
+    {
+      "case": "waiting_work",
+      "variant": "before_callback_model",
+      "sample": 42,
+      "elapsed_ms": 0.9745,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 0.0,
+      "waiting_callbacks": 30720
+    },
+    {
+      "case": "waiting_work",
+      "variant": "after_event_queue",
+      "sample": 42,
+      "elapsed_ms": 0.696,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 0.0,
+      "waiting_callbacks": 0
+    },
+    {
+      "case": "waiting_work",
+      "variant": "before_callback_model",
+      "sample": 43,
+      "elapsed_ms": 0.9971,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 0.0,
+      "waiting_callbacks": 30720
+    },
+    {
+      "case": "waiting_work",
+      "variant": "after_event_queue",
+      "sample": 43,
+      "elapsed_ms": 0.6671,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 0.0,
+      "waiting_callbacks": 0
+    },
+    {
+      "case": "waiting_work",
+      "variant": "before_callback_model",
+      "sample": 44,
+      "elapsed_ms": 0.9798,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 0.0,
+      "waiting_callbacks": 30720
+    },
+    {
+      "case": "waiting_work",
+      "variant": "after_event_queue",
+      "sample": 44,
+      "elapsed_ms": 0.7842,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 0.0,
+      "waiting_callbacks": 0
+    },
+    {
+      "case": "waiting_work",
+      "variant": "before_callback_model",
+      "sample": 45,
+      "elapsed_ms": 1.0674,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 0.0,
+      "waiting_callbacks": 30720
+    },
+    {
+      "case": "waiting_work",
+      "variant": "after_event_queue",
+      "sample": 45,
+      "elapsed_ms": 0.7542,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 0.0,
+      "waiting_callbacks": 0
+    },
+    {
+      "case": "waiting_work",
+      "variant": "before_callback_model",
+      "sample": 46,
+      "elapsed_ms": 1.0781,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 15.625,
+      "waiting_callbacks": 30720
+    },
+    {
+      "case": "waiting_work",
+      "variant": "after_event_queue",
+      "sample": 46,
+      "elapsed_ms": 0.9783,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 0.0,
+      "waiting_callbacks": 0
+    },
+    {
+      "case": "waiting_work",
+      "variant": "before_callback_model",
+      "sample": 47,
+      "elapsed_ms": 0.7752,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 0.0,
+      "waiting_callbacks": 30720
+    },
+    {
+      "case": "waiting_work",
+      "variant": "after_event_queue",
+      "sample": 47,
+      "elapsed_ms": 0.8061,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 0.0,
+      "waiting_callbacks": 0
+    },
+    {
+      "case": "waiting_work",
+      "variant": "before_callback_model",
+      "sample": 48,
+      "elapsed_ms": 1.0164,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 0.0,
+      "waiting_callbacks": 30720
+    },
+    {
+      "case": "waiting_work",
+      "variant": "after_event_queue",
+      "sample": 48,
+      "elapsed_ms": 0.8852,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 0.0,
+      "waiting_callbacks": 0
+    },
+    {
+      "case": "waiting_work",
+      "variant": "before_callback_model",
+      "sample": 49,
+      "elapsed_ms": 0.6277,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 0.0,
+      "waiting_callbacks": 30720
+    },
+    {
+      "case": "waiting_work",
+      "variant": "after_event_queue",
+      "sample": 49,
+      "elapsed_ms": 0.5682,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 0.0,
+      "waiting_callbacks": 0
+    },
+    {
+      "case": "foreground_read",
+      "variant": "foreground_only",
+      "sample": 0,
+      "elapsed_ms": 78.6839,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 78.125
+    },
+    {
+      "case": "foreground_read",
+      "variant": "background_enabled",
+      "sample": 0,
+      "elapsed_ms": 96.9521,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 93.75,
+      "background": {
+        "bytes_read": 4096,
+        "native_probes": 0,
+        "native_calls": 0,
+        "deferred": true
+      }
+    },
+    {
+      "case": "foreground_read",
+      "variant": "background_enabled",
+      "sample": 1,
+      "elapsed_ms": 85.3535,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 78.125,
+      "background": {
+        "bytes_read": 4096,
+        "native_probes": 0,
+        "native_calls": 0,
+        "deferred": true
+      }
+    },
+    {
+      "case": "foreground_read",
+      "variant": "foreground_only",
+      "sample": 1,
+      "elapsed_ms": 52.4823,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 46.875
+    },
+    {
+      "case": "foreground_read",
+      "variant": "foreground_only",
+      "sample": 2,
+      "elapsed_ms": 64.4855,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 62.5
+    },
+    {
+      "case": "foreground_read",
+      "variant": "background_enabled",
+      "sample": 2,
+      "elapsed_ms": 69.181,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 62.5,
+      "background": {
+        "bytes_read": 4096,
+        "native_probes": 0,
+        "native_calls": 0,
+        "deferred": true
+      }
+    },
+    {
+      "case": "foreground_read",
+      "variant": "background_enabled",
+      "sample": 3,
+      "elapsed_ms": 87.8405,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 78.125,
+      "background": {
+        "bytes_read": 4096,
+        "native_probes": 0,
+        "native_calls": 0,
+        "deferred": true
+      }
+    },
+    {
+      "case": "foreground_read",
+      "variant": "foreground_only",
+      "sample": 3,
+      "elapsed_ms": 84.2886,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 78.125
+    },
+    {
+      "case": "foreground_read",
+      "variant": "foreground_only",
+      "sample": 4,
+      "elapsed_ms": 66.0576,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 78.125
+    },
+    {
+      "case": "foreground_read",
+      "variant": "background_enabled",
+      "sample": 4,
+      "elapsed_ms": 59.3815,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 62.5,
+      "background": {
+        "bytes_read": 4096,
+        "native_probes": 0,
+        "native_calls": 0,
+        "deferred": true
+      }
+    },
+    {
+      "case": "foreground_read",
+      "variant": "background_enabled",
+      "sample": 5,
+      "elapsed_ms": 82.2411,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 78.125,
+      "background": {
+        "bytes_read": 4096,
+        "native_probes": 0,
+        "native_calls": 0,
+        "deferred": true
+      }
+    },
+    {
+      "case": "foreground_read",
+      "variant": "foreground_only",
+      "sample": 5,
+      "elapsed_ms": 107.7722,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 109.375
+    },
+    {
+      "case": "foreground_read",
+      "variant": "foreground_only",
+      "sample": 6,
+      "elapsed_ms": 105.823,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 109.375
+    },
+    {
+      "case": "foreground_read",
+      "variant": "background_enabled",
+      "sample": 6,
+      "elapsed_ms": 94.9312,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 109.375,
+      "background": {
+        "bytes_read": 4096,
+        "native_probes": 0,
+        "native_calls": 0,
+        "deferred": true
+      }
+    },
+    {
+      "case": "foreground_read",
+      "variant": "background_enabled",
+      "sample": 7,
+      "elapsed_ms": 109.4582,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 109.375,
+      "background": {
+        "bytes_read": 4096,
+        "native_probes": 0,
+        "native_calls": 0,
+        "deferred": true
+      }
+    },
+    {
+      "case": "foreground_read",
+      "variant": "foreground_only",
+      "sample": 7,
+      "elapsed_ms": 152.184,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 156.25
+    },
+    {
+      "case": "foreground_read",
+      "variant": "foreground_only",
+      "sample": 8,
+      "elapsed_ms": 94.2237,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 93.75
+    },
+    {
+      "case": "foreground_read",
+      "variant": "background_enabled",
+      "sample": 8,
+      "elapsed_ms": 104.0803,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 109.375,
+      "background": {
+        "bytes_read": 4096,
+        "native_probes": 0,
+        "native_calls": 0,
+        "deferred": true
+      }
+    },
+    {
+      "case": "foreground_read",
+      "variant": "background_enabled",
+      "sample": 9,
+      "elapsed_ms": 111.2331,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 109.375,
+      "background": {
+        "bytes_read": 4096,
+        "native_probes": 0,
+        "native_calls": 0,
+        "deferred": true
+      }
+    },
+    {
+      "case": "foreground_read",
+      "variant": "foreground_only",
+      "sample": 9,
+      "elapsed_ms": 110.6388,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 109.375
+    },
+    {
+      "case": "foreground_read",
+      "variant": "foreground_only",
+      "sample": 10,
+      "elapsed_ms": 127.8709,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 125.0
+    },
+    {
+      "case": "foreground_read",
+      "variant": "background_enabled",
+      "sample": 10,
+      "elapsed_ms": 105.8619,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 109.375,
+      "background": {
+        "bytes_read": 4096,
+        "native_probes": 0,
+        "native_calls": 0,
+        "deferred": true
+      }
+    },
+    {
+      "case": "foreground_read",
+      "variant": "background_enabled",
+      "sample": 11,
+      "elapsed_ms": 117.1569,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 93.75,
+      "background": {
+        "bytes_read": 4096,
+        "native_probes": 0,
+        "native_calls": 0,
+        "deferred": true
+      }
+    },
+    {
+      "case": "foreground_read",
+      "variant": "foreground_only",
+      "sample": 11,
+      "elapsed_ms": 77.6949,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 78.125
+    },
+    {
+      "case": "foreground_read",
+      "variant": "foreground_only",
+      "sample": 12,
+      "elapsed_ms": 70.3134,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 62.5
+    },
+    {
+      "case": "foreground_read",
+      "variant": "background_enabled",
+      "sample": 12,
+      "elapsed_ms": 84.1103,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 93.75,
+      "background": {
+        "bytes_read": 4096,
+        "native_probes": 0,
+        "native_calls": 0,
+        "deferred": true
+      }
+    },
+    {
+      "case": "foreground_read",
+      "variant": "background_enabled",
+      "sample": 13,
+      "elapsed_ms": 90.0818,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 93.75,
+      "background": {
+        "bytes_read": 4096,
+        "native_probes": 0,
+        "native_calls": 0,
+        "deferred": true
+      }
+    },
+    {
+      "case": "foreground_read",
+      "variant": "foreground_only",
+      "sample": 13,
+      "elapsed_ms": 62.554,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 62.5
+    },
+    {
+      "case": "foreground_read",
+      "variant": "foreground_only",
+      "sample": 14,
+      "elapsed_ms": 57.0245,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 62.5
+    },
+    {
+      "case": "foreground_read",
+      "variant": "background_enabled",
+      "sample": 14,
+      "elapsed_ms": 62.2226,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 46.875,
+      "background": {
+        "bytes_read": 4096,
+        "native_probes": 0,
+        "native_calls": 0,
+        "deferred": true
+      }
+    },
+    {
+      "case": "foreground_read",
+      "variant": "background_enabled",
+      "sample": 15,
+      "elapsed_ms": 61.1542,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 62.5,
+      "background": {
+        "bytes_read": 4096,
+        "native_probes": 0,
+        "native_calls": 0,
+        "deferred": true
+      }
+    },
+    {
+      "case": "foreground_read",
+      "variant": "foreground_only",
+      "sample": 15,
+      "elapsed_ms": 70.9193,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 78.125
+    },
+    {
+      "case": "foreground_read",
+      "variant": "foreground_only",
+      "sample": 16,
+      "elapsed_ms": 58.0097,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 46.875
+    },
+    {
+      "case": "foreground_read",
+      "variant": "background_enabled",
+      "sample": 16,
+      "elapsed_ms": 62.536,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 62.5,
+      "background": {
+        "bytes_read": 4096,
+        "native_probes": 0,
+        "native_calls": 0,
+        "deferred": true
+      }
+    },
+    {
+      "case": "foreground_read",
+      "variant": "background_enabled",
+      "sample": 17,
+      "elapsed_ms": 81.1515,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 78.125,
+      "background": {
+        "bytes_read": 4096,
+        "native_probes": 0,
+        "native_calls": 0,
+        "deferred": true
+      }
+    },
+    {
+      "case": "foreground_read",
+      "variant": "foreground_only",
+      "sample": 17,
+      "elapsed_ms": 78.1438,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 78.125
+    },
+    {
+      "case": "foreground_read",
+      "variant": "foreground_only",
+      "sample": 18,
+      "elapsed_ms": 97.1063,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 78.125
+    },
+    {
+      "case": "foreground_read",
+      "variant": "background_enabled",
+      "sample": 18,
+      "elapsed_ms": 97.2471,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 93.75,
+      "background": {
+        "bytes_read": 4096,
+        "native_probes": 0,
+        "native_calls": 0,
+        "deferred": true
+      }
+    },
+    {
+      "case": "foreground_read",
+      "variant": "background_enabled",
+      "sample": 19,
+      "elapsed_ms": 93.6181,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 93.75,
+      "background": {
+        "bytes_read": 4096,
+        "native_probes": 0,
+        "native_calls": 0,
+        "deferred": true
+      }
+    },
+    {
+      "case": "foreground_read",
+      "variant": "foreground_only",
+      "sample": 19,
+      "elapsed_ms": 83.824,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 93.75
+    },
+    {
+      "case": "foreground_read",
+      "variant": "foreground_only",
+      "sample": 20,
+      "elapsed_ms": 81.1262,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 78.125
+    },
+    {
+      "case": "foreground_read",
+      "variant": "background_enabled",
+      "sample": 20,
+      "elapsed_ms": 81.8558,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 78.125,
+      "background": {
+        "bytes_read": 4096,
+        "native_probes": 0,
+        "native_calls": 0,
+        "deferred": true
+      }
+    },
+    {
+      "case": "foreground_read",
+      "variant": "background_enabled",
+      "sample": 21,
+      "elapsed_ms": 71.4675,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 62.5,
+      "background": {
+        "bytes_read": 4096,
+        "native_probes": 0,
+        "native_calls": 0,
+        "deferred": true
+      }
+    },
+    {
+      "case": "foreground_read",
+      "variant": "foreground_only",
+      "sample": 21,
+      "elapsed_ms": 81.32,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 78.125
+    },
+    {
+      "case": "foreground_read",
+      "variant": "foreground_only",
+      "sample": 22,
+      "elapsed_ms": 73.7082,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 78.125
+    },
+    {
+      "case": "foreground_read",
+      "variant": "background_enabled",
+      "sample": 22,
+      "elapsed_ms": 115.5731,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 109.375,
+      "background": {
+        "bytes_read": 4096,
+        "native_probes": 0,
+        "native_calls": 0,
+        "deferred": true
+      }
+    },
+    {
+      "case": "foreground_read",
+      "variant": "background_enabled",
+      "sample": 23,
+      "elapsed_ms": 102.9069,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 109.375,
+      "background": {
+        "bytes_read": 4096,
+        "native_probes": 0,
+        "native_calls": 0,
+        "deferred": true
+      }
+    },
+    {
+      "case": "foreground_read",
+      "variant": "foreground_only",
+      "sample": 23,
+      "elapsed_ms": 93.5899,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 93.75
+    },
+    {
+      "case": "foreground_read",
+      "variant": "foreground_only",
+      "sample": 24,
+      "elapsed_ms": 87.7584,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 78.125
+    },
+    {
+      "case": "foreground_read",
+      "variant": "background_enabled",
+      "sample": 24,
+      "elapsed_ms": 97.6286,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 78.125,
+      "background": {
+        "bytes_read": 4096,
+        "native_probes": 0,
+        "native_calls": 0,
+        "deferred": true
+      }
+    },
+    {
+      "case": "foreground_read",
+      "variant": "background_enabled",
+      "sample": 25,
+      "elapsed_ms": 59.1159,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 62.5,
+      "background": {
+        "bytes_read": 4096,
+        "native_probes": 0,
+        "native_calls": 0,
+        "deferred": true
+      }
+    },
+    {
+      "case": "foreground_read",
+      "variant": "foreground_only",
+      "sample": 25,
+      "elapsed_ms": 89.2501,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 62.5
+    },
+    {
+      "case": "foreground_read",
+      "variant": "foreground_only",
+      "sample": 26,
+      "elapsed_ms": 91.2169,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 93.75
+    },
+    {
+      "case": "foreground_read",
+      "variant": "background_enabled",
+      "sample": 26,
+      "elapsed_ms": 96.7763,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 93.75,
+      "background": {
+        "bytes_read": 4096,
+        "native_probes": 0,
+        "native_calls": 0,
+        "deferred": true
+      }
+    },
+    {
+      "case": "foreground_read",
+      "variant": "background_enabled",
+      "sample": 27,
+      "elapsed_ms": 110.5378,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 109.375,
+      "background": {
+        "bytes_read": 4096,
+        "native_probes": 0,
+        "native_calls": 0,
+        "deferred": true
+      }
+    },
+    {
+      "case": "foreground_read",
+      "variant": "foreground_only",
+      "sample": 27,
+      "elapsed_ms": 90.9791,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 93.75
+    },
+    {
+      "case": "foreground_read",
+      "variant": "foreground_only",
+      "sample": 28,
+      "elapsed_ms": 98.1226,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 93.75
+    },
+    {
+      "case": "foreground_read",
+      "variant": "background_enabled",
+      "sample": 28,
+      "elapsed_ms": 103.6516,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 109.375,
+      "background": {
+        "bytes_read": 4096,
+        "native_probes": 0,
+        "native_calls": 0,
+        "deferred": true
+      }
+    },
+    {
+      "case": "foreground_read",
+      "variant": "background_enabled",
+      "sample": 29,
+      "elapsed_ms": 66.6348,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 78.125,
+      "background": {
+        "bytes_read": 4096,
+        "native_probes": 0,
+        "native_calls": 0,
+        "deferred": true
+      }
+    },
+    {
+      "case": "foreground_read",
+      "variant": "foreground_only",
+      "sample": 29,
+      "elapsed_ms": 72.2145,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 62.5
+    },
+    {
+      "case": "foreground_read",
+      "variant": "foreground_only",
+      "sample": 30,
+      "elapsed_ms": 84.3281,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 93.75
+    },
+    {
+      "case": "foreground_read",
+      "variant": "background_enabled",
+      "sample": 30,
+      "elapsed_ms": 87.072,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 62.5,
+      "background": {
+        "bytes_read": 4096,
+        "native_probes": 0,
+        "native_calls": 0,
+        "deferred": true
+      }
+    },
+    {
+      "case": "foreground_read",
+      "variant": "background_enabled",
+      "sample": 31,
+      "elapsed_ms": 93.4054,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 78.125,
+      "background": {
+        "bytes_read": 4096,
+        "native_probes": 0,
+        "native_calls": 0,
+        "deferred": true
+      }
+    },
+    {
+      "case": "foreground_read",
+      "variant": "foreground_only",
+      "sample": 31,
+      "elapsed_ms": 69.173,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 62.5
+    },
+    {
+      "case": "foreground_read",
+      "variant": "foreground_only",
+      "sample": 32,
+      "elapsed_ms": 55.7227,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 62.5
+    },
+    {
+      "case": "foreground_read",
+      "variant": "background_enabled",
+      "sample": 32,
+      "elapsed_ms": 58.9466,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 62.5,
+      "background": {
+        "bytes_read": 4096,
+        "native_probes": 0,
+        "native_calls": 0,
+        "deferred": true
+      }
+    },
+    {
+      "case": "foreground_read",
+      "variant": "background_enabled",
+      "sample": 33,
+      "elapsed_ms": 68.7857,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 78.125,
+      "background": {
+        "bytes_read": 4096,
+        "native_probes": 0,
+        "native_calls": 0,
+        "deferred": true
+      }
+    },
+    {
+      "case": "foreground_read",
+      "variant": "foreground_only",
+      "sample": 33,
+      "elapsed_ms": 65.0059,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 62.5
+    },
+    {
+      "case": "foreground_read",
+      "variant": "foreground_only",
+      "sample": 34,
+      "elapsed_ms": 51.1419,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 46.875
+    },
+    {
+      "case": "foreground_read",
+      "variant": "background_enabled",
+      "sample": 34,
+      "elapsed_ms": 55.5704,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 62.5,
+      "background": {
+        "bytes_read": 4096,
+        "native_probes": 0,
+        "native_calls": 0,
+        "deferred": true
+      }
+    },
+    {
+      "case": "foreground_read",
+      "variant": "background_enabled",
+      "sample": 35,
+      "elapsed_ms": 58.3966,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 62.5,
+      "background": {
+        "bytes_read": 4096,
+        "native_probes": 0,
+        "native_calls": 0,
+        "deferred": true
+      }
+    },
+    {
+      "case": "foreground_read",
+      "variant": "foreground_only",
+      "sample": 35,
+      "elapsed_ms": 62.389,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 62.5
+    },
+    {
+      "case": "foreground_read",
+      "variant": "foreground_only",
+      "sample": 36,
+      "elapsed_ms": 60.6352,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 62.5
+    },
+    {
+      "case": "foreground_read",
+      "variant": "background_enabled",
+      "sample": 36,
+      "elapsed_ms": 61.1696,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 62.5,
+      "background": {
+        "bytes_read": 4096,
+        "native_probes": 0,
+        "native_calls": 0,
+        "deferred": true
+      }
+    },
+    {
+      "case": "foreground_read",
+      "variant": "background_enabled",
+      "sample": 37,
+      "elapsed_ms": 66.9324,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 78.125,
+      "background": {
+        "bytes_read": 4096,
+        "native_probes": 0,
+        "native_calls": 0,
+        "deferred": true
+      }
+    },
+    {
+      "case": "foreground_read",
+      "variant": "foreground_only",
+      "sample": 37,
+      "elapsed_ms": 88.7379,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 78.125
+    },
+    {
+      "case": "foreground_read",
+      "variant": "foreground_only",
+      "sample": 38,
+      "elapsed_ms": 99.1318,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 109.375
+    },
+    {
+      "case": "foreground_read",
+      "variant": "background_enabled",
+      "sample": 38,
+      "elapsed_ms": 149.5384,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 156.25,
+      "background": {
+        "bytes_read": 4096,
+        "native_probes": 0,
+        "native_calls": 0,
+        "deferred": true
+      }
+    },
+    {
+      "case": "foreground_read",
+      "variant": "background_enabled",
+      "sample": 39,
+      "elapsed_ms": 113.0797,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 109.375,
+      "background": {
+        "bytes_read": 4096,
+        "native_probes": 0,
+        "native_calls": 0,
+        "deferred": true
+      }
+    },
+    {
+      "case": "foreground_read",
+      "variant": "foreground_only",
+      "sample": 39,
+      "elapsed_ms": 132.1319,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 140.625
+    },
+    {
+      "case": "foreground_read",
+      "variant": "foreground_only",
+      "sample": 40,
+      "elapsed_ms": 125.0221,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 125.0
+    },
+    {
+      "case": "foreground_read",
+      "variant": "background_enabled",
+      "sample": 40,
+      "elapsed_ms": 123.2731,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 109.375,
+      "background": {
+        "bytes_read": 4096,
+        "native_probes": 0,
+        "native_calls": 0,
+        "deferred": true
+      }
+    },
+    {
+      "case": "foreground_read",
+      "variant": "background_enabled",
+      "sample": 41,
+      "elapsed_ms": 122.3367,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 125.0,
+      "background": {
+        "bytes_read": 4096,
+        "native_probes": 0,
+        "native_calls": 0,
+        "deferred": true
+      }
+    },
+    {
+      "case": "foreground_read",
+      "variant": "foreground_only",
+      "sample": 41,
+      "elapsed_ms": 153.6713,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 156.25
+    },
+    {
+      "case": "foreground_read",
+      "variant": "foreground_only",
+      "sample": 42,
+      "elapsed_ms": 124.4245,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 125.0
+    },
+    {
+      "case": "foreground_read",
+      "variant": "background_enabled",
+      "sample": 42,
+      "elapsed_ms": 130.5482,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 140.625,
+      "background": {
+        "bytes_read": 4096,
+        "native_probes": 0,
+        "native_calls": 0,
+        "deferred": true
+      }
+    },
+    {
+      "case": "foreground_read",
+      "variant": "background_enabled",
+      "sample": 43,
+      "elapsed_ms": 136.9168,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 140.625,
+      "background": {
+        "bytes_read": 4096,
+        "native_probes": 0,
+        "native_calls": 0,
+        "deferred": true
+      }
+    },
+    {
+      "case": "foreground_read",
+      "variant": "foreground_only",
+      "sample": 43,
+      "elapsed_ms": 143.133,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 140.625
+    },
+    {
+      "case": "foreground_read",
+      "variant": "foreground_only",
+      "sample": 44,
+      "elapsed_ms": 142.0603,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 125.0
+    },
+    {
+      "case": "foreground_read",
+      "variant": "background_enabled",
+      "sample": 44,
+      "elapsed_ms": 175.4277,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 140.625,
+      "background": {
+        "bytes_read": 4096,
+        "native_probes": 0,
+        "native_calls": 0,
+        "deferred": true
+      }
+    },
+    {
+      "case": "foreground_read",
+      "variant": "background_enabled",
+      "sample": 45,
+      "elapsed_ms": 244.4294,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 234.375,
+      "background": {
+        "bytes_read": 4096,
+        "native_probes": 0,
+        "native_calls": 0,
+        "deferred": true
+      }
+    },
+    {
+      "case": "foreground_read",
+      "variant": "foreground_only",
+      "sample": 45,
+      "elapsed_ms": 237.3327,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 203.125
+    },
+    {
+      "case": "foreground_read",
+      "variant": "foreground_only",
+      "sample": 46,
+      "elapsed_ms": 228.5941,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 218.75
+    },
+    {
+      "case": "foreground_read",
+      "variant": "background_enabled",
+      "sample": 46,
+      "elapsed_ms": 173.557,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 187.5,
+      "background": {
+        "bytes_read": 4096,
+        "native_probes": 0,
+        "native_calls": 0,
+        "deferred": true
+      }
+    },
+    {
+      "case": "foreground_read",
+      "variant": "background_enabled",
+      "sample": 47,
+      "elapsed_ms": 213.7673,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 203.125,
+      "background": {
+        "bytes_read": 4096,
+        "native_probes": 0,
+        "native_calls": 0,
+        "deferred": true
+      }
+    },
+    {
+      "case": "foreground_read",
+      "variant": "foreground_only",
+      "sample": 47,
+      "elapsed_ms": 196.5339,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 125.0
+    },
+    {
+      "case": "foreground_read",
+      "variant": "foreground_only",
+      "sample": 48,
+      "elapsed_ms": 189.6946,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 203.125
+    },
+    {
+      "case": "foreground_read",
+      "variant": "background_enabled",
+      "sample": 48,
+      "elapsed_ms": 208.5619,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 187.5,
+      "background": {
+        "bytes_read": 4096,
+        "native_probes": 0,
+        "native_calls": 0,
+        "deferred": true
+      }
+    },
+    {
+      "case": "foreground_read",
+      "variant": "background_enabled",
+      "sample": 49,
+      "elapsed_ms": 222.2362,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 218.75,
+      "background": {
+        "bytes_read": 4096,
+        "native_probes": 0,
+        "native_calls": 0,
+        "deferred": true
+      }
+    },
+    {
+      "case": "foreground_read",
+      "variant": "foreground_only",
+      "sample": 49,
+      "elapsed_ms": 289.1831,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 265.625
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "foreground_only",
+      "sample": 0,
+      "elapsed_ms": 19.2533,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 15.625
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "background_enabled",
+      "sample": 0,
+      "elapsed_ms": 9.579,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 15.625,
+      "background": {
+        "bytes_read": 4096,
+        "native_probes": 0,
+        "native_calls": 0,
+        "deferred": true
+      }
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "background_enabled",
+      "sample": 1,
+      "elapsed_ms": 10.3457,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 15.625,
+      "background": {
+        "bytes_read": 4096,
+        "native_probes": 0,
+        "native_calls": 0,
+        "deferred": true
+      }
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "foreground_only",
+      "sample": 1,
+      "elapsed_ms": 8.6192,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 0.0
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "foreground_only",
+      "sample": 2,
+      "elapsed_ms": 7.4619,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 15.625
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "background_enabled",
+      "sample": 2,
+      "elapsed_ms": 10.0268,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 15.625,
+      "background": {
+        "bytes_read": 4096,
+        "native_probes": 0,
+        "native_calls": 0,
+        "deferred": true
+      }
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "background_enabled",
+      "sample": 3,
+      "elapsed_ms": 12.0964,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 15.625,
+      "background": {
+        "bytes_read": 4096,
+        "native_probes": 0,
+        "native_calls": 0,
+        "deferred": true
+      }
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "foreground_only",
+      "sample": 3,
+      "elapsed_ms": 12.1091,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 15.625
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "foreground_only",
+      "sample": 4,
+      "elapsed_ms": 9.3398,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 0.0
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "background_enabled",
+      "sample": 4,
+      "elapsed_ms": 9.8115,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 0.0,
+      "background": {
+        "bytes_read": 4096,
+        "native_probes": 0,
+        "native_calls": 0,
+        "deferred": true
+      }
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "background_enabled",
+      "sample": 5,
+      "elapsed_ms": 9.1254,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 0.0,
+      "background": {
+        "bytes_read": 4096,
+        "native_probes": 0,
+        "native_calls": 0,
+        "deferred": true
+      }
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "foreground_only",
+      "sample": 5,
+      "elapsed_ms": 10.4894,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 15.625
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "foreground_only",
+      "sample": 6,
+      "elapsed_ms": 8.3695,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 15.625
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "background_enabled",
+      "sample": 6,
+      "elapsed_ms": 9.7203,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 15.625,
+      "background": {
+        "bytes_read": 4096,
+        "native_probes": 0,
+        "native_calls": 0,
+        "deferred": true
+      }
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "background_enabled",
+      "sample": 7,
+      "elapsed_ms": 12.4994,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 15.625,
+      "background": {
+        "bytes_read": 4096,
+        "native_probes": 0,
+        "native_calls": 0,
+        "deferred": true
+      }
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "foreground_only",
+      "sample": 7,
+      "elapsed_ms": 18.5361,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 15.625
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "foreground_only",
+      "sample": 8,
+      "elapsed_ms": 7.7244,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 15.625
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "background_enabled",
+      "sample": 8,
+      "elapsed_ms": 9.8742,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 15.625,
+      "background": {
+        "bytes_read": 4096,
+        "native_probes": 0,
+        "native_calls": 0,
+        "deferred": true
+      }
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "background_enabled",
+      "sample": 9,
+      "elapsed_ms": 10.5803,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 15.625,
+      "background": {
+        "bytes_read": 4096,
+        "native_probes": 0,
+        "native_calls": 0,
+        "deferred": true
+      }
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "foreground_only",
+      "sample": 9,
+      "elapsed_ms": 7.8564,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 0.0
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "foreground_only",
+      "sample": 10,
+      "elapsed_ms": 6.2677,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 0.0
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "background_enabled",
+      "sample": 10,
+      "elapsed_ms": 11.5232,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 15.625,
+      "background": {
+        "bytes_read": 4096,
+        "native_probes": 0,
+        "native_calls": 0,
+        "deferred": true
+      }
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "background_enabled",
+      "sample": 11,
+      "elapsed_ms": 11.425,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 15.625,
+      "background": {
+        "bytes_read": 4096,
+        "native_probes": 0,
+        "native_calls": 0,
+        "deferred": true
+      }
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "foreground_only",
+      "sample": 11,
+      "elapsed_ms": 7.7437,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 15.625
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "foreground_only",
+      "sample": 12,
+      "elapsed_ms": 6.0909,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 0.0
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "background_enabled",
+      "sample": 12,
+      "elapsed_ms": 8.9177,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 15.625,
+      "background": {
+        "bytes_read": 4096,
+        "native_probes": 0,
+        "native_calls": 0,
+        "deferred": true
+      }
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "background_enabled",
+      "sample": 13,
+      "elapsed_ms": 7.1103,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 15.625,
+      "background": {
+        "bytes_read": 4096,
+        "native_probes": 0,
+        "native_calls": 0,
+        "deferred": true
+      }
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "foreground_only",
+      "sample": 13,
+      "elapsed_ms": 6.0048,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 0.0
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "foreground_only",
+      "sample": 14,
+      "elapsed_ms": 6.5495,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 15.625
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "background_enabled",
+      "sample": 14,
+      "elapsed_ms": 6.9793,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 0.0,
+      "background": {
+        "bytes_read": 4096,
+        "native_probes": 0,
+        "native_calls": 0,
+        "deferred": true
+      }
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "background_enabled",
+      "sample": 15,
+      "elapsed_ms": 14.037,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 15.625,
+      "background": {
+        "bytes_read": 4096,
+        "native_probes": 0,
+        "native_calls": 0,
+        "deferred": true
+      }
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "foreground_only",
+      "sample": 15,
+      "elapsed_ms": 8.5407,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 0.0
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "foreground_only",
+      "sample": 16,
+      "elapsed_ms": 8.8346,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 15.625
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "background_enabled",
+      "sample": 16,
+      "elapsed_ms": 6.5949,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 15.625,
+      "background": {
+        "bytes_read": 4096,
+        "native_probes": 0,
+        "native_calls": 0,
+        "deferred": true
+      }
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "background_enabled",
+      "sample": 17,
+      "elapsed_ms": 10.8128,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 15.625,
+      "background": {
+        "bytes_read": 4096,
+        "native_probes": 0,
+        "native_calls": 0,
+        "deferred": true
+      }
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "foreground_only",
+      "sample": 17,
+      "elapsed_ms": 9.0446,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 0.0
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "foreground_only",
+      "sample": 18,
+      "elapsed_ms": 10.9905,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 0.0
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "background_enabled",
+      "sample": 18,
+      "elapsed_ms": 9.2378,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 0.0,
+      "background": {
+        "bytes_read": 4096,
+        "native_probes": 0,
+        "native_calls": 0,
+        "deferred": true
+      }
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "background_enabled",
+      "sample": 19,
+      "elapsed_ms": 10.3235,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 0.0,
+      "background": {
+        "bytes_read": 4096,
+        "native_probes": 0,
+        "native_calls": 0,
+        "deferred": true
+      }
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "foreground_only",
+      "sample": 19,
+      "elapsed_ms": 9.93,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 15.625
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "foreground_only",
+      "sample": 20,
+      "elapsed_ms": 10.8767,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 15.625
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "background_enabled",
+      "sample": 20,
+      "elapsed_ms": 10.9665,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 15.625,
+      "background": {
+        "bytes_read": 4096,
+        "native_probes": 0,
+        "native_calls": 0,
+        "deferred": true
+      }
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "background_enabled",
+      "sample": 21,
+      "elapsed_ms": 11.6917,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 15.625,
+      "background": {
+        "bytes_read": 4096,
+        "native_probes": 0,
+        "native_calls": 0,
+        "deferred": true
+      }
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "foreground_only",
+      "sample": 21,
+      "elapsed_ms": 7.049,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 15.625
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "foreground_only",
+      "sample": 22,
+      "elapsed_ms": 9.6199,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 0.0
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "background_enabled",
+      "sample": 22,
+      "elapsed_ms": 9.3774,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 0.0,
+      "background": {
+        "bytes_read": 4096,
+        "native_probes": 0,
+        "native_calls": 0,
+        "deferred": true
+      }
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "background_enabled",
+      "sample": 23,
+      "elapsed_ms": 10.547,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 0.0,
+      "background": {
+        "bytes_read": 4096,
+        "native_probes": 0,
+        "native_calls": 0,
+        "deferred": true
+      }
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "foreground_only",
+      "sample": 23,
+      "elapsed_ms": 6.1294,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 15.625
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "foreground_only",
+      "sample": 24,
+      "elapsed_ms": 7.8512,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 0.0
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "background_enabled",
+      "sample": 24,
+      "elapsed_ms": 9.2534,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 0.0,
+      "background": {
+        "bytes_read": 4096,
+        "native_probes": 0,
+        "native_calls": 0,
+        "deferred": true
+      }
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "background_enabled",
+      "sample": 25,
+      "elapsed_ms": 6.5106,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 15.625,
+      "background": {
+        "bytes_read": 4096,
+        "native_probes": 0,
+        "native_calls": 0,
+        "deferred": true
+      }
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "foreground_only",
+      "sample": 25,
+      "elapsed_ms": 5.804,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 0.0
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "foreground_only",
+      "sample": 26,
+      "elapsed_ms": 5.1028,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 15.625
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "background_enabled",
+      "sample": 26,
+      "elapsed_ms": 8.6634,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 15.625,
+      "background": {
+        "bytes_read": 4096,
+        "native_probes": 0,
+        "native_calls": 0,
+        "deferred": true
+      }
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "background_enabled",
+      "sample": 27,
+      "elapsed_ms": 7.8257,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 0.0,
+      "background": {
+        "bytes_read": 4096,
+        "native_probes": 0,
+        "native_calls": 0,
+        "deferred": true
+      }
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "foreground_only",
+      "sample": 27,
+      "elapsed_ms": 8.4587,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 15.625
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "foreground_only",
+      "sample": 28,
+      "elapsed_ms": 13.3724,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 15.625
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "background_enabled",
+      "sample": 28,
+      "elapsed_ms": 8.2587,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 15.625,
+      "background": {
+        "bytes_read": 4096,
+        "native_probes": 0,
+        "native_calls": 0,
+        "deferred": true
+      }
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "background_enabled",
+      "sample": 29,
+      "elapsed_ms": 8.7617,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 15.625,
+      "background": {
+        "bytes_read": 4096,
+        "native_probes": 0,
+        "native_calls": 0,
+        "deferred": true
+      }
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "foreground_only",
+      "sample": 29,
+      "elapsed_ms": 5.3595,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 0.0
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "foreground_only",
+      "sample": 30,
+      "elapsed_ms": 5.1304,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 0.0
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "background_enabled",
+      "sample": 30,
+      "elapsed_ms": 12.1365,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 15.625,
+      "background": {
+        "bytes_read": 4096,
+        "native_probes": 0,
+        "native_calls": 0,
+        "deferred": true
+      }
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "background_enabled",
+      "sample": 31,
+      "elapsed_ms": 10.9321,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 15.625,
+      "background": {
+        "bytes_read": 4096,
+        "native_probes": 0,
+        "native_calls": 0,
+        "deferred": true
+      }
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "foreground_only",
+      "sample": 31,
+      "elapsed_ms": 7.6388,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 0.0
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "foreground_only",
+      "sample": 32,
+      "elapsed_ms": 5.4031,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 15.625
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "background_enabled",
+      "sample": 32,
+      "elapsed_ms": 7.1082,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 0.0,
+      "background": {
+        "bytes_read": 4096,
+        "native_probes": 0,
+        "native_calls": 0,
+        "deferred": true
+      }
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "background_enabled",
+      "sample": 33,
+      "elapsed_ms": 9.6234,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 0.0,
+      "background": {
+        "bytes_read": 4096,
+        "native_probes": 0,
+        "native_calls": 0,
+        "deferred": true
+      }
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "foreground_only",
+      "sample": 33,
+      "elapsed_ms": 5.6984,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 15.625
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "foreground_only",
+      "sample": 34,
+      "elapsed_ms": 8.1788,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 0.0
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "background_enabled",
+      "sample": 34,
+      "elapsed_ms": 10.8811,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 0.0,
+      "background": {
+        "bytes_read": 4096,
+        "native_probes": 0,
+        "native_calls": 0,
+        "deferred": true
+      }
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "background_enabled",
+      "sample": 35,
+      "elapsed_ms": 6.1198,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 0.0,
+      "background": {
+        "bytes_read": 4096,
+        "native_probes": 0,
+        "native_calls": 0,
+        "deferred": true
+      }
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "foreground_only",
+      "sample": 35,
+      "elapsed_ms": 5.4151,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 0.0
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "foreground_only",
+      "sample": 36,
+      "elapsed_ms": 5.5045,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 15.625
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "background_enabled",
+      "sample": 36,
+      "elapsed_ms": 6.7215,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 0.0,
+      "background": {
+        "bytes_read": 4096,
+        "native_probes": 0,
+        "native_calls": 0,
+        "deferred": true
+      }
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "background_enabled",
+      "sample": 37,
+      "elapsed_ms": 8.3605,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 0.0,
+      "background": {
+        "bytes_read": 4096,
+        "native_probes": 0,
+        "native_calls": 0,
+        "deferred": true
+      }
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "foreground_only",
+      "sample": 37,
+      "elapsed_ms": 6.3583,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 15.625
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "foreground_only",
+      "sample": 38,
+      "elapsed_ms": 7.9599,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 0.0
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "background_enabled",
+      "sample": 38,
+      "elapsed_ms": 7.2399,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 0.0,
+      "background": {
+        "bytes_read": 4096,
+        "native_probes": 0,
+        "native_calls": 0,
+        "deferred": true
+      }
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "background_enabled",
+      "sample": 39,
+      "elapsed_ms": 6.4051,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 15.625,
+      "background": {
+        "bytes_read": 4096,
+        "native_probes": 0,
+        "native_calls": 0,
+        "deferred": true
+      }
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "foreground_only",
+      "sample": 39,
+      "elapsed_ms": 6.7467,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 0.0
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "foreground_only",
+      "sample": 40,
+      "elapsed_ms": 5.9096,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 15.625
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "background_enabled",
+      "sample": 40,
+      "elapsed_ms": 6.5842,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 0.0,
+      "background": {
+        "bytes_read": 4096,
+        "native_probes": 0,
+        "native_calls": 0,
+        "deferred": true
+      }
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "background_enabled",
+      "sample": 41,
+      "elapsed_ms": 8.3984,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 0.0,
+      "background": {
+        "bytes_read": 4096,
+        "native_probes": 0,
+        "native_calls": 0,
+        "deferred": true
+      }
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "foreground_only",
+      "sample": 41,
+      "elapsed_ms": 6.2651,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 15.625
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "foreground_only",
+      "sample": 42,
+      "elapsed_ms": 6.9685,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 0.0
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "background_enabled",
+      "sample": 42,
+      "elapsed_ms": 9.3057,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 15.625,
+      "background": {
+        "bytes_read": 4096,
+        "native_probes": 0,
+        "native_calls": 0,
+        "deferred": true
+      }
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "background_enabled",
+      "sample": 43,
+      "elapsed_ms": 8.6836,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 15.625,
+      "background": {
+        "bytes_read": 4096,
+        "native_probes": 0,
+        "native_calls": 0,
+        "deferred": true
+      }
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "foreground_only",
+      "sample": 43,
+      "elapsed_ms": 5.8489,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 0.0
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "foreground_only",
+      "sample": 44,
+      "elapsed_ms": 6.6353,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 15.625
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "background_enabled",
+      "sample": 44,
+      "elapsed_ms": 15.2698,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 15.625,
+      "background": {
+        "bytes_read": 4096,
+        "native_probes": 0,
+        "native_calls": 0,
+        "deferred": true
+      }
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "background_enabled",
+      "sample": 45,
+      "elapsed_ms": 19.1305,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 15.625,
+      "background": {
+        "bytes_read": 4096,
+        "native_probes": 0,
+        "native_calls": 0,
+        "deferred": true
+      }
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "foreground_only",
+      "sample": 45,
+      "elapsed_ms": 12.1615,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 15.625
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "foreground_only",
+      "sample": 46,
+      "elapsed_ms": 21.8517,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 15.625
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "background_enabled",
+      "sample": 46,
+      "elapsed_ms": 15.8893,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 15.625,
+      "background": {
+        "bytes_read": 4096,
+        "native_probes": 0,
+        "native_calls": 0,
+        "deferred": true
+      }
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "background_enabled",
+      "sample": 47,
+      "elapsed_ms": 26.285,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 31.25,
+      "background": {
+        "bytes_read": 4096,
+        "native_probes": 0,
+        "native_calls": 0,
+        "deferred": true
+      }
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "foreground_only",
+      "sample": 47,
+      "elapsed_ms": 23.222,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 31.25
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "foreground_only",
+      "sample": 48,
+      "elapsed_ms": 21.4298,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 15.625
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "background_enabled",
+      "sample": 48,
+      "elapsed_ms": 18.6649,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 15.625,
+      "background": {
+        "bytes_read": 4096,
+        "native_probes": 0,
+        "native_calls": 0,
+        "deferred": true
+      }
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "background_enabled",
+      "sample": 49,
+      "elapsed_ms": 18.224,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 15.625,
+      "background": {
+        "bytes_read": 4096,
+        "native_probes": 0,
+        "native_calls": 0,
+        "deferred": true
+      }
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "foreground_only",
+      "sample": 49,
+      "elapsed_ms": 17.787,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 15.625
+    },
+    {
+      "case": "foreground_read_with_inventory",
+      "variant": "foreground_only",
+      "sample": 0,
+      "elapsed_ms": 321.2923,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 265.625
+    },
+    {
+      "case": "foreground_read_with_inventory",
+      "variant": "background_enabled",
+      "sample": 0,
+      "elapsed_ms": 292.572,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 234.375,
+      "background": {
+        "bytes_read": 0,
+        "native_probes": 0,
+        "native_calls": 1,
+        "deferred": true
+      }
+    },
+    {
+      "case": "foreground_read_with_inventory",
+      "variant": "background_enabled",
+      "sample": 1,
+      "elapsed_ms": 231.9567,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 234.375,
+      "background": {
+        "bytes_read": 0,
+        "native_probes": 0,
+        "native_calls": 1,
+        "deferred": true
+      }
+    },
+    {
+      "case": "foreground_read_with_inventory",
+      "variant": "foreground_only",
+      "sample": 1,
+      "elapsed_ms": 208.8392,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 203.125
+    },
+    {
+      "case": "foreground_read_with_inventory",
+      "variant": "foreground_only",
+      "sample": 2,
+      "elapsed_ms": 211.9977,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 203.125
+    },
+    {
+      "case": "foreground_read_with_inventory",
+      "variant": "background_enabled",
+      "sample": 2,
+      "elapsed_ms": 190.8712,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 171.875,
+      "background": {
+        "bytes_read": 0,
+        "native_probes": 0,
+        "native_calls": 1,
+        "deferred": true
+      }
+    },
+    {
+      "case": "foreground_read_with_inventory",
+      "variant": "background_enabled",
+      "sample": 3,
+      "elapsed_ms": 202.2934,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 203.125,
+      "background": {
+        "bytes_read": 0,
+        "native_probes": 0,
+        "native_calls": 1,
+        "deferred": true
+      }
+    },
+    {
+      "case": "foreground_read_with_inventory",
+      "variant": "foreground_only",
+      "sample": 3,
+      "elapsed_ms": 164.881,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 171.875
+    },
+    {
+      "case": "foreground_read_with_inventory",
+      "variant": "foreground_only",
+      "sample": 4,
+      "elapsed_ms": 160.5043,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 156.25
+    },
+    {
+      "case": "foreground_read_with_inventory",
+      "variant": "background_enabled",
+      "sample": 4,
+      "elapsed_ms": 136.9635,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 140.625,
+      "background": {
+        "bytes_read": 0,
+        "native_probes": 0,
+        "native_calls": 1,
+        "deferred": true
+      }
+    },
+    {
+      "case": "foreground_read_with_inventory",
+      "variant": "background_enabled",
+      "sample": 5,
+      "elapsed_ms": 132.0566,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 125.0,
+      "background": {
+        "bytes_read": 0,
+        "native_probes": 0,
+        "native_calls": 1,
+        "deferred": true
+      }
+    },
+    {
+      "case": "foreground_read_with_inventory",
+      "variant": "foreground_only",
+      "sample": 5,
+      "elapsed_ms": 195.0161,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 156.25
+    },
+    {
+      "case": "foreground_read_with_inventory",
+      "variant": "foreground_only",
+      "sample": 6,
+      "elapsed_ms": 162.4968,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 140.625
+    },
+    {
+      "case": "foreground_read_with_inventory",
+      "variant": "background_enabled",
+      "sample": 6,
+      "elapsed_ms": 132.6604,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 125.0,
+      "background": {
+        "bytes_read": 0,
+        "native_probes": 0,
+        "native_calls": 1,
+        "deferred": true
+      }
+    },
+    {
+      "case": "foreground_read_with_inventory",
+      "variant": "background_enabled",
+      "sample": 7,
+      "elapsed_ms": 177.3754,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 187.5,
+      "background": {
+        "bytes_read": 0,
+        "native_probes": 0,
+        "native_calls": 1,
+        "deferred": true
+      }
+    },
+    {
+      "case": "foreground_read_with_inventory",
+      "variant": "foreground_only",
+      "sample": 7,
+      "elapsed_ms": 196.7615,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 187.5
+    },
+    {
+      "case": "foreground_read_with_inventory",
+      "variant": "foreground_only",
+      "sample": 8,
+      "elapsed_ms": 173.1226,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 156.25
+    },
+    {
+      "case": "foreground_read_with_inventory",
+      "variant": "background_enabled",
+      "sample": 8,
+      "elapsed_ms": 148.4443,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 156.25,
+      "background": {
+        "bytes_read": 0,
+        "native_probes": 0,
+        "native_calls": 1,
+        "deferred": true
+      }
+    },
+    {
+      "case": "foreground_read_with_inventory",
+      "variant": "background_enabled",
+      "sample": 9,
+      "elapsed_ms": 185.9793,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 171.875,
+      "background": {
+        "bytes_read": 0,
+        "native_probes": 0,
+        "native_calls": 1,
+        "deferred": true
+      }
+    },
+    {
+      "case": "foreground_read_with_inventory",
+      "variant": "foreground_only",
+      "sample": 9,
+      "elapsed_ms": 149.2331,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 156.25
+    },
+    {
+      "case": "foreground_read_with_inventory",
+      "variant": "foreground_only",
+      "sample": 10,
+      "elapsed_ms": 111.591,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 109.375
+    },
+    {
+      "case": "foreground_read_with_inventory",
+      "variant": "background_enabled",
+      "sample": 10,
+      "elapsed_ms": 186.1158,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 171.875,
+      "background": {
+        "bytes_read": 0,
+        "native_probes": 0,
+        "native_calls": 1,
+        "deferred": true
+      }
+    },
+    {
+      "case": "foreground_read_with_inventory",
+      "variant": "background_enabled",
+      "sample": 11,
+      "elapsed_ms": 194.1403,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 156.25,
+      "background": {
+        "bytes_read": 0,
+        "native_probes": 0,
+        "native_calls": 1,
+        "deferred": true
+      }
+    },
+    {
+      "case": "foreground_read_with_inventory",
+      "variant": "foreground_only",
+      "sample": 11,
+      "elapsed_ms": 203.0635,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 187.5
+    },
+    {
+      "case": "foreground_read_with_inventory",
+      "variant": "foreground_only",
+      "sample": 12,
+      "elapsed_ms": 154.2815,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 156.25
+    },
+    {
+      "case": "foreground_read_with_inventory",
+      "variant": "background_enabled",
+      "sample": 12,
+      "elapsed_ms": 137.5157,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 140.625,
+      "background": {
+        "bytes_read": 0,
+        "native_probes": 0,
+        "native_calls": 1,
+        "deferred": true
+      }
+    },
+    {
+      "case": "foreground_read_with_inventory",
+      "variant": "background_enabled",
+      "sample": 13,
+      "elapsed_ms": 201.4115,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 187.5,
+      "background": {
+        "bytes_read": 0,
+        "native_probes": 0,
+        "native_calls": 1,
+        "deferred": true
+      }
+    },
+    {
+      "case": "foreground_read_with_inventory",
+      "variant": "foreground_only",
+      "sample": 13,
+      "elapsed_ms": 216.6237,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 203.125
+    },
+    {
+      "case": "foreground_read_with_inventory",
+      "variant": "foreground_only",
+      "sample": 14,
+      "elapsed_ms": 195.0208,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 203.125
+    },
+    {
+      "case": "foreground_read_with_inventory",
+      "variant": "background_enabled",
+      "sample": 14,
+      "elapsed_ms": 200.0748,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 187.5,
+      "background": {
+        "bytes_read": 0,
+        "native_probes": 0,
+        "native_calls": 1,
+        "deferred": true
+      }
+    },
+    {
+      "case": "foreground_read_with_inventory",
+      "variant": "background_enabled",
+      "sample": 15,
+      "elapsed_ms": 202.1337,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 203.125,
+      "background": {
+        "bytes_read": 0,
+        "native_probes": 0,
+        "native_calls": 1,
+        "deferred": true
+      }
+    },
+    {
+      "case": "foreground_read_with_inventory",
+      "variant": "foreground_only",
+      "sample": 15,
+      "elapsed_ms": 142.1392,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 140.625
+    },
+    {
+      "case": "foreground_read_with_inventory",
+      "variant": "foreground_only",
+      "sample": 16,
+      "elapsed_ms": 177.7135,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 171.875
+    },
+    {
+      "case": "foreground_read_with_inventory",
+      "variant": "background_enabled",
+      "sample": 16,
+      "elapsed_ms": 184.0496,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 187.5,
+      "background": {
+        "bytes_read": 0,
+        "native_probes": 0,
+        "native_calls": 1,
+        "deferred": true
+      }
+    },
+    {
+      "case": "foreground_read_with_inventory",
+      "variant": "background_enabled",
+      "sample": 17,
+      "elapsed_ms": 169.774,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 156.25,
+      "background": {
+        "bytes_read": 0,
+        "native_probes": 0,
+        "native_calls": 1,
+        "deferred": true
+      }
+    },
+    {
+      "case": "foreground_read_with_inventory",
+      "variant": "foreground_only",
+      "sample": 17,
+      "elapsed_ms": 154.9334,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 156.25
+    },
+    {
+      "case": "foreground_read_with_inventory",
+      "variant": "foreground_only",
+      "sample": 18,
+      "elapsed_ms": 170.6305,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 171.875
+    },
+    {
+      "case": "foreground_read_with_inventory",
+      "variant": "background_enabled",
+      "sample": 18,
+      "elapsed_ms": 118.4145,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 109.375,
+      "background": {
+        "bytes_read": 0,
+        "native_probes": 0,
+        "native_calls": 1,
+        "deferred": true
+      }
+    },
+    {
+      "case": "foreground_read_with_inventory",
+      "variant": "background_enabled",
+      "sample": 19,
+      "elapsed_ms": 138.0467,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 125.0,
+      "background": {
+        "bytes_read": 0,
+        "native_probes": 0,
+        "native_calls": 1,
+        "deferred": true
+      }
+    },
+    {
+      "case": "foreground_read_with_inventory",
+      "variant": "foreground_only",
+      "sample": 19,
+      "elapsed_ms": 112.4115,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 109.375
+    },
+    {
+      "case": "foreground_read_with_inventory",
+      "variant": "foreground_only",
+      "sample": 20,
+      "elapsed_ms": 111.1011,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 109.375
+    },
+    {
+      "case": "foreground_read_with_inventory",
+      "variant": "background_enabled",
+      "sample": 20,
+      "elapsed_ms": 187.6482,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 171.875,
+      "background": {
+        "bytes_read": 0,
+        "native_probes": 0,
+        "native_calls": 1,
+        "deferred": true
+      }
+    },
+    {
+      "case": "foreground_read_with_inventory",
+      "variant": "background_enabled",
+      "sample": 21,
+      "elapsed_ms": 177.0714,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 171.875,
+      "background": {
+        "bytes_read": 0,
+        "native_probes": 0,
+        "native_calls": 1,
+        "deferred": true
+      }
+    },
+    {
+      "case": "foreground_read_with_inventory",
+      "variant": "foreground_only",
+      "sample": 21,
+      "elapsed_ms": 255.4921,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 250.0
+    },
+    {
+      "case": "foreground_read_with_inventory",
+      "variant": "foreground_only",
+      "sample": 22,
+      "elapsed_ms": 174.1749,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 171.875
+    },
+    {
+      "case": "foreground_read_with_inventory",
+      "variant": "background_enabled",
+      "sample": 22,
+      "elapsed_ms": 129.2869,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 109.375,
+      "background": {
+        "bytes_read": 0,
+        "native_probes": 0,
+        "native_calls": 1,
+        "deferred": true
+      }
+    },
+    {
+      "case": "foreground_read_with_inventory",
+      "variant": "background_enabled",
+      "sample": 23,
+      "elapsed_ms": 93.7232,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 93.75,
+      "background": {
+        "bytes_read": 0,
+        "native_probes": 0,
+        "native_calls": 1,
+        "deferred": true
+      }
+    },
+    {
+      "case": "foreground_read_with_inventory",
+      "variant": "foreground_only",
+      "sample": 23,
+      "elapsed_ms": 138.5061,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 125.0
+    },
+    {
+      "case": "foreground_read_with_inventory",
+      "variant": "foreground_only",
+      "sample": 24,
+      "elapsed_ms": 142.0212,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 125.0
+    },
+    {
+      "case": "foreground_read_with_inventory",
+      "variant": "background_enabled",
+      "sample": 24,
+      "elapsed_ms": 99.3662,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 93.75,
+      "background": {
+        "bytes_read": 0,
+        "native_probes": 0,
+        "native_calls": 1,
+        "deferred": true
+      }
+    },
+    {
+      "case": "foreground_read_with_inventory",
+      "variant": "background_enabled",
+      "sample": 25,
+      "elapsed_ms": 131.3196,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 125.0,
+      "background": {
+        "bytes_read": 0,
+        "native_probes": 0,
+        "native_calls": 1,
+        "deferred": true
+      }
+    },
+    {
+      "case": "foreground_read_with_inventory",
+      "variant": "foreground_only",
+      "sample": 25,
+      "elapsed_ms": 93.229,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 78.125
+    },
+    {
+      "case": "foreground_read_with_inventory",
+      "variant": "foreground_only",
+      "sample": 26,
+      "elapsed_ms": 51.236,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 62.5
+    },
+    {
+      "case": "foreground_read_with_inventory",
+      "variant": "background_enabled",
+      "sample": 26,
+      "elapsed_ms": 67.0436,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 62.5,
+      "background": {
+        "bytes_read": 0,
+        "native_probes": 0,
+        "native_calls": 1,
+        "deferred": true
+      }
+    },
+    {
+      "case": "foreground_read_with_inventory",
+      "variant": "background_enabled",
+      "sample": 27,
+      "elapsed_ms": 74.0104,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 78.125,
+      "background": {
+        "bytes_read": 0,
+        "native_probes": 0,
+        "native_calls": 1,
+        "deferred": true
+      }
+    },
+    {
+      "case": "foreground_read_with_inventory",
+      "variant": "foreground_only",
+      "sample": 27,
+      "elapsed_ms": 79.7496,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 78.125
+    },
+    {
+      "case": "foreground_read_with_inventory",
+      "variant": "foreground_only",
+      "sample": 28,
+      "elapsed_ms": 91.8023,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 93.75
+    },
+    {
+      "case": "foreground_read_with_inventory",
+      "variant": "background_enabled",
+      "sample": 28,
+      "elapsed_ms": 84.2377,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 78.125,
+      "background": {
+        "bytes_read": 0,
+        "native_probes": 0,
+        "native_calls": 1,
+        "deferred": true
+      }
+    },
+    {
+      "case": "foreground_read_with_inventory",
+      "variant": "background_enabled",
+      "sample": 29,
+      "elapsed_ms": 95.9073,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 93.75,
+      "background": {
+        "bytes_read": 0,
+        "native_probes": 0,
+        "native_calls": 1,
+        "deferred": true
+      }
+    },
+    {
+      "case": "foreground_read_with_inventory",
+      "variant": "foreground_only",
+      "sample": 29,
+      "elapsed_ms": 88.5566,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 78.125
+    },
+    {
+      "case": "foreground_read_with_inventory",
+      "variant": "foreground_only",
+      "sample": 30,
+      "elapsed_ms": 139.0719,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 140.625
+    },
+    {
+      "case": "foreground_read_with_inventory",
+      "variant": "background_enabled",
+      "sample": 30,
+      "elapsed_ms": 128.4177,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 109.375,
+      "background": {
+        "bytes_read": 0,
+        "native_probes": 0,
+        "native_calls": 1,
+        "deferred": true
+      }
+    },
+    {
+      "case": "foreground_read_with_inventory",
+      "variant": "background_enabled",
+      "sample": 31,
+      "elapsed_ms": 118.3259,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 109.375,
+      "background": {
+        "bytes_read": 0,
+        "native_probes": 0,
+        "native_calls": 1,
+        "deferred": true
+      }
+    },
+    {
+      "case": "foreground_read_with_inventory",
+      "variant": "foreground_only",
+      "sample": 31,
+      "elapsed_ms": 89.1172,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 93.75
+    },
+    {
+      "case": "foreground_read_with_inventory",
+      "variant": "foreground_only",
+      "sample": 32,
+      "elapsed_ms": 101.8861,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 109.375
+    },
+    {
+      "case": "foreground_read_with_inventory",
+      "variant": "background_enabled",
+      "sample": 32,
+      "elapsed_ms": 141.2781,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 140.625,
+      "background": {
+        "bytes_read": 0,
+        "native_probes": 0,
+        "native_calls": 1,
+        "deferred": true
+      }
+    },
+    {
+      "case": "foreground_read_with_inventory",
+      "variant": "background_enabled",
+      "sample": 33,
+      "elapsed_ms": 105.8675,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 109.375,
+      "background": {
+        "bytes_read": 0,
+        "native_probes": 0,
+        "native_calls": 1,
+        "deferred": true
+      }
+    },
+    {
+      "case": "foreground_read_with_inventory",
+      "variant": "foreground_only",
+      "sample": 33,
+      "elapsed_ms": 118.3113,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 125.0
+    },
+    {
+      "case": "foreground_read_with_inventory",
+      "variant": "foreground_only",
+      "sample": 34,
+      "elapsed_ms": 114.7178,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 109.375
+    },
+    {
+      "case": "foreground_read_with_inventory",
+      "variant": "background_enabled",
+      "sample": 34,
+      "elapsed_ms": 101.0516,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 93.75,
+      "background": {
+        "bytes_read": 0,
+        "native_probes": 0,
+        "native_calls": 1,
+        "deferred": true
+      }
+    },
+    {
+      "case": "foreground_read_with_inventory",
+      "variant": "background_enabled",
+      "sample": 35,
+      "elapsed_ms": 113.0059,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 109.375,
+      "background": {
+        "bytes_read": 0,
+        "native_probes": 0,
+        "native_calls": 1,
+        "deferred": true
+      }
+    },
+    {
+      "case": "foreground_read_with_inventory",
+      "variant": "foreground_only",
+      "sample": 35,
+      "elapsed_ms": 89.9545,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 93.75
+    },
+    {
+      "case": "foreground_read_with_inventory",
+      "variant": "foreground_only",
+      "sample": 36,
+      "elapsed_ms": 121.6204,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 125.0
+    },
+    {
+      "case": "foreground_read_with_inventory",
+      "variant": "background_enabled",
+      "sample": 36,
+      "elapsed_ms": 118.9066,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 125.0,
+      "background": {
+        "bytes_read": 0,
+        "native_probes": 0,
+        "native_calls": 1,
+        "deferred": true
+      }
+    },
+    {
+      "case": "foreground_read_with_inventory",
+      "variant": "background_enabled",
+      "sample": 37,
+      "elapsed_ms": 116.0022,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 109.375,
+      "background": {
+        "bytes_read": 0,
+        "native_probes": 0,
+        "native_calls": 1,
+        "deferred": true
+      }
+    },
+    {
+      "case": "foreground_read_with_inventory",
+      "variant": "foreground_only",
+      "sample": 37,
+      "elapsed_ms": 96.6907,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 93.75
+    },
+    {
+      "case": "foreground_read_with_inventory",
+      "variant": "foreground_only",
+      "sample": 38,
+      "elapsed_ms": 101.4478,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 109.375
+    },
+    {
+      "case": "foreground_read_with_inventory",
+      "variant": "background_enabled",
+      "sample": 38,
+      "elapsed_ms": 142.2332,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 140.625,
+      "background": {
+        "bytes_read": 0,
+        "native_probes": 0,
+        "native_calls": 1,
+        "deferred": true
+      }
+    },
+    {
+      "case": "foreground_read_with_inventory",
+      "variant": "background_enabled",
+      "sample": 39,
+      "elapsed_ms": 95.6929,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 93.75,
+      "background": {
+        "bytes_read": 0,
+        "native_probes": 0,
+        "native_calls": 1,
+        "deferred": true
+      }
+    },
+    {
+      "case": "foreground_read_with_inventory",
+      "variant": "foreground_only",
+      "sample": 39,
+      "elapsed_ms": 99.9444,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 109.375
+    },
+    {
+      "case": "foreground_read_with_inventory",
+      "variant": "foreground_only",
+      "sample": 40,
+      "elapsed_ms": 81.8075,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 78.125
+    },
+    {
+      "case": "foreground_read_with_inventory",
+      "variant": "background_enabled",
+      "sample": 40,
+      "elapsed_ms": 72.4785,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 62.5,
+      "background": {
+        "bytes_read": 0,
+        "native_probes": 0,
+        "native_calls": 1,
+        "deferred": true
+      }
+    },
+    {
+      "case": "foreground_read_with_inventory",
+      "variant": "background_enabled",
+      "sample": 41,
+      "elapsed_ms": 67.2565,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 62.5,
+      "background": {
+        "bytes_read": 0,
+        "native_probes": 0,
+        "native_calls": 1,
+        "deferred": true
+      }
+    },
+    {
+      "case": "foreground_read_with_inventory",
+      "variant": "foreground_only",
+      "sample": 41,
+      "elapsed_ms": 86.7386,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 93.75
+    },
+    {
+      "case": "foreground_read_with_inventory",
+      "variant": "foreground_only",
+      "sample": 42,
+      "elapsed_ms": 60.0153,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 62.5
+    },
+    {
+      "case": "foreground_read_with_inventory",
+      "variant": "background_enabled",
+      "sample": 42,
+      "elapsed_ms": 55.1294,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 62.5,
+      "background": {
+        "bytes_read": 0,
+        "native_probes": 0,
+        "native_calls": 1,
+        "deferred": true
+      }
+    },
+    {
+      "case": "foreground_read_with_inventory",
+      "variant": "background_enabled",
+      "sample": 43,
+      "elapsed_ms": 58.9827,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 62.5,
+      "background": {
+        "bytes_read": 0,
+        "native_probes": 0,
+        "native_calls": 1,
+        "deferred": true
+      }
+    },
+    {
+      "case": "foreground_read_with_inventory",
+      "variant": "foreground_only",
+      "sample": 43,
+      "elapsed_ms": 74.6728,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 62.5
+    },
+    {
+      "case": "foreground_read_with_inventory",
+      "variant": "foreground_only",
+      "sample": 44,
+      "elapsed_ms": 78.5572,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 78.125
+    },
+    {
+      "case": "foreground_read_with_inventory",
+      "variant": "background_enabled",
+      "sample": 44,
+      "elapsed_ms": 88.6432,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 93.75,
+      "background": {
+        "bytes_read": 0,
+        "native_probes": 0,
+        "native_calls": 1,
+        "deferred": true
+      }
+    },
+    {
+      "case": "foreground_read_with_inventory",
+      "variant": "background_enabled",
+      "sample": 45,
+      "elapsed_ms": 78.2861,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 62.5,
+      "background": {
+        "bytes_read": 0,
+        "native_probes": 0,
+        "native_calls": 1,
+        "deferred": true
+      }
+    },
+    {
+      "case": "foreground_read_with_inventory",
+      "variant": "foreground_only",
+      "sample": 45,
+      "elapsed_ms": 105.0867,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 93.75
+    },
+    {
+      "case": "foreground_read_with_inventory",
+      "variant": "foreground_only",
+      "sample": 46,
+      "elapsed_ms": 81.1491,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 93.75
+    },
+    {
+      "case": "foreground_read_with_inventory",
+      "variant": "background_enabled",
+      "sample": 46,
+      "elapsed_ms": 101.6989,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 109.375,
+      "background": {
+        "bytes_read": 0,
+        "native_probes": 0,
+        "native_calls": 1,
+        "deferred": true
+      }
+    },
+    {
+      "case": "foreground_read_with_inventory",
+      "variant": "background_enabled",
+      "sample": 47,
+      "elapsed_ms": 103.7255,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 109.375,
+      "background": {
+        "bytes_read": 0,
+        "native_probes": 0,
+        "native_calls": 1,
+        "deferred": true
+      }
+    },
+    {
+      "case": "foreground_read_with_inventory",
+      "variant": "foreground_only",
+      "sample": 47,
+      "elapsed_ms": 108.0432,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 109.375
+    },
+    {
+      "case": "foreground_read_with_inventory",
+      "variant": "foreground_only",
+      "sample": 48,
+      "elapsed_ms": 105.8384,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 109.375
+    },
+    {
+      "case": "foreground_read_with_inventory",
+      "variant": "background_enabled",
+      "sample": 48,
+      "elapsed_ms": 105.7495,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 93.75,
+      "background": {
+        "bytes_read": 0,
+        "native_probes": 0,
+        "native_calls": 1,
+        "deferred": true
+      }
+    },
+    {
+      "case": "foreground_read_with_inventory",
+      "variant": "background_enabled",
+      "sample": 49,
+      "elapsed_ms": 98.939,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 93.75,
+      "background": {
+        "bytes_read": 0,
+        "native_probes": 0,
+        "native_calls": 1,
+        "deferred": true
+      }
+    },
+    {
+      "case": "foreground_read_with_inventory",
+      "variant": "foreground_only",
+      "sample": 49,
+      "elapsed_ms": 148.9345,
+      "policy_reads": 0,
+      "foreground_cpu_ms": 156.25
+    },
+    {
+      "case": "dispatch_with_inventory",
+      "variant": "foreground_only",
+      "sample": 0,
+      "elapsed_ms": 12.4573,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 15.625
+    },
+    {
+      "case": "dispatch_with_inventory",
+      "variant": "background_enabled",
+      "sample": 0,
+      "elapsed_ms": 7.8924,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 15.625,
+      "background": {
+        "bytes_read": 0,
+        "native_probes": 0,
+        "native_calls": 1,
+        "deferred": true
+      }
+    },
+    {
+      "case": "dispatch_with_inventory",
+      "variant": "background_enabled",
+      "sample": 1,
+      "elapsed_ms": 9.9978,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 15.625,
+      "background": {
+        "bytes_read": 0,
+        "native_probes": 0,
+        "native_calls": 1,
+        "deferred": true
+      }
+    },
+    {
+      "case": "dispatch_with_inventory",
+      "variant": "foreground_only",
+      "sample": 1,
+      "elapsed_ms": 5.4957,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 0.0
+    },
+    {
+      "case": "dispatch_with_inventory",
+      "variant": "foreground_only",
+      "sample": 2,
+      "elapsed_ms": 5.4308,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 15.625
+    },
+    {
+      "case": "dispatch_with_inventory",
+      "variant": "background_enabled",
+      "sample": 2,
+      "elapsed_ms": 6.1931,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 15.625,
+      "background": {
+        "bytes_read": 0,
+        "native_probes": 0,
+        "native_calls": 1,
+        "deferred": true
+      }
+    },
+    {
+      "case": "dispatch_with_inventory",
+      "variant": "background_enabled",
+      "sample": 3,
+      "elapsed_ms": 12.6064,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 0.0,
+      "background": {
+        "bytes_read": 0,
+        "native_probes": 0,
+        "native_calls": 1,
+        "deferred": true
+      }
+    },
+    {
+      "case": "dispatch_with_inventory",
+      "variant": "foreground_only",
+      "sample": 3,
+      "elapsed_ms": 8.5786,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 15.625
+    },
+    {
+      "case": "dispatch_with_inventory",
+      "variant": "foreground_only",
+      "sample": 4,
+      "elapsed_ms": 7.6995,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 15.625
+    },
+    {
+      "case": "dispatch_with_inventory",
+      "variant": "background_enabled",
+      "sample": 4,
+      "elapsed_ms": 10.1933,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 15.625,
+      "background": {
+        "bytes_read": 0,
+        "native_probes": 0,
+        "native_calls": 1,
+        "deferred": true
+      }
+    },
+    {
+      "case": "dispatch_with_inventory",
+      "variant": "background_enabled",
+      "sample": 5,
+      "elapsed_ms": 9.0966,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 0.0,
+      "background": {
+        "bytes_read": 0,
+        "native_probes": 0,
+        "native_calls": 1,
+        "deferred": true
+      }
+    },
+    {
+      "case": "dispatch_with_inventory",
+      "variant": "foreground_only",
+      "sample": 5,
+      "elapsed_ms": 6.7036,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 15.625
+    },
+    {
+      "case": "dispatch_with_inventory",
+      "variant": "foreground_only",
+      "sample": 6,
+      "elapsed_ms": 6.9395,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 0.0
+    },
+    {
+      "case": "dispatch_with_inventory",
+      "variant": "background_enabled",
+      "sample": 6,
+      "elapsed_ms": 7.7874,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 0.0,
+      "background": {
+        "bytes_read": 0,
+        "native_probes": 0,
+        "native_calls": 1,
+        "deferred": true
+      }
+    },
+    {
+      "case": "dispatch_with_inventory",
+      "variant": "background_enabled",
+      "sample": 7,
+      "elapsed_ms": 11.2428,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 15.625,
+      "background": {
+        "bytes_read": 0,
+        "native_probes": 0,
+        "native_calls": 1,
+        "deferred": true
+      }
+    },
+    {
+      "case": "dispatch_with_inventory",
+      "variant": "foreground_only",
+      "sample": 7,
+      "elapsed_ms": 8.448,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 0.0
+    },
+    {
+      "case": "dispatch_with_inventory",
+      "variant": "foreground_only",
+      "sample": 8,
+      "elapsed_ms": 7.4548,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 15.625
+    },
+    {
+      "case": "dispatch_with_inventory",
+      "variant": "background_enabled",
+      "sample": 8,
+      "elapsed_ms": 10.0087,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 0.0,
+      "background": {
+        "bytes_read": 0,
+        "native_probes": 0,
+        "native_calls": 1,
+        "deferred": true
+      }
+    },
+    {
+      "case": "dispatch_with_inventory",
+      "variant": "background_enabled",
+      "sample": 9,
+      "elapsed_ms": 14.2946,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 15.625,
+      "background": {
+        "bytes_read": 0,
+        "native_probes": 0,
+        "native_calls": 1,
+        "deferred": true
+      }
+    },
+    {
+      "case": "dispatch_with_inventory",
+      "variant": "foreground_only",
+      "sample": 9,
+      "elapsed_ms": 16.055,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 15.625
+    },
+    {
+      "case": "dispatch_with_inventory",
+      "variant": "foreground_only",
+      "sample": 10,
+      "elapsed_ms": 14.4407,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 0.0
+    },
+    {
+      "case": "dispatch_with_inventory",
+      "variant": "background_enabled",
+      "sample": 10,
+      "elapsed_ms": 9.3657,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 15.625,
+      "background": {
+        "bytes_read": 0,
+        "native_probes": 0,
+        "native_calls": 1,
+        "deferred": true
+      }
+    },
+    {
+      "case": "dispatch_with_inventory",
+      "variant": "background_enabled",
+      "sample": 11,
+      "elapsed_ms": 8.3764,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 0.0,
+      "background": {
+        "bytes_read": 0,
+        "native_probes": 0,
+        "native_calls": 1,
+        "deferred": true
+      }
+    },
+    {
+      "case": "dispatch_with_inventory",
+      "variant": "foreground_only",
+      "sample": 11,
+      "elapsed_ms": 7.2863,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 15.625
+    },
+    {
+      "case": "dispatch_with_inventory",
+      "variant": "foreground_only",
+      "sample": 12,
+      "elapsed_ms": 6.7668,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 0.0
+    },
+    {
+      "case": "dispatch_with_inventory",
+      "variant": "background_enabled",
+      "sample": 12,
+      "elapsed_ms": 11.215,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 15.625,
+      "background": {
+        "bytes_read": 0,
+        "native_probes": 0,
+        "native_calls": 1,
+        "deferred": true
+      }
+    },
+    {
+      "case": "dispatch_with_inventory",
+      "variant": "background_enabled",
+      "sample": 13,
+      "elapsed_ms": 8.1504,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 15.625,
+      "background": {
+        "bytes_read": 0,
+        "native_probes": 0,
+        "native_calls": 1,
+        "deferred": true
+      }
+    },
+    {
+      "case": "dispatch_with_inventory",
+      "variant": "foreground_only",
+      "sample": 13,
+      "elapsed_ms": 9.7138,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 0.0
+    },
+    {
+      "case": "dispatch_with_inventory",
+      "variant": "foreground_only",
+      "sample": 14,
+      "elapsed_ms": 8.0048,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 0.0
+    },
+    {
+      "case": "dispatch_with_inventory",
+      "variant": "background_enabled",
+      "sample": 14,
+      "elapsed_ms": 8.3295,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 0.0,
+      "background": {
+        "bytes_read": 0,
+        "native_probes": 0,
+        "native_calls": 1,
+        "deferred": true
+      }
+    },
+    {
+      "case": "dispatch_with_inventory",
+      "variant": "background_enabled",
+      "sample": 15,
+      "elapsed_ms": 9.4981,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 15.625,
+      "background": {
+        "bytes_read": 0,
+        "native_probes": 0,
+        "native_calls": 1,
+        "deferred": true
+      }
+    },
+    {
+      "case": "dispatch_with_inventory",
+      "variant": "foreground_only",
+      "sample": 15,
+      "elapsed_ms": 9.5877,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 0.0
+    },
+    {
+      "case": "dispatch_with_inventory",
+      "variant": "foreground_only",
+      "sample": 16,
+      "elapsed_ms": 9.9661,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 15.625
+    },
+    {
+      "case": "dispatch_with_inventory",
+      "variant": "background_enabled",
+      "sample": 16,
+      "elapsed_ms": 9.6473,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 0.0,
+      "background": {
+        "bytes_read": 0,
+        "native_probes": 0,
+        "native_calls": 1,
+        "deferred": true
+      }
+    },
+    {
+      "case": "dispatch_with_inventory",
+      "variant": "background_enabled",
+      "sample": 17,
+      "elapsed_ms": 7.6096,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 15.625,
+      "background": {
+        "bytes_read": 0,
+        "native_probes": 0,
+        "native_calls": 1,
+        "deferred": true
+      }
+    },
+    {
+      "case": "dispatch_with_inventory",
+      "variant": "foreground_only",
+      "sample": 17,
+      "elapsed_ms": 6.2534,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 0.0
+    },
+    {
+      "case": "dispatch_with_inventory",
+      "variant": "foreground_only",
+      "sample": 18,
+      "elapsed_ms": 6.3248,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 0.0
+    },
+    {
+      "case": "dispatch_with_inventory",
+      "variant": "background_enabled",
+      "sample": 18,
+      "elapsed_ms": 10.4672,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 15.625,
+      "background": {
+        "bytes_read": 0,
+        "native_probes": 0,
+        "native_calls": 1,
+        "deferred": true
+      }
+    },
+    {
+      "case": "dispatch_with_inventory",
+      "variant": "background_enabled",
+      "sample": 19,
+      "elapsed_ms": 8.4358,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 15.625,
+      "background": {
+        "bytes_read": 0,
+        "native_probes": 0,
+        "native_calls": 1,
+        "deferred": true
+      }
+    },
+    {
+      "case": "dispatch_with_inventory",
+      "variant": "foreground_only",
+      "sample": 19,
+      "elapsed_ms": 9.3469,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 0.0
+    },
+    {
+      "case": "dispatch_with_inventory",
+      "variant": "foreground_only",
+      "sample": 20,
+      "elapsed_ms": 9.2966,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 0.0
+    },
+    {
+      "case": "dispatch_with_inventory",
+      "variant": "background_enabled",
+      "sample": 20,
+      "elapsed_ms": 9.1296,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 0.0,
+      "background": {
+        "bytes_read": 0,
+        "native_probes": 0,
+        "native_calls": 1,
+        "deferred": true
+      }
+    },
+    {
+      "case": "dispatch_with_inventory",
+      "variant": "background_enabled",
+      "sample": 21,
+      "elapsed_ms": 9.7681,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 15.625,
+      "background": {
+        "bytes_read": 0,
+        "native_probes": 0,
+        "native_calls": 1,
+        "deferred": true
+      }
+    },
+    {
+      "case": "dispatch_with_inventory",
+      "variant": "foreground_only",
+      "sample": 21,
+      "elapsed_ms": 7.5126,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 0.0
+    },
+    {
+      "case": "dispatch_with_inventory",
+      "variant": "foreground_only",
+      "sample": 22,
+      "elapsed_ms": 8.9784,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 15.625
+    },
+    {
+      "case": "dispatch_with_inventory",
+      "variant": "background_enabled",
+      "sample": 22,
+      "elapsed_ms": 11.3814,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 15.625,
+      "background": {
+        "bytes_read": 0,
+        "native_probes": 0,
+        "native_calls": 1,
+        "deferred": true
+      }
+    },
+    {
+      "case": "dispatch_with_inventory",
+      "variant": "background_enabled",
+      "sample": 23,
+      "elapsed_ms": 10.8786,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 15.625,
+      "background": {
+        "bytes_read": 0,
+        "native_probes": 0,
+        "native_calls": 1,
+        "deferred": true
+      }
+    },
+    {
+      "case": "dispatch_with_inventory",
+      "variant": "foreground_only",
+      "sample": 23,
+      "elapsed_ms": 10.4711,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 15.625
+    },
+    {
+      "case": "dispatch_with_inventory",
+      "variant": "foreground_only",
+      "sample": 24,
+      "elapsed_ms": 12.0945,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 15.625
+    },
+    {
+      "case": "dispatch_with_inventory",
+      "variant": "background_enabled",
+      "sample": 24,
+      "elapsed_ms": 8.1327,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 15.625,
+      "background": {
+        "bytes_read": 0,
+        "native_probes": 0,
+        "native_calls": 1,
+        "deferred": true
+      }
+    },
+    {
+      "case": "dispatch_with_inventory",
+      "variant": "background_enabled",
+      "sample": 25,
+      "elapsed_ms": 9.7776,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 0.0,
+      "background": {
+        "bytes_read": 0,
+        "native_probes": 0,
+        "native_calls": 1,
+        "deferred": true
+      }
+    },
+    {
+      "case": "dispatch_with_inventory",
+      "variant": "foreground_only",
+      "sample": 25,
+      "elapsed_ms": 7.425,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 15.625
+    },
+    {
+      "case": "dispatch_with_inventory",
+      "variant": "foreground_only",
+      "sample": 26,
+      "elapsed_ms": 8.5943,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 0.0
+    },
+    {
+      "case": "dispatch_with_inventory",
+      "variant": "background_enabled",
+      "sample": 26,
+      "elapsed_ms": 7.6209,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 0.0,
+      "background": {
+        "bytes_read": 0,
+        "native_probes": 0,
+        "native_calls": 1,
+        "deferred": true
+      }
+    },
+    {
+      "case": "dispatch_with_inventory",
+      "variant": "background_enabled",
+      "sample": 27,
+      "elapsed_ms": 11.0628,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 15.625,
+      "background": {
+        "bytes_read": 0,
+        "native_probes": 0,
+        "native_calls": 1,
+        "deferred": true
+      }
+    },
+    {
+      "case": "dispatch_with_inventory",
+      "variant": "foreground_only",
+      "sample": 27,
+      "elapsed_ms": 5.856,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 0.0
+    },
+    {
+      "case": "dispatch_with_inventory",
+      "variant": "foreground_only",
+      "sample": 28,
+      "elapsed_ms": 9.0073,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 15.625
+    },
+    {
+      "case": "dispatch_with_inventory",
+      "variant": "background_enabled",
+      "sample": 28,
+      "elapsed_ms": 8.7784,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 0.0,
+      "background": {
+        "bytes_read": 0,
+        "native_probes": 0,
+        "native_calls": 1,
+        "deferred": true
+      }
+    },
+    {
+      "case": "dispatch_with_inventory",
+      "variant": "background_enabled",
+      "sample": 29,
+      "elapsed_ms": 7.1614,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 0.0,
+      "background": {
+        "bytes_read": 0,
+        "native_probes": 0,
+        "native_calls": 1,
+        "deferred": true
+      }
+    },
+    {
+      "case": "dispatch_with_inventory",
+      "variant": "foreground_only",
+      "sample": 29,
+      "elapsed_ms": 5.9371,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 15.625
+    },
+    {
+      "case": "dispatch_with_inventory",
+      "variant": "foreground_only",
+      "sample": 30,
+      "elapsed_ms": 9.036,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 0.0
+    },
+    {
+      "case": "dispatch_with_inventory",
+      "variant": "background_enabled",
+      "sample": 30,
+      "elapsed_ms": 11.1204,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 15.625,
+      "background": {
+        "bytes_read": 0,
+        "native_probes": 0,
+        "native_calls": 1,
+        "deferred": true
+      }
+    },
+    {
+      "case": "dispatch_with_inventory",
+      "variant": "background_enabled",
+      "sample": 31,
+      "elapsed_ms": 15.0614,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 15.625,
+      "background": {
+        "bytes_read": 0,
+        "native_probes": 0,
+        "native_calls": 1,
+        "deferred": true
+      }
+    },
+    {
+      "case": "dispatch_with_inventory",
+      "variant": "foreground_only",
+      "sample": 31,
+      "elapsed_ms": 10.221,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 0.0
+    },
+    {
+      "case": "dispatch_with_inventory",
+      "variant": "foreground_only",
+      "sample": 32,
+      "elapsed_ms": 8.1681,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 15.625
+    },
+    {
+      "case": "dispatch_with_inventory",
+      "variant": "background_enabled",
+      "sample": 32,
+      "elapsed_ms": 7.146,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 15.625,
+      "background": {
+        "bytes_read": 0,
+        "native_probes": 0,
+        "native_calls": 1,
+        "deferred": true
+      }
+    },
+    {
+      "case": "dispatch_with_inventory",
+      "variant": "background_enabled",
+      "sample": 33,
+      "elapsed_ms": 9.4807,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 0.0,
+      "background": {
+        "bytes_read": 0,
+        "native_probes": 0,
+        "native_calls": 1,
+        "deferred": true
+      }
+    },
+    {
+      "case": "dispatch_with_inventory",
+      "variant": "foreground_only",
+      "sample": 33,
+      "elapsed_ms": 8.1713,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 15.625
+    },
+    {
+      "case": "dispatch_with_inventory",
+      "variant": "foreground_only",
+      "sample": 34,
+      "elapsed_ms": 7.2993,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 0.0
+    },
+    {
+      "case": "dispatch_with_inventory",
+      "variant": "background_enabled",
+      "sample": 34,
+      "elapsed_ms": 10.1443,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 15.625,
+      "background": {
+        "bytes_read": 0,
+        "native_probes": 0,
+        "native_calls": 1,
+        "deferred": true
+      }
+    },
+    {
+      "case": "dispatch_with_inventory",
+      "variant": "background_enabled",
+      "sample": 35,
+      "elapsed_ms": 9.4011,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 0.0,
+      "background": {
+        "bytes_read": 0,
+        "native_probes": 0,
+        "native_calls": 1,
+        "deferred": true
+      }
+    },
+    {
+      "case": "dispatch_with_inventory",
+      "variant": "foreground_only",
+      "sample": 35,
+      "elapsed_ms": 5.8491,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 0.0
+    },
+    {
+      "case": "dispatch_with_inventory",
+      "variant": "foreground_only",
+      "sample": 36,
+      "elapsed_ms": 6.4584,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 0.0
+    },
+    {
+      "case": "dispatch_with_inventory",
+      "variant": "background_enabled",
+      "sample": 36,
+      "elapsed_ms": 6.2271,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 0.0,
+      "background": {
+        "bytes_read": 0,
+        "native_probes": 0,
+        "native_calls": 1,
+        "deferred": true
+      }
+    },
+    {
+      "case": "dispatch_with_inventory",
+      "variant": "background_enabled",
+      "sample": 37,
+      "elapsed_ms": 10.1985,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 0.0,
+      "background": {
+        "bytes_read": 0,
+        "native_probes": 0,
+        "native_calls": 1,
+        "deferred": true
+      }
+    },
+    {
+      "case": "dispatch_with_inventory",
+      "variant": "foreground_only",
+      "sample": 37,
+      "elapsed_ms": 5.2249,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 15.625
+    },
+    {
+      "case": "dispatch_with_inventory",
+      "variant": "foreground_only",
+      "sample": 38,
+      "elapsed_ms": 4.9983,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 0.0
+    },
+    {
+      "case": "dispatch_with_inventory",
+      "variant": "background_enabled",
+      "sample": 38,
+      "elapsed_ms": 9.5974,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 0.0,
+      "background": {
+        "bytes_read": 0,
+        "native_probes": 0,
+        "native_calls": 1,
+        "deferred": true
+      }
+    },
+    {
+      "case": "dispatch_with_inventory",
+      "variant": "background_enabled",
+      "sample": 39,
+      "elapsed_ms": 7.3784,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 0.0,
+      "background": {
+        "bytes_read": 0,
+        "native_probes": 0,
+        "native_calls": 1,
+        "deferred": true
+      }
+    },
+    {
+      "case": "dispatch_with_inventory",
+      "variant": "foreground_only",
+      "sample": 39,
+      "elapsed_ms": 5.6597,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 0.0
+    },
+    {
+      "case": "dispatch_with_inventory",
+      "variant": "foreground_only",
+      "sample": 40,
+      "elapsed_ms": 5.5746,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 15.625
+    },
+    {
+      "case": "dispatch_with_inventory",
+      "variant": "background_enabled",
+      "sample": 40,
+      "elapsed_ms": 7.1739,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 0.0,
+      "background": {
+        "bytes_read": 0,
+        "native_probes": 0,
+        "native_calls": 1,
+        "deferred": true
+      }
+    },
+    {
+      "case": "dispatch_with_inventory",
+      "variant": "background_enabled",
+      "sample": 41,
+      "elapsed_ms": 8.0952,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 0.0,
+      "background": {
+        "bytes_read": 0,
+        "native_probes": 0,
+        "native_calls": 1,
+        "deferred": true
+      }
+    },
+    {
+      "case": "dispatch_with_inventory",
+      "variant": "foreground_only",
+      "sample": 41,
+      "elapsed_ms": 6.5084,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 15.625
+    },
+    {
+      "case": "dispatch_with_inventory",
+      "variant": "foreground_only",
+      "sample": 42,
+      "elapsed_ms": 7.495,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 0.0
+    },
+    {
+      "case": "dispatch_with_inventory",
+      "variant": "background_enabled",
+      "sample": 42,
+      "elapsed_ms": 7.2483,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 0.0,
+      "background": {
+        "bytes_read": 0,
+        "native_probes": 0,
+        "native_calls": 1,
+        "deferred": true
+      }
+    },
+    {
+      "case": "dispatch_with_inventory",
+      "variant": "background_enabled",
+      "sample": 43,
+      "elapsed_ms": 9.8492,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 0.0,
+      "background": {
+        "bytes_read": 0,
+        "native_probes": 0,
+        "native_calls": 1,
+        "deferred": true
+      }
+    },
+    {
+      "case": "dispatch_with_inventory",
+      "variant": "foreground_only",
+      "sample": 43,
+      "elapsed_ms": 6.3047,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 15.625
+    },
+    {
+      "case": "dispatch_with_inventory",
+      "variant": "foreground_only",
+      "sample": 44,
+      "elapsed_ms": 8.1871,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 0.0
+    },
+    {
+      "case": "dispatch_with_inventory",
+      "variant": "background_enabled",
+      "sample": 44,
+      "elapsed_ms": 8.4817,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 15.625,
+      "background": {
+        "bytes_read": 0,
+        "native_probes": 0,
+        "native_calls": 1,
+        "deferred": true
+      }
+    },
+    {
+      "case": "dispatch_with_inventory",
+      "variant": "background_enabled",
+      "sample": 45,
+      "elapsed_ms": 8.6423,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 15.625,
+      "background": {
+        "bytes_read": 0,
+        "native_probes": 0,
+        "native_calls": 1,
+        "deferred": true
+      }
+    },
+    {
+      "case": "dispatch_with_inventory",
+      "variant": "foreground_only",
+      "sample": 45,
+      "elapsed_ms": 7.7463,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 0.0
+    },
+    {
+      "case": "dispatch_with_inventory",
+      "variant": "foreground_only",
+      "sample": 46,
+      "elapsed_ms": 6.6454,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 0.0
+    },
+    {
+      "case": "dispatch_with_inventory",
+      "variant": "background_enabled",
+      "sample": 46,
+      "elapsed_ms": 8.5163,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 15.625,
+      "background": {
+        "bytes_read": 0,
+        "native_probes": 0,
+        "native_calls": 1,
+        "deferred": true
+      }
+    },
+    {
+      "case": "dispatch_with_inventory",
+      "variant": "background_enabled",
+      "sample": 47,
+      "elapsed_ms": 9.3934,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 0.0,
+      "background": {
+        "bytes_read": 0,
+        "native_probes": 0,
+        "native_calls": 1,
+        "deferred": true
+      }
+    },
+    {
+      "case": "dispatch_with_inventory",
+      "variant": "foreground_only",
+      "sample": 47,
+      "elapsed_ms": 7.1229,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 15.625
+    },
+    {
+      "case": "dispatch_with_inventory",
+      "variant": "foreground_only",
+      "sample": 48,
+      "elapsed_ms": 6.834,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 0.0
+    },
+    {
+      "case": "dispatch_with_inventory",
+      "variant": "background_enabled",
+      "sample": 48,
+      "elapsed_ms": 10.3537,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 0.0,
+      "background": {
+        "bytes_read": 0,
+        "native_probes": 0,
+        "native_calls": 1,
+        "deferred": true
+      }
+    },
+    {
+      "case": "dispatch_with_inventory",
+      "variant": "background_enabled",
+      "sample": 49,
+      "elapsed_ms": 20.3308,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 15.625,
+      "background": {
+        "bytes_read": 0,
+        "native_probes": 0,
+        "native_calls": 1,
+        "deferred": true
+      }
+    },
+    {
+      "case": "dispatch_with_inventory",
+      "variant": "foreground_only",
+      "sample": 49,
+      "elapsed_ms": 14.675,
+      "policy_reads": 8,
+      "foreground_cpu_ms": 0.0
+    }
+  ]
+}

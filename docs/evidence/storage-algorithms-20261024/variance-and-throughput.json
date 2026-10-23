@@ -1,0 +1,275 @@
+{
+  "followup-bounded-preflight": {
+    "foreground_read": {
+      "n": 50,
+      "p95_ratio": 0.9704983563807742,
+      "p50_ratio": 0.9633117678315568,
+      "aggregate_rate_ratio": 1.0016647929483016,
+      "ranges_ms": {
+        "foreground_only": [
+          53.9595,
+          147.7359
+        ],
+        "background_enabled": [
+          56.5887,
+          183.3595
+        ]
+      },
+      "cpu_unique_ms": {
+        "foreground_only": [
+          46.875,
+          62.5,
+          78.125,
+          93.75,
+          109.375,
+          125.0,
+          140.625,
+          156.25
+        ],
+        "background_enabled": [
+          46.875,
+          62.5,
+          78.125,
+          93.75,
+          109.375,
+          125.0,
+          156.25,
+          171.875
+        ]
+      }
+    },
+    "dispatch_with_background": {
+      "n": 50,
+      "p95_ratio": 0.9198720174037817,
+      "p50_ratio": 1.1734486726143503,
+      "aggregate_rate_ratio": 0.8867681533565078,
+      "ranges_ms": {
+        "foreground_only": [
+          5.7566,
+          20.1041
+        ],
+        "background_enabled": [
+          7.2025,
+          18.4322
+        ]
+      },
+      "cpu_unique_ms": {
+        "foreground_only": [
+          0.0,
+          15.625,
+          31.25
+        ],
+        "background_enabled": [
+          0.0,
+          15.625
+        ]
+      }
+    },
+    "foreground_read_with_inventory": {
+      "n": 50,
+      "p95_ratio": 0.9512302227858093,
+      "p50_ratio": 0.9815728372540149,
+      "aggregate_rate_ratio": 1.0129397176555677,
+      "ranges_ms": {
+        "foreground_only": [
+          47.8516,
+          129.2643
+        ],
+        "background_enabled": [
+          50.31,
+          139.8304
+        ]
+      },
+      "cpu_unique_ms": {
+        "foreground_only": [
+          46.875,
+          62.5,
+          78.125,
+          93.75,
+          125.0,
+          140.625
+        ],
+        "background_enabled": [
+          46.875,
+          62.5,
+          78.125,
+          93.75,
+          125.0,
+          140.625
+        ]
+      }
+    },
+    "dispatch_with_inventory": {
+      "n": 50,
+      "p95_ratio": 1.1184942685615569,
+      "p50_ratio": 1.2161891655198298,
+      "aggregate_rate_ratio": 0.8390981160933757,
+      "ranges_ms": {
+        "foreground_only": [
+          5.008,
+          10.7186
+        ],
+        "background_enabled": [
+          5.8401,
+          13.5004
+        ]
+      },
+      "cpu_unique_ms": {
+        "foreground_only": [
+          0.0,
+          15.625
+        ],
+        "background_enabled": [
+          0.0,
+          15.625
+        ]
+      }
+    }
+  },
+  "followup-native-boundaries": {
+    "foreground_read": {
+      "n": 50,
+      "p95_ratio": 0.9351391833822483,
+      "p50_ratio": 1.0861842429558015,
+      "aggregate_rate_ratio": 0.9869000361909489,
+      "ranges_ms": {
+        "foreground_only": [
+          51.1419,
+          289.1831
+        ],
+        "background_enabled": [
+          55.5704,
+          244.4294
+        ]
+      },
+      "cpu_unique_ms": {
+        "foreground_only": [
+          46.875,
+          62.5,
+          78.125,
+          93.75,
+          109.375,
+          125.0,
+          140.625,
+          156.25,
+          203.125,
+          218.75,
+          265.625
+        ],
+        "background_enabled": [
+          46.875,
+          62.5,
+          78.125,
+          93.75,
+          109.375,
+          125.0,
+          140.625,
+          156.25,
+          187.5,
+          203.125,
+          218.75,
+          234.375
+        ]
+      }
+    },
+    "dispatch_with_background": {
+      "n": 50,
+      "p95_ratio": 0.8709787305527816,
+      "p50_ratio": 1.2403862801300425,
+      "aggregate_rate_ratio": 0.8799729463860602,
+      "ranges_ms": {
+        "foreground_only": [
+          5.1028,
+          23.222
+        ],
+        "background_enabled": [
+          6.1198,
+          26.285
+        ]
+      },
+      "cpu_unique_ms": {
+        "foreground_only": [
+          0.0,
+          15.625,
+          31.25
+        ],
+        "background_enabled": [
+          0.0,
+          15.625,
+          31.25
+        ]
+      }
+    },
+    "foreground_read_with_inventory": {
+      "n": 50,
+      "p95_ratio": 0.9338470352043658,
+      "p50_ratio": 1.074074830462169,
+      "aggregate_rate_ratio": 1.0145800915406107,
+      "ranges_ms": {
+        "foreground_only": [
+          51.236,
+          321.2923
+        ],
+        "background_enabled": [
+          55.1294,
+          292.572
+        ]
+      },
+      "cpu_unique_ms": {
+        "foreground_only": [
+          62.5,
+          78.125,
+          93.75,
+          109.375,
+          125.0,
+          140.625,
+          156.25,
+          171.875,
+          187.5,
+          203.125,
+          250.0,
+          265.625
+        ],
+        "background_enabled": [
+          62.5,
+          78.125,
+          93.75,
+          109.375,
+          125.0,
+          140.625,
+          156.25,
+          171.875,
+          187.5,
+          203.125,
+          234.375
+        ]
+      }
+    },
+    "dispatch_with_inventory": {
+      "n": 50,
+      "p95_ratio": 0.9898827619159737,
+      "p50_ratio": 1.2523321517098003,
+      "aggregate_rate_ratio": 0.850120841604077,
+      "ranges_ms": {
+        "foreground_only": [
+          4.9983,
+          16.055
+        ],
+        "background_enabled": [
+          6.1931,
+          20.3308
+        ]
+      },
+      "cpu_unique_ms": {
+        "foreground_only": [
+          0.0,
+          15.625
+        ],
+        "background_enabled": [
+          0.0,
+          15.625
+        ]
+      }
+    }
+  }
+}

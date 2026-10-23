@@ -1457,6 +1457,10 @@ class MetadataRepository:
         from . import metadata_actions  # Register additive durable metadata receipts.
         Base.metadata.create_all(self.engine)
         ReadModelBase.metadata.create_all(self.engine)
+        if self.engine.dialect.name == "sqlite":
+            from .storage_projection import ensure_schema
+            with self.engine.begin() as connection:
+                ensure_schema(connection)
         # Read-model version 2 stores only fields consumed by cluster insights.
         # Nullable additions let the ordinary revision/version backfill populate
         # existing databases before a reader can use the new facts.
@@ -4098,6 +4102,9 @@ class MetadataRepository:
                         artifact.created_at = manifest.created_at
                         artifact.payload = _payload(manifest)
                         session.add(artifact)
+                        if self.engine.dialect.name == "sqlite":
+                            from .storage_projection import record_manifest
+                            record_manifest(session.connection(), artifact.payload, current.project_id)
                     return current
                 except (RevisionConflictError, OperationalError) as exc:
                     if self._transaction_session() is not None:
@@ -4676,6 +4683,11 @@ class MetadataRepository:
                 row.created_at = manifest.created_at
                 row.payload = _payload(manifest)
                 session.add(row)
+                if self.engine.dialect.name == "sqlite":
+                    from .storage_projection import record_manifest
+                    project = session.scalar(select(JobRow.project_id).where(JobRow.job_id == manifest.job_id))
+                    if project is not None:
+                        record_manifest(session.connection(), row.payload, project)
 
         self._retry_sqlite_write(write)
 

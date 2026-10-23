@@ -1,0 +1,9 @@
+{
+  "status": "invalid_incomplete_run",
+  "configuration": {"background_chunk_bytes": 4096, "inventory_max_files": 8, "inventory_time_budget_ms": 10},
+  "failed_case": "foreground_read_with_inventory",
+  "error": "background did not enter actual work: bytes_read=0, native_probes=0, deferred=false",
+  "reason": "native occupancy time budget exhausted before the first probe; benchmark incorrectly assumed every preflight reaches work",
+  "timing_receipt_limitation": "The old harness wrote only at successful completion. Partial timing arrays from this failed process were not saved and cannot be reconstructed. This run provides no performance acceptance.",
+  "correction": "Save every timed sample to JSONL, save all bounded preflight deferrals, and save partial report on failure. Require the same 50 actual-overlap pairs, at most five preflights per background sample; no result-dependent repetition."
+}

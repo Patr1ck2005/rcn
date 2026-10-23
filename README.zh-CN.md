@@ -6,7 +6,7 @@
 
 RCN 负责把结构化科研任务分配到研究组贡献的机器上，提供 Python 控制面、资源调度、Dispatcher、网页控制台、Windows 成员客户端，以及个人 Agent CLI。任务按登记的执行 Profile 运行，系统记录放置条件、运行尝试、恢复过程、结果清单与审计事件。
 
-当前版本是 **0.15.0a2 公开预览版**，从研究组实际使用的系统中提取通用源码。调度与运维代码来自真实使用；公开示例和本地 demo 全部使用合成数据。组内使用经历不等于陌生实验室已完成部署验收。
+当前版本是 **0.15.0a3 公开预览版**，从研究组实际使用的系统中提取通用源码。调度与运维代码来自真实使用；公开示例和本地 demo 全部使用合成数据。组内使用经历不等于陌生实验室已完成部署验收。
 
 ## 可以做什么
 
@@ -63,7 +63,7 @@ npm --prefix web test
 npm --prefix web run build
 ```
 
-网页构建产物用于本机运行和 wheel 打包，不提交到源码历史。生成截图、runtime 档案、凭据与本地状态同样不入库。参见[贡献指南](docs/contributing.md)、[安全说明](docs/security.md)和[版本说明](docs/releases/0.15.0a2.md)。
+网页构建产物用于本机运行和 wheel 打包，不提交到源码历史。生成截图、runtime 档案、凭据与本地状态同样不入库。参见[贡献指南](docs/contributing.md)、[安全说明](docs/security.md)和[版本说明](docs/releases/0.15.0a3.md)。
 
 RCN 源码采用 [MIT](LICENSE)，版权归 2026 Patr1ck2005。依赖保留各自许可证；MIT 不覆盖第三方组件、外部 runtime 或商业求解器，详见[第三方说明](docs/third-party-notices.md)。
 

@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { usePageRefresh } from "./usePageRefresh";
-import { Bell, BookOpen, Boxes, Cpu, FlaskConical, Gauge, KeyRound, RefreshCw, Server, ShieldCheck, UserRoundCog } from "lucide-react";
+import { Bell, BookOpen, Boxes, Cpu, FlaskConical, Gauge, HardDrive, KeyRound, RefreshCw, Server, ShieldCheck, UserRoundCog } from "lucide-react";
 import { Link, useSearchParams } from "react-router-dom";
 
 import { api } from "./api";
@@ -12,12 +12,14 @@ import { clearSolverApproval, loadSolverApproval, recoverSolverApproval, saveSol
 import { DataLoadState, initialRequestState, RefreshStatus, settleResourceRequests } from "./AsyncState";
 import { RuntimeControlDialog } from "./ControlDialogs";
 import { HelpLink } from "./HelpSystem";
+import StorageDashboard from "./StorageDashboard.jsx";
 
 const tabs = [
   ["users", "用户与 Token", UserRoundCog], ["projects", "项目授权", Boxes],
   ["profiles", "Profile 版本", Cpu], ["approvals", "Solver 审批", ShieldCheck],
   ["templates", "模板环境", FlaskConical],
   ["nodes", "节点与运行时", Server], ["capacity", "容量策略", Gauge],
+  ["storage", "存储 Storage", HardDrive],
   ["breakglass", "Break-glass", KeyRound],
 ];
 const time = (value) => value ? new Date(value).toLocaleString("zh-CN", { hour12: false }) : "-";
@@ -28,6 +30,7 @@ const adminResources = {
   breakglass: "/v1/admin/break-glass", onboarding: "/v1/admin/onboarding/profiles",
   preflights: "/v1/admin/onboarding/runs", enrollments: "/v1/admin/enrollments",
   settings: "/v1/settings/features", executionRuntime: "/v1/execution-runtime",
+  storageInventory: "/v1/admin/storage/inventory",
 };
 const adminResourceKeys = Object.keys(adminResources);
 const tabResources = {
@@ -35,11 +38,13 @@ const tabResources = {
   approvals: ["approvals", "executionRuntime", "profiles", "projects"], templates: ["templateEnvironments"],
   nodes: ["users", "onboarding", "preflights", "enrollments", "projects", "profiles"], capacity: ["settings", "profiles"],
   breakglass: ["breakglass"],
+  storage: ["storageInventory"],
 };
 const tabLoadingLabels = {
   users: "正在加载用户与角色", projects: "正在加载项目授权", profiles: "正在加载 Profile 版本",
   approvals: "正在加载 Solver 审批", templates: "正在加载模板环境", nodes: "正在加载节点与运行时",
   capacity: "正在加载容量策略", breakglass: "正在加载应急配置",
+  storage: "正在加载存储快照",
 };
 const tabHelpTopics = {
   users: "adminUsers", projects: "adminProjects", profiles: "adminProfiles",
@@ -55,6 +60,7 @@ const tabHelpCopy = {
   nodes: ["节点与 Runtime", "准入、preflight、候选晋升与可回滚发布"],
   capacity: ["容量与资源自治", "压力阈值、遥测质量、资源边界与证据调节"],
   breakglass: ["应急控制", "强身份、主机级终止、审计与恢复责任"],
+  storage: ["存储", "物理卷余量、项目逻辑账目与归档取回接续"],
 };
 
 const resourcePolicyFor = (profile, stored) => stored || ({
@@ -318,12 +324,13 @@ export default function AdminConsole({ overview = {}, actorId = "", onGlobalRefr
   const initialLoading = activeRequests.some((request) => request?.status === "loading");
   const refreshing = activeRequests.some((request) => request?.status === "refreshing");
   const hasCachedTab = activeRequests.every((request) => request?.updatedAt);
+  const hasStorageSnapshot = tab === "storage" && activeRequests.some((request) => request?.updatedAt);
   const loadError = activeRequests.find((request) => request?.status === "error")?.error || "";
   const refreshTab = refreshPage;
   return <main className="app-page" aria-busy={initialLoading || refreshing || mutating}><div className="page-title"><div><span>ADMIN / GOVERNANCE</span><h1>管理员面板</h1><p>身份、项目、不可变执行契约、审批、节点准入和应急控制</p></div><div className="page-actions"><RefreshStatus visible={refreshing || mutating} label={mutating ? "正在保存变更" : "正在更新"} /><button className="button" disabled={initialLoading || refreshing || mutating} onClick={refreshTab}><RefreshCw size={16} />刷新</button></div></div>{error && <div className="inline-error">{error}</div>}{notice && <div className="inline-success">{notice}</div>}
     <nav className="detail-tabs admin-tabs">{tabs.map(([value, text, Icon]) => <button key={value} className={tab === value ? "active" : ""} onClick={() => { setNotice(""); setParams({ tab: value }); }}><Icon size={15} />{text}</button>)}</nav>
     <section className="admin-guide" aria-label="管理员工作区说明"><BookOpen size={17} /><div><b>管理员工作区</b><span>配置按职责分区；变更保留审计，运行时、节点与应急操作遵循预览、确认和恢复边界。</span></div><HelpLink topic="adminControl">面板总览</HelpLink></section>
-    <section className="admin-tab-guide" aria-label={`${tabHelpCopy[tab][0]}说明`}><div><span>CURRENT SECTION</span><b>{tabHelpCopy[tab][0]}</b><small>{tabHelpCopy[tab][1]}</small></div><HelpLink topic={tabHelpTopics[tab]}>本页说明</HelpLink></section>
+    <section className="admin-tab-guide" aria-label={`${tabHelpCopy[tab][0]}说明`}><div><span>CURRENT SECTION</span><b>{tabHelpCopy[tab][0]}</b><small>{tabHelpCopy[tab][1]}</small></div>{tabHelpTopics[tab] && <HelpLink topic={tabHelpTopics[tab]}>本页说明</HelpLink>}</section>
     <fieldset disabled={mutating} style={{ border: 0, padding: 0, margin: 0, minWidth: 0 }}>
     {tab === "users" && Object.keys(pendingTokens).length > 0 && <section className="detail-section" aria-label="待核对的 Token 签发"><h2>Token 签发结果待核对</h2><p>请求可能已被接受，明文响应无法重新读取。先查看并撤销无法交付的 Token；本页和重新加载页面都不会自动重签。原请求是否已送达，需要管理员核对服务端审计后处理检查点。</p>{Object.entries(pendingTokens).filter(([id]) => id !== "unreadable").map(([id, marker]) => <p key={id}><b>{id}</b> · {time(marker.started_at)} <button className="button small" onClick={() => inspectTokens(id)}>核对现有 Token</button></p>)}</section>}
     {tab === "users" && !initialLoading && <PersonPolicyEditor users={data.users} profiles={data.profiles} />}
@@ -331,7 +338,9 @@ export default function AdminConsole({ overview = {}, actorId = "", onGlobalRefr
     {tab === "projects" && !initialLoading && (!loadError || hasCachedTab) && <ProjectPriorityControls projects={data.projects} onSave={savePriorityCeiling} />}
     {tab === "nodes" && <MemberInvitations key={actorId} actorId={actorId} users={data.users} enrollments={data.enrollments} projects={data.projects} profiles={data.profiles} admissionReady={[requests.projects, requests.profiles].every(request => ["ready", "refreshing"].includes(request?.status))} ready={[requests.users, requests.enrollments].every(request => ["ready", "refreshing"].includes(request?.status))} onRefresh={() => load(["users", "enrollments", "projects", "profiles"], true)} />}
     {loadError && hasCachedTab && <p className="inline-error">刷新失败：{loadError}。保留上次成功内容。</p>}
-    {(initialLoading || (loadError && !hasCachedTab)) ? <DataLoadState label={tabLoadingLabels[tab]} error={loadError} onRetry={refreshTab} /> : <>
+    {loadError && hasStorageSnapshot && !hasCachedTab && <div className="inline-error" role="alert">存储快照部分不可用：{loadError}。以下仅展示成功读取的证据。<button className="button small" onClick={refreshTab}>重试存储快照</button></div>}
+    {(initialLoading || (loadError && !hasCachedTab && !hasStorageSnapshot)) ? <DataLoadState label={tabLoadingLabels[tab]} error={loadError} onRetry={refreshTab} /> : <>
+    {tab === "storage" && <StorageDashboard inventory={data.storageInventory} />}
     {tab === "users" && <section className="detail-section"><header><div><h2>用户与角色</h2><span>停用保留历史 provenance</span></div></header><p>Agent Token 只用于该用户本人获准的计算，可单独撤销；不具管理员或机器所有者管理权限。</p><div className="admin-form user-form"><label>用户 ID<input value={userDraft.user_id} onChange={(event) => setUserDraft({ ...userDraft, user_id: event.target.value })} /></label><label>显示名称<input value={userDraft.display_name} onChange={(event) => setUserDraft({ ...userDraft, display_name: event.target.value })} /></label><fieldset><legend>角色</legend>{["member", "machine_owner", "admin"].map((role) => <label key={role}><input type="checkbox" checked={userDraft.roles.includes(role)} onChange={(event) => setUserDraft({ ...userDraft, roles: event.target.checked ? [...new Set([...userDraft.roles, role])] : userDraft.roles.filter((item) => item !== role) })} />{role}</label>)}</fieldset><button className="button button-primary" disabled={!userDraft.user_id || !userDraft.display_name || !userDraft.roles.length} onClick={saveUser}>保存用户</button></div><div className="admin-table"><div className="admin-table-head"><span>用户</span><span>角色</span><span>状态</span><span>Token</span><span>操作</span></div>{data.users.map((user) => <div key={user.user_id}><b>{user.display_name || user.user_id}<small>{user.user_id}</small></b><span>{[...user.roles].join(" · ")}</span><span>{user.active ? "活动" : "停用"}</span><button className="text-button" onClick={() => setSelectedUser(user.user_id)}>查看 {selectedUser === user.user_id && tokensRequest.status === "ready" ? tokens.length : ""}</button><div style={{ flexWrap: "wrap" }}><button className="button small" onClick={() => { setUserDraft({ user_id: user.user_id, display_name: user.display_name, roles: [...user.roles] }); }}>编辑</button><button className="button small" disabled={Boolean(pendingTokens.unreadable || pendingTokens[user.user_id])} onClick={() => issueToken(user.user_id)}>签发</button><button className="button small" disabled={Boolean(pendingTokens.unreadable || pendingTokens[user.user_id])} onClick={() => issueToken(user.user_id, true)}>签发 Agent Token</button><button className="button small" onClick={() => updateUser(user, !user.active)}>{user.active ? "停用" : "恢复"}</button></div></div>)}{!data.users.length && <div className="admin-empty-row">尚未创建用户。</div>}</div>{selectedUser && <div className="token-panel"><header><h3>{selectedUser} / tokens</h3></header>{issuedToken?.user_id === selectedUser && <div className="secret-once"><KeyRound size={17} /><div><b>{issuedToken.agent ? "Agent Token · 仅显示一次" : "仅显示一次"}</b><code>{issuedToken.token}</code></div></div>}{tokensRequest.status === "loading" || tokensRequest.status === "error" ? <DataLoadState compact label="正在加载个人 Token" error={tokensRequest.error} onRetry={() => { setSelectedUser(null); queueMicrotask(() => setSelectedUser(selectedUser)); }} /> : <div className="deep-list">{tokens.map((item) => <div key={item.token_id}><KeyRound size={15} /><span><b>{item.token_id}</b><small>{item.active ? "active" : "revoked"} · 范围 {(item.scopes || ["api"]).join(" · ")} · {time(item.created_at)}</small></span>{item.active && <button className="button small" onClick={() => revokeToken(selectedUser, item.token_id)}>撤销</button>}</div>)}{!tokens.length && <p className="empty-copy">该用户尚无 Token。</p>}</div>}</div>}</section>}
     {tab === "projects" && <section className="detail-section"><header><div><h2>项目授权与配额</h2><span>项目只冻结，不硬删除；Agent 必须列入授权用户</span></div></header><div className="admin-form project-form"><label>项目 ID<input value={projectDraft.project_id} onChange={(event) => setProjectDraft({ ...projectDraft, project_id: event.target.value })} /></label><label>所有者<input value={projectDraft.owner_user_id} onChange={(event) => setProjectDraft({ ...projectDraft, owner_user_id: event.target.value })} /></label><label>授权 Agent / 成员<input value={projectDraft.authorized_user_ids} onChange={(event) => setProjectDraft({ ...projectDraft, authorized_user_ids: event.target.value })} placeholder="用户 ID，逗号分隔" /></label><label>允许 Profile<input value={projectDraft.allowed_profiles} onChange={(event) => setProjectDraft({ ...projectDraft, allowed_profiles: event.target.value })} placeholder="逗号分隔" /></label><label>可信机器标签<input value={projectDraft.trusted_machine_labels} onChange={(event) => setProjectDraft({ ...projectDraft, trusted_machine_labels: event.target.value })} /></label><label>排队上限<input type="number" min="1" value={projectDraft.max_queued_units} onChange={(event) => setProjectDraft({ ...projectDraft, max_queued_units: Number(event.target.value) })} /></label><label>运行上限<input type="number" min="1" value={projectDraft.max_running_units} onChange={(event) => setProjectDraft({ ...projectDraft, max_running_units: Number(event.target.value) })} /></label><button className="button button-primary" disabled={!projectDraft.project_id || !projectDraft.owner_user_id} onClick={saveProject}>保存项目</button></div><div className="admin-table projects-table"><div className="admin-table-head"><span>项目</span><span>所有者</span><span>授权成员</span><span>运行配额</span><span>允许 Profile</span><span>状态</span></div>{data.projects.map((project) => { const active = project.status === "active"; return <div key={project.project_id}><b>{project.project_id}</b><span>{project.owner_user_id}</span><span>{project.authorized_user_ids?.join(" · ") || "仅所有者"}</span><span>{project.max_running_units} / {project.max_queued_units}</span><span>{project.allowed_profiles?.join(" · ") || "-"}</span><div><button className="button small" onClick={() => setProjectDraft({ ...project, authorized_user_ids: (project.authorized_user_ids || []).join(", "), allowed_profiles: project.allowed_profiles.join(", "), trusted_machine_labels: project.trusted_machine_labels.join(", ") })}>编辑</button><button className="button small" onClick={() => setProjectActive(project, !active)}>{active ? "冻结" : "恢复"}</button></div></div>; })}</div></section>}
     {tab === "profiles" && <section className="detail-section"><header><div><h2>不可变 Profile 版本</h2><span>已存在 ID 不能原地修改</span></div></header><div className="admin-form profile-form"><label>Profile ID<input value={profileDraft.profile_id} onChange={(event) => setProfileDraft({ ...profileDraft, profile_id: event.target.value })} /></label><label>版本<input value={profileDraft.version} onChange={(event) => setProfileDraft({ ...profileDraft, version: event.target.value })} /></label><label>执行器类型<input value={profileDraft.executor_kind} onChange={(event) => setProfileDraft({ ...profileDraft, executor_kind: event.target.value })} /></label><label>输出契约<input value={profileDraft.output_schema} onChange={(event) => setProfileDraft({ ...profileDraft, output_schema: event.target.value })} /></label><label>平台<input value={profileDraft.platforms} onChange={(event) => setProfileDraft({ ...profileDraft, platforms: event.target.value })} /></label><label>所需能力<input value={profileDraft.required_capabilities} onChange={(event) => setProfileDraft({ ...profileDraft, required_capabilities: event.target.value })} /></label><label>CPU<input type="number" min="1" value={profileDraft.cpus} onChange={(event) => setProfileDraft({ ...profileDraft, cpus: Number(event.target.value) })} /></label><label>内存 MiB<input type="number" min="1" value={profileDraft.memory_mb} onChange={(event) => setProfileDraft({ ...profileDraft, memory_mb: Number(event.target.value) })} /></label><label>磁盘 MiB<input type="number" min="1" value={profileDraft.disk_mb} onChange={(event) => setProfileDraft({ ...profileDraft, disk_mb: Number(event.target.value) })} /></label><label>GPU<input type="number" min="0" value={profileDraft.gpus} onChange={(event) => setProfileDraft({ ...profileDraft, gpus: Number(event.target.value) })} /></label><button className="button button-primary" disabled={!profileDraft.profile_id || !profileDraft.output_schema} onClick={createProfile}>创建新版本</button></div><div className="profile-grid">{data.profiles.map((profile) => <article key={profile.profile_id}><Cpu size={17} /><h3>{profile.profile_id}</h3><p>{profile.output_schema}</p><dl><div><dt>version</dt><dd>{profile.version}</dd></div><div><dt>executor</dt><dd>{profile.executor_kind}</dd></div><div><dt>capabilities</dt><dd>{profile.required_capabilities?.join(", ") || "无"}</dd></div><div><dt>resources</dt><dd>{profile.default_resources.cpus} CPU · {profile.default_resources.memory_mb} MiB</dd></div></dl></article>)}</div></section>}

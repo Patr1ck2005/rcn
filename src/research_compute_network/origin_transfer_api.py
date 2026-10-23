@@ -16,6 +16,7 @@ import traceback
 import zipfile
 import zlib
 from functools import wraps
+from contextlib import nullcontext
 from pathlib import Path
 
 from fastapi import APIRouter, Depends, HTTPException, Request
@@ -35,6 +36,7 @@ from .origin_transfer_diagnostics import OriginTransferDiagnostics
 from .spool_relocation import SpoolRelocationRegistry
 from .storage_roots import StorageRootError
 from .storage_lifecycle import StorageMetadataBusy
+from .storage_io import io_priority, BackgroundBudget, BackgroundDeferred, BACKGROUND_CHUNK_BYTES
 from .volume_budget import HARD_RESERVE_BYTES, VolumeBudget, VolumeBudgetError, VolumeCapacityUnavailable
 from .result_preparations import (PreparationCancelled, ResultPreparations,
                                   TransferActivity, VERIFY_CHUNK_BYTES, verification_slots)
@@ -44,18 +46,23 @@ class PinnedFileResponse(FileResponse):
     """Keep an exact persistent reader pin through streaming and cancellation."""
 
     def __init__(self, *args, reader_pin=None, opened_file=None, storage_validator=None, diagnostics=None,
-                 transfer_activity=None, **kwargs):
+                 transfer_activity=None, background_budget=None, **kwargs):
         super().__init__(*args, **kwargs)
         self.reader_pin = reader_pin
         self.opened_file = opened_file
         self.storage_validator = storage_validator
         self.diagnostics = diagnostics
         self.transfer_activity = transfer_activity
+        self.background_budget = background_budget
+        if background_budget is not None:
+            self.chunk_size = BACKGROUND_CHUNK_BYTES
 
     async def __call__(self, scope, receive, send):
         accepted_bytes = 0
         response_status = None
         outcome, error_type = "body_complete", None
+        activity = io_priority.foreground() if self.background_budget is None else nullcontext()
+        activity.__enter__()
 
         async def observed_send(message):
             nonlocal accepted_bytes, response_status
@@ -67,6 +74,8 @@ class PinnedFileResponse(FileResponse):
 
         try:
             try:
+                if self.background_budget is not None:
+                    await joined_io(self.background_budget.checkpoint)
                 if self.storage_validator is not None:
                     try:
                         await joined_io(self.storage_validator)
@@ -86,8 +95,11 @@ class PinnedFileResponse(FileResponse):
                     await joined_io(self.transfer_activity.release)
         except BaseException as exc:
             outcome, error_type = "body_error", type(exc).__name__
+            if isinstance(exc, BackgroundDeferred) and response_status is None:
+                raise HTTPException(503, {"reason_code": exc.reason_code}, headers={"Retry-After": "2"}) from exc
             raise
         finally:
+            activity.__exit__(None, None, None)
             if self.diagnostics is not None:
                 self.diagnostics.finish(outcome, asgi_accepted_body_bytes=accepted_bytes,
                                         response_status=response_status, error_type=error_type)
@@ -95,6 +107,8 @@ class PinnedFileResponse(FileResponse):
     async def _body(self, send, start, end, *, multipart=False):
         await joined_io(self.opened_file.seek, start)
         while start < end:
+            if self.background_budget is not None:
+                await joined_io(self.background_budget.checkpoint)
             chunk = await joined_io(self.opened_file.read, min(self.chunk_size, end - start))
             if not chunk:
                 raise OSError("verified result handle ended before its declared size")
@@ -140,17 +154,26 @@ class PinnedFileResponse(FileResponse):
         await send({"type": "http.response.body", "body": f"\n--{boundary}--\n".encode("latin-1"), "more_body": False})
 
 
-def open_verified_result(path, size_bytes, expected_sha256, *, progress=None, cancelled=lambda: False):
+def open_verified_result(path, size_bytes, expected_sha256, *, progress=None, cancelled=lambda: False, background_budget=None):
     """Verify once and stream that same handle; NTFS denies concurrent mutation."""
     volume = os.stat(path.parent).st_dev
-    verification_slots.acquire(volume, cancelled)
-    try:
-        return _open_verified_result(path, size_bytes, expected_sha256, progress=progress, cancelled=cancelled)
-    finally:
-        verification_slots.release(volume)
+    cancelled = cancelled or (lambda: False)
+    def check_cancelled():
+        if background_budget is not None:
+            background_budget.checkpoint()
+        return cancelled()
+    # Foreground demand is visible while waiting for a volume slot, so an
+    # archive already holding it yields at its next chunk and releases it.
+    with (io_priority.foreground() if background_budget is None else nullcontext()):
+        verification_slots.acquire(volume, check_cancelled)
+        try:
+            return _open_verified_result(path, size_bytes, expected_sha256, progress=progress,
+                                         cancelled=check_cancelled, background_budget=background_budget)
+        finally:
+            verification_slots.release(volume)
 
 
-def _open_verified_result(path, size_bytes, expected_sha256, *, progress, cancelled):
+def _open_verified_result(path, size_bytes, expected_sha256, *, progress, cancelled, background_budget=None):
     if cancelled():
         raise PreparationCancelled()
     if os.name == "nt":
@@ -185,7 +208,7 @@ def _open_verified_result(path, size_bytes, expected_sha256, *, progress, cancel
         while True:
             if cancelled():
                 raise PreparationCancelled()
-            chunk = stream.read(VERIFY_CHUNK_BYTES)
+            chunk = stream.read(BACKGROUND_CHUNK_BYTES if background_budget is not None else VERIFY_CHUNK_BYTES)
             if not chunk:
                 break
             checksum.update(chunk)
@@ -250,7 +273,13 @@ class PreparedContentResponse(Response):
 
     async def __call__(self, scope, receive, send):
         resource = self.ticket.resource
+        background = getattr(resource, "background_budget", None)
+        activity = io_priority.foreground() if background is None else nullcontext()
+        activity.__enter__()
+        started = False
         try:
+            if background is not None:
+                await joined_io(background.checkpoint)
             await joined_io(self.validator)
             if resource.storage_validator is not None:
                 await joined_io(resource.storage_validator)
@@ -262,21 +291,44 @@ class PreparedContentResponse(Response):
                 raise HTTPException(409, {"reason_code": "result_handle_changed"})
             await joined_io(resource.opened_file.seek, self.start)
             await send({"type": "http.response.start", "status": self.status_code, "headers": self.raw_headers})
+            started = True
             position = self.start
             if position == self.end:
                 await send({"type": "http.response.body", "body": b"", "more_body": False})
             while position < self.end:
                 if self.ticket.cancel.is_set():
                     raise PreparationCancelled()
-                chunk = await joined_io(resource.opened_file.read, min(VERIFY_CHUNK_BYTES, self.end - position))
+                if background is not None:
+                    await joined_io(background.checkpoint)
+                chunk = await joined_io(resource.opened_file.read, min(
+                    BACKGROUND_CHUNK_BYTES if background is not None else VERIFY_CHUNK_BYTES, self.end - position))
                 if self.ticket.cancel.is_set():
                     raise PreparationCancelled()
                 if not chunk:
                     raise OSError("verified result handle ended before its declared size")
                 position += len(chunk)
                 await send({"type": "http.response.body", "body": chunk, "more_body": position < self.end})
+        except BackgroundDeferred as exc:
+            await joined_io(self.manager.defer_body, self.ticket)
+            if not started:
+                raise HTTPException(503, {"reason_code": exc.reason_code}, headers={"Retry-After": "2"}) from exc
+            raise ConnectionAbortedError("archive yielded; resume original Range") from exc
+        except HTTPException as exc:
+            if background is not None and isinstance(exc.detail, dict) and exc.detail.get("reason_code") == "restore_source_unavailable":
+                await joined_io(self.manager.defer_body, self.ticket, "restore_source_unavailable")
+            raise
+        except OSError as exc:
+            from .restore_sources import source_unavailable
+            if background is not None and source_unavailable(exc):
+                await joined_io(self.manager.defer_body, self.ticket, "restore_source_unavailable")
+                if not started:
+                    raise HTTPException(503, {"reason_code":"restore_source_unavailable"}, headers={"Retry-After":"2"}) from exc
+            raise
         finally:
-            await joined_io(self.manager.end_body, self.ticket)
+            try:
+                await joined_io(self.manager.end_body, self.ticket)
+            finally:
+                activity.__exit__(None, None, None)
 
 
 async def joined_io(operation, *args, on_cancelled_result=None, **kwargs):
@@ -452,7 +504,7 @@ class OriginTransferStore:
 
 def build_origin_transfer_router(*, repository, auth, root, require_owner, enabled=False,
                                  validate_root=None, validate_write=None, budget_database=None, lifecycle=None,
-                                 control_root=None, transfer_gate=None):
+                                 control_root=None, transfer_gate=None, restore_sources=None):
     router = APIRouter(route_class=OriginTransferRoute)
     if budget_database is None:
         url = repository.engine.url
@@ -465,6 +517,10 @@ def build_origin_transfer_router(*, repository, auth, root, require_owner, enabl
         transfer_gate = get_transfer_gate(control_root)
     preparations = ResultPreparations(control_root, gate=transfer_gate)
     router.result_preparations = preparations
+    if restore_sources is None and lifecycle is not None:
+        from .restore_sources import RegisteredResultSources
+        restore_sources = RegisteredResultSources(lifecycle)
+    router.restore_sources = restore_sources
     router.add_event_handler("shutdown", preparations.close)
 
     def admitted_transfer(function):
@@ -536,6 +592,7 @@ def build_origin_transfer_router(*, repository, auth, root, require_owner, enabl
                 "bundle_status": True, "bundle_source_receipts": True, "max_parallel_uploads": 4,
                 "content_addressed_inputs": 1, "asset_encoding": "gzip",
                 "result_preparations": True, "result_range_resume": True,
+                "registered_archive_restore": restore_sources is not None,
                 "result_preparation_idle_seconds": 120, "max_ready_result_tickets": 8,
                 "max_actor_ready_result_tickets": 2, "max_result_verifications": 2,
                 "max_volume_result_verifications": 1}
@@ -859,21 +916,42 @@ def build_origin_transfer_router(*, repository, auth, root, require_owner, enabl
             return
         pin = None
         opened_file = None
+        restored = None
+        background = None
         try:
-            with diagnostics.stage("storage_root"):
-                store.check_root()
-            with diagnostics.stage("pin_reader"):
-                if lifecycle is not None:
-                    pin = lifecycle.pin_reader(job_id, unit_id, attempt_id, file)
-            with diagnostics.stage("result_paths"):
-                paths, relocation_validator = result_paths(job, unit, attempt, manifest, [record])
-            target = paths[0]
-            with diagnostics.stage("open_verified_result"):
-                if progress is None:
-                    opened_file, file_stat = open_verified_result(target, record.size_bytes, record.sha256)
-                else:
-                    opened_file, file_stat = open_verified_result(target, record.size_bytes, record.sha256,
-                        progress=progress, cancelled=cancelled)
+            try:
+                with diagnostics.stage("storage_root"):
+                    store.check_root()
+                with diagnostics.stage("result_paths"):
+                    paths, relocation_validator = result_paths(job, unit, attempt, manifest, [record])
+                    target = paths[0]
+                    if not target.is_file():
+                        raise FileNotFoundError("original staging file is unavailable")
+                with diagnostics.stage("pin_reader"):
+                    if lifecycle is not None:
+                        pin = lifecycle.pin_reader(job_id, unit_id, attempt_id, file)
+            except (FileNotFoundError, StorageRootError, ValueError) as unavailable:
+                allowed = isinstance(unavailable, (FileNotFoundError, StorageRootError)) or getattr(unavailable, "reason_code", None) in {
+                    "result_retirement_pending_or_completed", "file_retirement_in_progress"}
+                if not allowed or restore_sources is None:
+                    raise
+                if progress is not None:
+                    progress(0, record.size_bytes, state="restore_pending")
+                background = BackgroundBudget(lifecycle.database)
+                with diagnostics.stage("open_verified_result"):
+                    restored, pin, target, opened_file, file_stat = restore_sources.open_verified(
+                        job_id, unit_id, attempt_id, sha256_value(manifest.model_dump(mode="json")), record,
+                        checkpoint=background.checkpoint,
+                        opener=lambda source_path: open_verified_result(source_path, record.size_bytes, record.sha256,
+                            progress=progress, cancelled=cancelled, background_budget=background))
+                relocation_validator = None
+            if opened_file is None:
+                with diagnostics.stage("open_verified_result"):
+                    if progress is None:
+                        opened_file, file_stat = open_verified_result(target, record.size_bytes, record.sha256)
+                    else:
+                        opened_file, file_stat = open_verified_result(target, record.size_bytes, record.sha256,
+                            progress=progress, cancelled=cancelled)
             with diagnostics.stage("append_event"):
                 repository.append_event(AuditEvent(event_type="origin_transfer.result_requested",
                     actor_id=context.actor_id, subject_type="job", subject_id=job_id,
@@ -884,11 +962,21 @@ def build_origin_transfer_router(*, repository, auth, root, require_owner, enabl
                 "X-RCN-Transfer-Request": diagnostics.request_id}}
             def validate_result():
                 with diagnostics.stage("response_storage_validate"):
+                    if restored is not None:
+                        try:
+                            restored.validate()
+                        except (ValueError, OSError) as exc:
+                            from .restore_sources import source_unavailable
+                            transient = source_unavailable(exc)
+                            raise HTTPException(503 if transient else 409, {"reason_code": "restore_source_unavailable" if transient
+                                else getattr(exc, "reason_code", "restore_source_integrity_failed")}) from exc
+                        return
                     managed_path(store.incoming(job, unit_id, attempt_id), file)
                     if relocation_validator is not None:
                         relocation_validator()
             response = PinnedFileResponse(target, reader_pin=pin, opened_file=opened_file,
-                stat_result=file_stat, storage_validator=validate_result, diagnostics=diagnostics, **arguments)
+                stat_result=file_stat, storage_validator=validate_result, diagnostics=diagnostics,
+                background_budget=background, **arguments)
             diagnostics.checkpoint("response_ready")
             return response
         except BaseException as exc:
@@ -900,7 +988,9 @@ def build_origin_transfer_router(*, repository, auth, root, require_owner, enabl
                     pin.release()
             if isinstance(exc, (OSError, ValueError)):
                 reason = getattr(exc, "reason_code", "result_unavailable_or_integrity_failed")
-                raise HTTPException(409, {"reason_code": reason}) from exc
+                transient = isinstance(exc, BackgroundDeferred) or reason == "restore_source_unavailable"
+                raise HTTPException(503 if transient else 409,
+                    {"reason_code": reason}, headers={"Retry-After": "2"} if transient else None) from exc
             raise
 
     @router.get("/v1/jobs/{job_id}/origin-results/{unit_id}/{attempt_id}")

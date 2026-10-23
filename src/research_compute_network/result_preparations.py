@@ -205,10 +205,17 @@ class ResultPreparations:
 
     def _trim_cache(self):
         terminal = [key for key, item in self.tickets.items() if item.resource is None and item.admission is None
-                    and not item.serving and item.document["state"] not in {"queued", "verifying", "ready", "cancelling"}]
+                    and not item.serving and (item.document["state"] not in {"queued", "verifying", "restore_pending", "ready", "cancelling"}
+                                             or self._deferred(item))]
         for key in terminal[:max(0, len(terminal) - self.terminal_cache_limit)]:
             item = self.tickets.pop(key)
             self.operations.pop((item.document["actor_id"], item.document["operation_id"]), None)
+
+    @staticmethod
+    def _deferred(ticket):
+        return (ticket.document.get("state") == "restore_pending"
+                and ticket.document.get("reason_code") in {"storage_background_deferred", "restore_source_unavailable"}
+                and ticket.resource is None and ticket.admission is None and not ticket.serving)
 
     def _remember(self, document):
         if document is None:
@@ -216,7 +223,7 @@ class ResultPreparations:
         ticket = Ticket(document)
         self.tickets[document["ticket_id"]] = ticket
         self.operations[(document["actor_id"], document["operation_id"])] = ticket
-        if document["state"] in {"queued", "verifying", "ready", "cancelling"}:
+        if document["state"] in {"queued", "verifying", "restore_pending", "ready", "cancelling"}:
             document.update(state="reprepare_required", reason_code="preparation_process_restarted")
             self._save(ticket)
         self._trim_cache()
@@ -274,15 +281,15 @@ class ResultPreparations:
                 if any(ticket.document.get(name) != value for name, value in identity.items()):
                     raise HTTPException(409, {"reason_code": "operation_id_conflict"})
                 self._expire(ticket)
-                if ticket.document["state"] in {"queued", "verifying", "ready", "cancelling"}:
+                if ticket.document["state"] in {"queued", "verifying", "restore_pending", "ready", "cancelling"} and not self._deferred(ticket):
                     return self._view(ticket)
             if self.stopped.is_set() or (self.draining and self.gate is None):
                 raise HTTPException(503, {"reason_code": "release_draining"}, headers={"Retry-After": "5"})
             admission = TransferActivity(self.gate) if self.gate is not None else None
             if admission is not None:
                 self.draining = False
-            active = [item for item in self.tickets.values() if item.admission is not None or
-                      item.document["state"] in {"queued", "verifying", "ready", "cancelling"}]
+            active = [item for item in self.tickets.values() if not self._deferred(item) and (item.admission is not None or
+                      item.document["state"] in {"queued", "verifying", "restore_pending", "ready", "cancelling"})]
             if len(active) >= 8 or sum(item.document["actor_id"] == actor_id for item in active) >= 2:
                 if admission is not None:
                     admission.release()
@@ -312,11 +319,11 @@ class ResultPreparations:
             return self._view(ticket)
 
     def _verify(self, ticket, factory):
-        def progress(checked, total):
+        def progress(checked, total, *, state="verifying"):
             with self.lock:
-                ticket.document.update(state="cancelling" if ticket.cancel.is_set() else "verifying",
+                ticket.document.update(state="cancelling" if ticket.cancel.is_set() else state,
                                        checked_bytes=checked, total_bytes=total, last_progress_at=utc_now())
-                if time.monotonic() - ticket.saved_at >= 1:
+                if state == "restore_pending" or time.monotonic() - ticket.saved_at >= 1:
                     self._save(ticket)
 
         resource = None
@@ -342,7 +349,8 @@ class ResultPreparations:
                 self._release(ticket)
                 detail = getattr(exc, "detail", {})
                 reason = detail.get("reason_code") if isinstance(detail, dict) else None
-                ticket.document.update(state="cancelled" if ticket.cancel.is_set() or isinstance(exc, PreparationCancelled) else "failed",
+                deferred = (reason or getattr(exc, "reason_code", None)) in {"storage_background_deferred", "restore_source_unavailable"}
+                ticket.document.update(state="cancelled" if ticket.cancel.is_set() or isinstance(exc, PreparationCancelled) else "restore_pending" if deferred else "failed",
                     reason_code="preparation_cancelled" if ticket.cancel.is_set() or isinstance(exc, PreparationCancelled)
                     else reason or getattr(exc, "reason_code", "result_unavailable_or_integrity_failed"),
                     http_status=getattr(exc, "status_code", 409))
@@ -358,7 +366,7 @@ class ResultPreparations:
         with self.lock:
             ticket = self._owned(ticket_id, actor_id, job_id)
             ticket.cancel.set()
-            if ticket.serving or ticket.document["state"] in {"queued", "verifying", "cancelling"}:
+            if ticket.serving or (ticket.document["state"] in {"queued", "verifying", "restore_pending", "cancelling"} and not self._deferred(ticket)):
                 ticket.document.update(state="cancelling", reason_code="preparation_cancelled")
             else:
                 self._release(ticket)
@@ -376,7 +384,8 @@ class ResultPreparations:
                 # ready poll. This is maintenance deferral, just like a new
                 # preparation admission, and must not become a permanent
                 # identity/integrity conflict in the existing client.
-                maintenance = reason == "release_draining"
+                maintenance = reason in {"release_draining", "storage_background_deferred", "restore_source_unavailable",
+                    "preparation_expired", "preparation_process_restarted", "preparation_process_stopped"}
                 raise HTTPException(503 if maintenance else 409,
                     {"reason_code": reason, "state": ticket.document["state"]},
                     headers={"Retry-After": "5"} if maintenance else None)
@@ -385,6 +394,15 @@ class ResultPreparations:
             ticket.serving = True
             ticket.last_active = time.monotonic()
             return ticket
+
+    def defer_body(self, ticket, reason="storage_background_deferred"):
+        """Called after its last joined read ended; free scarce ready ownership."""
+        with self.lock:
+            ticket.serving = False
+            self.body_ended.notify_all()
+            self._release(ticket)
+            ticket.document.update(state="restore_pending", reason_code=reason, http_status=503)
+            self._save(ticket)
 
     def end_body(self, ticket):
         with self.lock:
@@ -426,9 +444,9 @@ class ResultPreparations:
         while not self.stopped.wait(1):
             try:
                 with self.lock:
-                    active = any(ticket.admission is not None or ticket.resource is not None or ticket.serving
-                                 or ticket.document["state"] in {"queued", "verifying", "cancelling"}
-                                 for ticket in self.tickets.values())
+                    active = any(not self._deferred(ticket) and (ticket.admission is not None or ticket.resource is not None or ticket.serving
+                                 or ticket.document["state"] in {"queued", "verifying", "restore_pending", "cancelling"}
+                                 ) for ticket in self.tickets.values())
                     if not active:
                         self.sweeper = None
                         return
@@ -469,7 +487,7 @@ class ResultPreparations:
             for ticket in list(self.tickets.values()):
                 if ticket.serving:
                     continue
-                if ticket.document["state"] in {"queued", "verifying", "cancelling"}:
+                if ticket.document["state"] in {"queued", "verifying", "restore_pending", "cancelling"}:
                     ticket.cancel.set()
                 elif ticket.resource is not None:
                     self._release(ticket)

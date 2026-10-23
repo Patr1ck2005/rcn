@@ -54,7 +54,53 @@
     "web/src/memberClientModel.js",
     "web/src/memberClient.css",
     "web/src/memberContributionCheckpoint.js",
-    "web/src/styles.css"
+    "web/src/styles.css",
+    "src/research_compute_network/dispatcher.py",
+    "src/research_compute_network/repository.py",
+    "src/research_compute_network/schedulers/ssh.py",
+    "src/research_compute_network/origin_transfer_api.py",
+    "src/research_compute_network/origin_transfer_client.py",
+    "src/research_compute_network/storage_lifecycle.py",
+    "src/research_compute_network/restore_sources.py",
+    "src/research_compute_network/storage_io.py",
+    "src/research_compute_network/storage_occupancy.py",
+    "src/research_compute_network/storage_projection.py",
+    "src/research_compute_network/transfer_queue.py",
+    "src/research_compute_network/release.py",
+    "src/research_compute_network/release_identity.py",
+    "src/research_compute_network/deployment.py",
+    "web/src/AdminConsole.jsx",
+    "web/src/StorageDashboard.jsx",
+    "web/src/StorageDashboard.css",
+    "web/src/storageDashboardModel.js",
+    "web/src/StorageDashboard.test.jsx",
+    "web/src/memberClientModel.test.js",
+    "web/tests/storage-dashboard.spec.js",
+    "web/tests/member-client.spec.js",
+    "tests/test_release_versions.py",
+    "tests/test_storage_algorithms.py",
+    "tests/test_registered_restore_boundaries.py",
+    "tests/test_storage_occupancy.py",
+    "tools/benchmark_storage_algorithms.py",
+    "docs/storage-algorithm-interfaces.md",
+    "tests/test_storage_lifecycle.py",
+    "tests/test_scientific_retention.py",
+    "tests/test_member_client_collection_recovery.py",
+    "tests/test_deployment_storage_schema.py",
+    "tests/test_archive_priority.py",
+    "tests/test_result_preparations.py",
+    "tests/test_collection_recovery.py",
+    "docs/storage-algorithm-verification.md",
+    "docs/evidence/storage-algorithms-20261024/final-controlled-overlap.json",
+    "docs/evidence/storage-algorithms-20261024/followup-bounded-preflight.json",
+    "docs/evidence/storage-algorithms-20261024/followup-incomplete.json",
+    "docs/evidence/storage-algorithms-20261024/followup-native-boundaries.json",
+    "docs/evidence/storage-algorithms-20261024/followup-verification.json",
+    "docs/evidence/storage-algorithms-20261024/native-profile-comparison.json",
+    "docs/evidence/storage-algorithms-20261024/run-1.json",
+    "docs/evidence/storage-algorithms-20261024/run-3.json",
+    "docs/evidence/storage-algorithms-20261024/run-4.json",
+    "docs/evidence/storage-algorithms-20261024/variance-and-throughput.json"
   ],
   "required_files": [
     "docs/member-task-package-guide.zh.md",
@@ -62,27 +108,60 @@
   ],
   "intentional_differences": [
     {
-      "paths": ["pyproject.toml", "src/research_compute_network/__init__.py", "src/research_compute_network/build_identity.json"],
+      "paths": [
+        "pyproject.toml",
+        "src/research_compute_network/__init__.py",
+        "src/research_compute_network/build_identity.json"
+      ],
       "reason": "Internal stability and public preview releases have separate versions, distribution metadata and source identities."
     },
     {
-      "paths": ["README.md", "AGENTS.md", "config/", "docs/", "src/research_compute_network/help_content/public/getting-started.md"],
+      "paths": [
+        "README.md",
+        "AGENTS.md",
+        "config/",
+        "docs/",
+        "src/research_compute_network/help_content/public/getting-started.md"
+      ],
       "reason": "Deployment configuration, entry documentation and onboarding differ. Internal connection policy uses managed SSH; public onboarding defaults to HTTPS. Internal operational records are not exported."
     },
     {
-      "paths": ["docs/member-task-package-guide.zh.md", "src/research_compute_network/help_content/public/member-task-package.md"],
+      "paths": [
+        "docs/member-task-package-guide.zh.md",
+        "src/research_compute_network/help_content/public/member-task-package.md"
+      ],
       "reason": "Both distributions require the task-package guide and packaged help. Their navigation and origin-adapter links differ to keep private filesystem and operational references out of the public edition. Verify packaged help against each edition's source instead of copying it."
     },
     {
-      "paths": ["src/research_compute_network/member_client_connection.py"],
+      "paths": [
+        "src/research_compute_network/member_client_connection.py"
+      ],
       "reason": "Connection behavior is maintained in both trees; the public legacy migration uses generic identifiers instead of private deployment path names. Review changes in both trees without copying this file wholesale."
     },
     {
-      "paths": ["src/research_compute_network/member_client_installer.py", "src/research_compute_network/member_installer.py", "src/research_compute_network/member_client_compute.py", "src/research_compute_network/member_release_catalog.py", "src/research_compute_network/member_runtime.py", "src/research_compute_network/member_runtime_verification.py", "src/research_compute_network/runtime_policy.py"],
+      "paths": [
+        "src/research_compute_network/member_client_installer.py",
+        "src/research_compute_network/member_installer.py",
+        "src/research_compute_network/member_client_compute.py",
+        "src/research_compute_network/member_release_catalog.py",
+        "src/research_compute_network/member_runtime.py",
+        "src/research_compute_network/member_runtime_verification.py",
+        "src/research_compute_network/runtime_policy.py"
+      ],
       "reason": "Internal scientific runtime approvals, pins and offline scientific dependencies are private. Public releases require operator supplied approvals and sanitize portable installer inputs."
     },
     {
-      "paths": ["src/research_compute_network/service.py", "src/research_compute_network/api.py", "src/research_compute_network/remote_agent/", "web/src/App.jsx", "web/src/main.jsx", "web/package.json", "web/package-lock.json", "web/vite.config.js", "src/research_compute_network/web_dist/"],
+      "paths": [
+        "src/research_compute_network/service.py",
+        "src/research_compute_network/api.py",
+        "src/research_compute_network/remote_agent/",
+        "web/src/App.jsx",
+        "web/src/main.jsx",
+        "web/package.json",
+        "web/package-lock.json",
+        "web/vite.config.js",
+        "src/research_compute_network/web_dist/"
+      ],
       "reason": "The platform and surrounding console have independently reviewed public sanitization and build metadata. They are outside the common copy allowlist. Each distribution's built UI must match its own wheel and member runtime."
     }
   ],

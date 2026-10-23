@@ -636,6 +636,11 @@ def create_app(
                     app.state.storage_gc = {"phase": "deferred", "error_type": type(exc).__name__}
                 await asyncio.sleep(30)
 
+        @app.get("/v1/admin/storage/inventory")
+        def storage_inventory(context: AuthContext = Depends(auth.actor)) -> dict:
+            require_role(context, UserRole.ADMIN)
+            return lifecycle.inventory.snapshot()
+
         @app.on_event("startup")
         async def start_storage_gc() -> None:
             storage_gc_stop.clear()

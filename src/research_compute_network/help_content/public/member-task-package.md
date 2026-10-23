@@ -68,3 +68,5 @@ $memberPython = Join-Path (Split-Path -Parent $active.pythonw_path) 'python.exe'
 客户端显示任务包预览、原提交与 Job、计算进度和下载校验结果。Agent 保留原提交编号，上传中断继续上传、下载中断继续核验；明确重新计算时才创建新编号。
 
 缺少分包信息时填写真实计算单元数，不自动猜耗时。结果正式导入与物理分析留在来源项目。成员职责见[开始使用](/help/getting-started)，操作正文见文档来源中的“成员任务包”指南。
+
+明确点击下载或由 Agent 调用 `collect` 后，系统才会从已登记归档取回缺失结果，直接写入本机结果目录。浏览任务、清单或存储页面不搬运数据。`collection.stage == "restore_pending"` 表示正在准备归档取回；断线、空间不足或来源离线时保留原操作及断点，明确暂停仍保持暂停。记录原 `operation_id`、Job 和 `collection.directory` 供接续；已按科学保留合同删除的 MPH 不会因取回而重算。

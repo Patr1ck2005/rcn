@@ -9,7 +9,7 @@ import MemberAgentSetup from "./MemberAgentSetup";
 import { usePageRefresh } from "./usePageRefresh";
 import { DATA_REFRESH_EVENT, watchPageReturn } from "./freshness";
 import { HelpCenter, rememberHelpReturn } from "./HelpSystem";
-import { mutateAndRecover, operationActions, operationLabel, requiresUnitCount, validateUnitCount } from "./memberClientModel";
+import { mutateAndRecover, operationActions, operationLabel, collectionProgress, requiresUnitCount, validateUnitCount } from "./memberClientModel";
 import { contributionScope, contributionNotFound, loadContributionCheckpoints, saveContributionCheckpoints, readContributionOriginal, submitContribution } from "./memberContributionCheckpoint";
 import "./memberClient.css";
 
@@ -219,7 +219,8 @@ function OperationCard({ operation, onChange, online }) {
     {jobId && <p>Job：<Link className="member-job-link" to={`/app/runs/${encodeURIComponent(jobId)}`}>{jobId}</Link></p>}
     {operation.job && <p className="member-progress-text">计算进度：{operation.job.completed_units ?? "未知"} / {operation.job.total_units ?? "未知"} 单元</p>}
     {operation.upload && <TransferProgress title="输入上传" progress={operation.upload} />}
-    {operation.collection && <TransferProgress title="结果下载与核验" progress={operation.collection} />}
+    {operation.collection && <TransferProgress title="结果下载与核验" progress={collectionProgress(operation)} />}
+    {(operation.collection?.stage || operation.collection?.state) === "restore_pending" && <p className="member-notice" role="status">该下载使用已登记归档来源，当前进度见上方状态。取回后直接保存到本机结果目录；暂停或等待时保留原下载记录和已核验文件。</p>}
     {operation.collection_control?.state === "retry_wait" && <p className="member-notice" role="status">连接或存储暂时不可用，后台将自动续传原任务，已核验文件会保留。</p>}
     {operation.collection_control?.state === "user_paused" && <p className="member-notice" role="status">下载已暂停，断点保留。点击“下载并核验结果”继续原任务。</p>}
     {actions.canPauseCollection && <button className="button" disabled={Boolean(busy)} onClick={() => runAction("collection/pause")}><Pause size={16} />暂停结果下载</button>}
@@ -244,7 +245,7 @@ function TransferProgress({ title, progress }) {
   const noun = progress.total_units != null || progress.unit === "unit" ? "单元" : "文件";
   const fraction = completed != null && total > 0 ? Math.max(0, Math.min(1, completed / total)) : null;
   const transferState = progress.stage || progress.state;
-  const states = { complete: "完成", completed: "完成", verified: "校验通过", uploading: "正在上传", collecting: "正在下载", planned: "等待开始", prepare: "正在准备", uploaded: "已上传", preparing: "正在校验源文件", downloading: "正在续传文件", bytes_complete: "文件已收齐，正在收尾", verifying: "正在核验结果", finalizing: "正在保存回收回执", finalized: "回收完成", retry_wait: "等待自动恢复", paused: "已暂停", conflict: "需要核对结果", credentials_required: "请恢复登录" };
+  const states = { complete: "完成", completed: "完成", verified: "校验通过", uploading: "正在上传", collecting: "正在下载", planned: "等待开始", prepare: "正在准备", uploaded: "已上传", preparing: "正在校验源文件", restore_pending: "等待归档取回", downloading: "正在续传文件", bytes_complete: "文件已收齐，正在收尾", verifying: "正在核验结果", finalizing: "正在保存回收回执", finalized: "回收完成", retry_wait: "等待自动恢复", paused: "已暂停", waiting: "等待下载槽位", conflict: "需要核对结果", credentials_required: "请恢复登录" };
   return <div className="member-transfer"><div><b>{title}</b><span>{progress.message || states[transferState] || "正在处理"}{completed != null && total != null ? ` · ${completed} / ${total} ${noun}` : ""}</span></div>{fraction != null && <progress aria-label={title} value={fraction} max="1" />}{transferState === "preparing" && progress.source_total_bytes > 0 && <small>源文件校验：{(Number(progress.source_checked_bytes || 0) / 1048576).toFixed(1)} / {(progress.source_total_bytes / 1048576).toFixed(1)} MiB</small>}</div>;
 }
 

@@ -1,0 +1,3821 @@
+{
+  "schema": 1,
+  "generated_at": "2026-10-23T16:13:01.284029+00:00",
+  "scope": "isolated warm-cache local fixture; no production or natural full-load acceptance",
+  "background_chunk_bytes": 16384,
+  "fixtures": {
+    "dispatch_jobs": 256,
+    "unique_users": 8,
+    "manifest_files": 8192,
+    "file_bytes": 33554432
+  },
+  "summary": {
+    "dispatch_sort/before": {
+      "n": 50,
+      "p50_ms": 60.20085,
+      "p95_ms": 73.4084
+    },
+    "dispatch_sort/after": {
+      "n": 50,
+      "p50_ms": 5.6773,
+      "p95_ms": 8.5371
+    },
+    "inventory_query/before_reference_full_metadata_reduce": {
+      "n": 50,
+      "p50_ms": 12.07445,
+      "p95_ms": 14.3096
+    },
+    "inventory_query/after": {
+      "n": 50,
+      "p50_ms": 1.73795,
+      "p95_ms": 2.4138
+    },
+    "waiting_work/before_callback_model": {
+      "n": 50,
+      "p50_ms": 0.5763,
+      "p95_ms": 0.8348
+    },
+    "waiting_work/after_event_queue": {
+      "n": 50,
+      "p50_ms": 0.40275,
+      "p95_ms": 0.4706
+    },
+    "foreground_read/foreground_only": {
+      "n": 50,
+      "p50_ms": 54.5031,
+      "p95_ms": 89.3193
+    },
+    "foreground_read/background_enabled": {
+      "n": 50,
+      "p50_ms": 57.1874,
+      "p95_ms": 97.8685
+    },
+    "dispatch_with_background/foreground_only": {
+      "n": 50,
+      "p50_ms": 5.40685,
+      "p95_ms": 19.4537
+    },
+    "dispatch_with_background/background_enabled": {
+      "n": 50,
+      "p50_ms": 5.987299999999999,
+      "p95_ms": 14.8323
+    }
+  },
+  "background_p95_ratios": {
+    "foreground_read": 1.0957150358321215,
+    "dispatch_with_background": 0.7624410780468497
+  },
+  "background_target_passed": true,
+  "samples": [
+    {
+      "case": "dispatch_sort",
+      "variant": "before",
+      "sample": 0,
+      "elapsed_ms": 63.3629,
+      "policy_reads": 256
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "after",
+      "sample": 0,
+      "elapsed_ms": 5.5687,
+      "policy_reads": 8
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "after",
+      "sample": 1,
+      "elapsed_ms": 5.2689,
+      "policy_reads": 8
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "before",
+      "sample": 1,
+      "elapsed_ms": 57.9833,
+      "policy_reads": 256
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "before",
+      "sample": 2,
+      "elapsed_ms": 64.8017,
+      "policy_reads": 256
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "after",
+      "sample": 2,
+      "elapsed_ms": 9.7255,
+      "policy_reads": 8
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "after",
+      "sample": 3,
+      "elapsed_ms": 6.5454,
+      "policy_reads": 8
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "before",
+      "sample": 3,
+      "elapsed_ms": 66.0377,
+      "policy_reads": 256
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "before",
+      "sample": 4,
+      "elapsed_ms": 58.766,
+      "policy_reads": 256
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "after",
+      "sample": 4,
+      "elapsed_ms": 5.3269,
+      "policy_reads": 8
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "after",
+      "sample": 5,
+      "elapsed_ms": 5.4268,
+      "policy_reads": 8
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "before",
+      "sample": 5,
+      "elapsed_ms": 63.3533,
+      "policy_reads": 256
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "before",
+      "sample": 6,
+      "elapsed_ms": 69.5707,
+      "policy_reads": 256
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "after",
+      "sample": 6,
+      "elapsed_ms": 6.4696,
+      "policy_reads": 8
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "after",
+      "sample": 7,
+      "elapsed_ms": 8.5371,
+      "policy_reads": 8
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "before",
+      "sample": 7,
+      "elapsed_ms": 73.4084,
+      "policy_reads": 256
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "before",
+      "sample": 8,
+      "elapsed_ms": 60.4471,
+      "policy_reads": 256
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "after",
+      "sample": 8,
+      "elapsed_ms": 6.3602,
+      "policy_reads": 8
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "after",
+      "sample": 9,
+      "elapsed_ms": 5.9117,
+      "policy_reads": 8
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "before",
+      "sample": 9,
+      "elapsed_ms": 58.6737,
+      "policy_reads": 256
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "before",
+      "sample": 10,
+      "elapsed_ms": 68.909,
+      "policy_reads": 256
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "after",
+      "sample": 10,
+      "elapsed_ms": 8.7755,
+      "policy_reads": 8
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "after",
+      "sample": 11,
+      "elapsed_ms": 5.8995,
+      "policy_reads": 8
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "before",
+      "sample": 11,
+      "elapsed_ms": 82.7307,
+      "policy_reads": 256
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "before",
+      "sample": 12,
+      "elapsed_ms": 77.338,
+      "policy_reads": 256
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "after",
+      "sample": 12,
+      "elapsed_ms": 6.8245,
+      "policy_reads": 8
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "after",
+      "sample": 13,
+      "elapsed_ms": 7.5376,
+      "policy_reads": 8
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "before",
+      "sample": 13,
+      "elapsed_ms": 64.9742,
+      "policy_reads": 256
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "before",
+      "sample": 14,
+      "elapsed_ms": 63.5173,
+      "policy_reads": 256
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "after",
+      "sample": 14,
+      "elapsed_ms": 5.6126,
+      "policy_reads": 8
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "after",
+      "sample": 15,
+      "elapsed_ms": 5.1242,
+      "policy_reads": 8
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "before",
+      "sample": 15,
+      "elapsed_ms": 57.9456,
+      "policy_reads": 256
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "before",
+      "sample": 16,
+      "elapsed_ms": 70.2498,
+      "policy_reads": 256
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "after",
+      "sample": 16,
+      "elapsed_ms": 6.1307,
+      "policy_reads": 8
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "after",
+      "sample": 17,
+      "elapsed_ms": 5.6833,
+      "policy_reads": 8
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "before",
+      "sample": 17,
+      "elapsed_ms": 58.5329,
+      "policy_reads": 256
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "before",
+      "sample": 18,
+      "elapsed_ms": 56.4343,
+      "policy_reads": 256
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "after",
+      "sample": 18,
+      "elapsed_ms": 5.6006,
+      "policy_reads": 8
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "after",
+      "sample": 19,
+      "elapsed_ms": 5.4407,
+      "policy_reads": 8
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "before",
+      "sample": 19,
+      "elapsed_ms": 55.6518,
+      "policy_reads": 256
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "before",
+      "sample": 20,
+      "elapsed_ms": 63.0948,
+      "policy_reads": 256
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "after",
+      "sample": 20,
+      "elapsed_ms": 6.15,
+      "policy_reads": 8
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "after",
+      "sample": 21,
+      "elapsed_ms": 5.7997,
+      "policy_reads": 8
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "before",
+      "sample": 21,
+      "elapsed_ms": 60.7491,
+      "policy_reads": 256
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "before",
+      "sample": 22,
+      "elapsed_ms": 60.2991,
+      "policy_reads": 256
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "after",
+      "sample": 22,
+      "elapsed_ms": 7.2335,
+      "policy_reads": 8
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "after",
+      "sample": 23,
+      "elapsed_ms": 6.5089,
+      "policy_reads": 8
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "before",
+      "sample": 23,
+      "elapsed_ms": 71.5228,
+      "policy_reads": 256
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "before",
+      "sample": 24,
+      "elapsed_ms": 60.1044,
+      "policy_reads": 256
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "after",
+      "sample": 24,
+      "elapsed_ms": 5.869,
+      "policy_reads": 8
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "after",
+      "sample": 25,
+      "elapsed_ms": 5.299,
+      "policy_reads": 8
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "before",
+      "sample": 25,
+      "elapsed_ms": 60.2973,
+      "policy_reads": 256
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "before",
+      "sample": 26,
+      "elapsed_ms": 66.1005,
+      "policy_reads": 256
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "after",
+      "sample": 26,
+      "elapsed_ms": 7.543,
+      "policy_reads": 8
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "after",
+      "sample": 27,
+      "elapsed_ms": 6.409,
+      "policy_reads": 8
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "before",
+      "sample": 27,
+      "elapsed_ms": 63.3133,
+      "policy_reads": 256
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "before",
+      "sample": 28,
+      "elapsed_ms": 58.8521,
+      "policy_reads": 256
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "after",
+      "sample": 28,
+      "elapsed_ms": 5.902,
+      "policy_reads": 8
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "after",
+      "sample": 29,
+      "elapsed_ms": 5.4297,
+      "policy_reads": 8
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "before",
+      "sample": 29,
+      "elapsed_ms": 61.9108,
+      "policy_reads": 256
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "before",
+      "sample": 30,
+      "elapsed_ms": 60.7694,
+      "policy_reads": 256
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "after",
+      "sample": 30,
+      "elapsed_ms": 5.4876,
+      "policy_reads": 8
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "after",
+      "sample": 31,
+      "elapsed_ms": 5.2443,
+      "policy_reads": 8
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "before",
+      "sample": 31,
+      "elapsed_ms": 58.9444,
+      "policy_reads": 256
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "before",
+      "sample": 32,
+      "elapsed_ms": 60.4438,
+      "policy_reads": 256
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "after",
+      "sample": 32,
+      "elapsed_ms": 5.5957,
+      "policy_reads": 8
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "after",
+      "sample": 33,
+      "elapsed_ms": 5.629,
+      "policy_reads": 8
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "before",
+      "sample": 33,
+      "elapsed_ms": 58.4173,
+      "policy_reads": 256
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "before",
+      "sample": 34,
+      "elapsed_ms": 58.3505,
+      "policy_reads": 256
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "after",
+      "sample": 34,
+      "elapsed_ms": 5.4412,
+      "policy_reads": 8
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "after",
+      "sample": 35,
+      "elapsed_ms": 5.3204,
+      "policy_reads": 8
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "before",
+      "sample": 35,
+      "elapsed_ms": 58.2545,
+      "policy_reads": 256
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "before",
+      "sample": 36,
+      "elapsed_ms": 57.7905,
+      "policy_reads": 256
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "after",
+      "sample": 36,
+      "elapsed_ms": 6.0132,
+      "policy_reads": 8
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "after",
+      "sample": 37,
+      "elapsed_ms": 5.6713,
+      "policy_reads": 8
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "before",
+      "sample": 37,
+      "elapsed_ms": 59.2816,
+      "policy_reads": 256
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "before",
+      "sample": 38,
+      "elapsed_ms": 61.0894,
+      "policy_reads": 256
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "after",
+      "sample": 38,
+      "elapsed_ms": 6.2856,
+      "policy_reads": 8
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "after",
+      "sample": 39,
+      "elapsed_ms": 6.1148,
+      "policy_reads": 8
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "before",
+      "sample": 39,
+      "elapsed_ms": 57.1295,
+      "policy_reads": 256
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "before",
+      "sample": 40,
+      "elapsed_ms": 57.1579,
+      "policy_reads": 256
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "after",
+      "sample": 40,
+      "elapsed_ms": 5.4058,
+      "policy_reads": 8
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "after",
+      "sample": 41,
+      "elapsed_ms": 6.0911,
+      "policy_reads": 8
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "before",
+      "sample": 41,
+      "elapsed_ms": 55.35,
+      "policy_reads": 256
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "before",
+      "sample": 42,
+      "elapsed_ms": 55.5663,
+      "policy_reads": 256
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "after",
+      "sample": 42,
+      "elapsed_ms": 4.9211,
+      "policy_reads": 8
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "after",
+      "sample": 43,
+      "elapsed_ms": 6.1871,
+      "policy_reads": 8
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "before",
+      "sample": 43,
+      "elapsed_ms": 57.1322,
+      "policy_reads": 256
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "before",
+      "sample": 44,
+      "elapsed_ms": 60.8129,
+      "policy_reads": 256
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "after",
+      "sample": 44,
+      "elapsed_ms": 5.6179,
+      "policy_reads": 8
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "after",
+      "sample": 45,
+      "elapsed_ms": 5.2847,
+      "policy_reads": 8
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "before",
+      "sample": 45,
+      "elapsed_ms": 54.5901,
+      "policy_reads": 256
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "before",
+      "sample": 46,
+      "elapsed_ms": 54.4515,
+      "policy_reads": 256
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "after",
+      "sample": 46,
+      "elapsed_ms": 5.1344,
+      "policy_reads": 8
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "after",
+      "sample": 47,
+      "elapsed_ms": 5.0112,
+      "policy_reads": 8
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "before",
+      "sample": 47,
+      "elapsed_ms": 53.9515,
+      "policy_reads": 256
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "before",
+      "sample": 48,
+      "elapsed_ms": 54.2679,
+      "policy_reads": 256
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "after",
+      "sample": 48,
+      "elapsed_ms": 4.9458,
+      "policy_reads": 8
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "after",
+      "sample": 49,
+      "elapsed_ms": 4.8817,
+      "policy_reads": 8
+    },
+    {
+      "case": "dispatch_sort",
+      "variant": "before",
+      "sample": 49,
+      "elapsed_ms": 54.284,
+      "policy_reads": 256
+    },
+    {
+      "case": "inventory_query",
+      "variant": "before_reference_full_metadata_reduce",
+      "sample": 0,
+      "elapsed_ms": 11.7048,
+      "policy_reads": 0
+    },
+    {
+      "case": "inventory_query",
+      "variant": "after",
+      "sample": 0,
+      "elapsed_ms": 1.8174,
+      "policy_reads": 0
+    },
+    {
+      "case": "inventory_query",
+      "variant": "after",
+      "sample": 1,
+      "elapsed_ms": 1.5726,
+      "policy_reads": 0
+    },
+    {
+      "case": "inventory_query",
+      "variant": "before_reference_full_metadata_reduce",
+      "sample": 1,
+      "elapsed_ms": 12.3913,
+      "policy_reads": 0
+    },
+    {
+      "case": "inventory_query",
+      "variant": "before_reference_full_metadata_reduce",
+      "sample": 2,
+      "elapsed_ms": 12.6353,
+      "policy_reads": 0
+    },
+    {
+      "case": "inventory_query",
+      "variant": "after",
+      "sample": 2,
+      "elapsed_ms": 1.7564,
+      "policy_reads": 0
+    },
+    {
+      "case": "inventory_query",
+      "variant": "after",
+      "sample": 3,
+      "elapsed_ms": 1.5008,
+      "policy_reads": 0
+    },
+    {
+      "case": "inventory_query",
+      "variant": "before_reference_full_metadata_reduce",
+      "sample": 3,
+      "elapsed_ms": 12.0857,
+      "policy_reads": 0
+    },
+    {
+      "case": "inventory_query",
+      "variant": "before_reference_full_metadata_reduce",
+      "sample": 4,
+      "elapsed_ms": 12.2025,
+      "policy_reads": 0
+    },
+    {
+      "case": "inventory_query",
+      "variant": "after",
+      "sample": 4,
+      "elapsed_ms": 1.882,
+      "policy_reads": 0
+    },
+    {
+      "case": "inventory_query",
+      "variant": "after",
+      "sample": 5,
+      "elapsed_ms": 1.4197,
+      "policy_reads": 0
+    },
+    {
+      "case": "inventory_query",
+      "variant": "before_reference_full_metadata_reduce",
+      "sample": 5,
+      "elapsed_ms": 14.1065,
+      "policy_reads": 0
+    },
+    {
+      "case": "inventory_query",
+      "variant": "before_reference_full_metadata_reduce",
+      "sample": 6,
+      "elapsed_ms": 12.6057,
+      "policy_reads": 0
+    },
+    {
+      "case": "inventory_query",
+      "variant": "after",
+      "sample": 6,
+      "elapsed_ms": 2.0749,
+      "policy_reads": 0
+    },
+    {
+      "case": "inventory_query",
+      "variant": "after",
+      "sample": 7,
+      "elapsed_ms": 1.563,
+      "policy_reads": 0
+    },
+    {
+      "case": "inventory_query",
+      "variant": "before_reference_full_metadata_reduce",
+      "sample": 7,
+      "elapsed_ms": 12.1205,
+      "policy_reads": 0
+    },
+    {
+      "case": "inventory_query",
+      "variant": "before_reference_full_metadata_reduce",
+      "sample": 8,
+      "elapsed_ms": 11.8434,
+      "policy_reads": 0
+    },
+    {
+      "case": "inventory_query",
+      "variant": "after",
+      "sample": 8,
+      "elapsed_ms": 1.7399,
+      "policy_reads": 0
+    },
+    {
+      "case": "inventory_query",
+      "variant": "after",
+      "sample": 9,
+      "elapsed_ms": 1.5211,
+      "policy_reads": 0
+    },
+    {
+      "case": "inventory_query",
+      "variant": "before_reference_full_metadata_reduce",
+      "sample": 9,
+      "elapsed_ms": 11.413,
+      "policy_reads": 0
+    },
+    {
+      "case": "inventory_query",
+      "variant": "before_reference_full_metadata_reduce",
+      "sample": 10,
+      "elapsed_ms": 12.0897,
+      "policy_reads": 0
+    },
+    {
+      "case": "inventory_query",
+      "variant": "after",
+      "sample": 10,
+      "elapsed_ms": 1.9378,
+      "policy_reads": 0
+    },
+    {
+      "case": "inventory_query",
+      "variant": "after",
+      "sample": 11,
+      "elapsed_ms": 1.736,
+      "policy_reads": 0
+    },
+    {
+      "case": "inventory_query",
+      "variant": "before_reference_full_metadata_reduce",
+      "sample": 11,
+      "elapsed_ms": 11.4795,
+      "policy_reads": 0
+    },
+    {
+      "case": "inventory_query",
+      "variant": "before_reference_full_metadata_reduce",
+      "sample": 12,
+      "elapsed_ms": 12.5906,
+      "policy_reads": 0
+    },
+    {
+      "case": "inventory_query",
+      "variant": "after",
+      "sample": 12,
+      "elapsed_ms": 2.0649,
+      "policy_reads": 0
+    },
+    {
+      "case": "inventory_query",
+      "variant": "after",
+      "sample": 13,
+      "elapsed_ms": 1.8788,
+      "policy_reads": 0
+    },
+    {
+      "case": "inventory_query",
+      "variant": "before_reference_full_metadata_reduce",
+      "sample": 13,
+      "elapsed_ms": 11.6141,
+      "policy_reads": 0
+    },
+    {
+      "case": "inventory_query",
+      "variant": "before_reference_full_metadata_reduce",
+      "sample": 14,
+      "elapsed_ms": 12.41,
+      "policy_reads": 0
+    },
+    {
+      "case": "inventory_query",
+      "variant": "after",
+      "sample": 14,
+      "elapsed_ms": 2.019,
+      "policy_reads": 0
+    },
+    {
+      "case": "inventory_query",
+      "variant": "after",
+      "sample": 15,
+      "elapsed_ms": 1.7012,
+      "policy_reads": 0
+    },
+    {
+      "case": "inventory_query",
+      "variant": "before_reference_full_metadata_reduce",
+      "sample": 15,
+      "elapsed_ms": 12.0736,
+      "policy_reads": 0
+    },
+    {
+      "case": "inventory_query",
+      "variant": "before_reference_full_metadata_reduce",
+      "sample": 16,
+      "elapsed_ms": 11.6968,
+      "policy_reads": 0
+    },
+    {
+      "case": "inventory_query",
+      "variant": "after",
+      "sample": 16,
+      "elapsed_ms": 1.7711,
+      "policy_reads": 0
+    },
+    {
+      "case": "inventory_query",
+      "variant": "after",
+      "sample": 17,
+      "elapsed_ms": 1.679,
+      "policy_reads": 0
+    },
+    {
+      "case": "inventory_query",
+      "variant": "before_reference_full_metadata_reduce",
+      "sample": 17,
+      "elapsed_ms": 11.6011,
+      "policy_reads": 0
+    },
+    {
+      "case": "inventory_query",
+      "variant": "before_reference_full_metadata_reduce",
+      "sample": 18,
+      "elapsed_ms": 12.0753,
+      "policy_reads": 0
+    },
+    {
+      "case": "inventory_query",
+      "variant": "after",
+      "sample": 18,
+      "elapsed_ms": 2.0617,
+      "policy_reads": 0
+    },
+    {
+      "case": "inventory_query",
+      "variant": "after",
+      "sample": 19,
+      "elapsed_ms": 1.501,
+      "policy_reads": 0
+    },
+    {
+      "case": "inventory_query",
+      "variant": "before_reference_full_metadata_reduce",
+      "sample": 19,
+      "elapsed_ms": 11.1391,
+      "policy_reads": 0
+    },
+    {
+      "case": "inventory_query",
+      "variant": "before_reference_full_metadata_reduce",
+      "sample": 20,
+      "elapsed_ms": 11.2743,
+      "policy_reads": 0
+    },
+    {
+      "case": "inventory_query",
+      "variant": "after",
+      "sample": 20,
+      "elapsed_ms": 1.8568,
+      "policy_reads": 0
+    },
+    {
+      "case": "inventory_query",
+      "variant": "after",
+      "sample": 21,
+      "elapsed_ms": 1.5224,
+      "policy_reads": 0
+    },
+    {
+      "case": "inventory_query",
+      "variant": "before_reference_full_metadata_reduce",
+      "sample": 21,
+      "elapsed_ms": 10.9584,
+      "policy_reads": 0
+    },
+    {
+      "case": "inventory_query",
+      "variant": "before_reference_full_metadata_reduce",
+      "sample": 22,
+      "elapsed_ms": 12.4516,
+      "policy_reads": 0
+    },
+    {
+      "case": "inventory_query",
+      "variant": "after",
+      "sample": 22,
+      "elapsed_ms": 1.7473,
+      "policy_reads": 0
+    },
+    {
+      "case": "inventory_query",
+      "variant": "after",
+      "sample": 23,
+      "elapsed_ms": 1.4573,
+      "policy_reads": 0
+    },
+    {
+      "case": "inventory_query",
+      "variant": "before_reference_full_metadata_reduce",
+      "sample": 23,
+      "elapsed_ms": 11.7032,
+      "policy_reads": 0
+    },
+    {
+      "case": "inventory_query",
+      "variant": "before_reference_full_metadata_reduce",
+      "sample": 24,
+      "elapsed_ms": 13.0045,
+      "policy_reads": 0
+    },
+    {
+      "case": "inventory_query",
+      "variant": "after",
+      "sample": 24,
+      "elapsed_ms": 2.3058,
+      "policy_reads": 0
+    },
+    {
+      "case": "inventory_query",
+      "variant": "after",
+      "sample": 25,
+      "elapsed_ms": 1.7105,
+      "policy_reads": 0
+    },
+    {
+      "case": "inventory_query",
+      "variant": "before_reference_full_metadata_reduce",
+      "sample": 25,
+      "elapsed_ms": 11.7669,
+      "policy_reads": 0
+    },
+    {
+      "case": "inventory_query",
+      "variant": "before_reference_full_metadata_reduce",
+      "sample": 26,
+      "elapsed_ms": 11.6384,
+      "policy_reads": 0
+    },
+    {
+      "case": "inventory_query",
+      "variant": "after",
+      "sample": 26,
+      "elapsed_ms": 2.1425,
+      "policy_reads": 0
+    },
+    {
+      "case": "inventory_query",
+      "variant": "after",
+      "sample": 27,
+      "elapsed_ms": 1.5601,
+      "policy_reads": 0
+    },
+    {
+      "case": "inventory_query",
+      "variant": "before_reference_full_metadata_reduce",
+      "sample": 27,
+      "elapsed_ms": 12.4052,
+      "policy_reads": 0
+    },
+    {
+      "case": "inventory_query",
+      "variant": "before_reference_full_metadata_reduce",
+      "sample": 28,
+      "elapsed_ms": 13.6508,
+      "policy_reads": 0
+    },
+    {
+      "case": "inventory_query",
+      "variant": "after",
+      "sample": 28,
+      "elapsed_ms": 1.7632,
+      "policy_reads": 0
+    },
+    {
+      "case": "inventory_query",
+      "variant": "after",
+      "sample": 29,
+      "elapsed_ms": 1.5004,
+      "policy_reads": 0
+    },
+    {
+      "case": "inventory_query",
+      "variant": "before_reference_full_metadata_reduce",
+      "sample": 29,
+      "elapsed_ms": 13.6328,
+      "policy_reads": 0
+    },
+    {
+      "case": "inventory_query",
+      "variant": "before_reference_full_metadata_reduce",
+      "sample": 30,
+      "elapsed_ms": 17.1618,
+      "policy_reads": 0
+    },
+    {
+      "case": "inventory_query",
+      "variant": "after",
+      "sample": 30,
+      "elapsed_ms": 2.1554,
+      "policy_reads": 0
+    },
+    {
+      "case": "inventory_query",
+      "variant": "after",
+      "sample": 31,
+      "elapsed_ms": 1.5767,
+      "policy_reads": 0
+    },
+    {
+      "case": "inventory_query",
+      "variant": "before_reference_full_metadata_reduce",
+      "sample": 31,
+      "elapsed_ms": 14.3824,
+      "policy_reads": 0
+    },
+    {
+      "case": "inventory_query",
+      "variant": "before_reference_full_metadata_reduce",
+      "sample": 32,
+      "elapsed_ms": 14.3096,
+      "policy_reads": 0
+    },
+    {
+      "case": "inventory_query",
+      "variant": "after",
+      "sample": 32,
+      "elapsed_ms": 3.2394,
+      "policy_reads": 0
+    },
+    {
+      "case": "inventory_query",
+      "variant": "after",
+      "sample": 33,
+      "elapsed_ms": 2.1386,
+      "policy_reads": 0
+    },
+    {
+      "case": "inventory_query",
+      "variant": "before_reference_full_metadata_reduce",
+      "sample": 33,
+      "elapsed_ms": 12.4148,
+      "policy_reads": 0
+    },
+    {
+      "case": "inventory_query",
+      "variant": "before_reference_full_metadata_reduce",
+      "sample": 34,
+      "elapsed_ms": 12.9693,
+      "policy_reads": 0
+    },
+    {
+      "case": "inventory_query",
+      "variant": "after",
+      "sample": 34,
+      "elapsed_ms": 1.9223,
+      "policy_reads": 0
+    },
+    {
+      "case": "inventory_query",
+      "variant": "after",
+      "sample": 35,
+      "elapsed_ms": 1.4785,
+      "policy_reads": 0
+    },
+    {
+      "case": "inventory_query",
+      "variant": "before_reference_full_metadata_reduce",
+      "sample": 35,
+      "elapsed_ms": 11.577,
+      "policy_reads": 0
+    },
+    {
+      "case": "inventory_query",
+      "variant": "before_reference_full_metadata_reduce",
+      "sample": 36,
+      "elapsed_ms": 11.6264,
+      "policy_reads": 0
+    },
+    {
+      "case": "inventory_query",
+      "variant": "after",
+      "sample": 36,
+      "elapsed_ms": 1.6256,
+      "policy_reads": 0
+    },
+    {
+      "case": "inventory_query",
+      "variant": "after",
+      "sample": 37,
+      "elapsed_ms": 1.4855,
+      "policy_reads": 0
+    },
+    {
+      "case": "inventory_query",
+      "variant": "before_reference_full_metadata_reduce",
+      "sample": 37,
+      "elapsed_ms": 11.6816,
+      "policy_reads": 0
+    },
+    {
+      "case": "inventory_query",
+      "variant": "before_reference_full_metadata_reduce",
+      "sample": 38,
+      "elapsed_ms": 12.5654,
+      "policy_reads": 0
+    },
+    {
+      "case": "inventory_query",
+      "variant": "after",
+      "sample": 38,
+      "elapsed_ms": 2.4138,
+      "policy_reads": 0
+    },
+    {
+      "case": "inventory_query",
+      "variant": "after",
+      "sample": 39,
+      "elapsed_ms": 1.6221,
+      "policy_reads": 0
+    },
+    {
+      "case": "inventory_query",
+      "variant": "before_reference_full_metadata_reduce",
+      "sample": 39,
+      "elapsed_ms": 11.9598,
+      "policy_reads": 0
+    },
+    {
+      "case": "inventory_query",
+      "variant": "before_reference_full_metadata_reduce",
+      "sample": 40,
+      "elapsed_ms": 11.7721,
+      "policy_reads": 0
+    },
+    {
+      "case": "inventory_query",
+      "variant": "after",
+      "sample": 40,
+      "elapsed_ms": 1.9107,
+      "policy_reads": 0
+    },
+    {
+      "case": "inventory_query",
+      "variant": "after",
+      "sample": 41,
+      "elapsed_ms": 1.5636,
+      "policy_reads": 0
+    },
+    {
+      "case": "inventory_query",
+      "variant": "before_reference_full_metadata_reduce",
+      "sample": 41,
+      "elapsed_ms": 12.0325,
+      "policy_reads": 0
+    },
+    {
+      "case": "inventory_query",
+      "variant": "before_reference_full_metadata_reduce",
+      "sample": 42,
+      "elapsed_ms": 12.2963,
+      "policy_reads": 0
+    },
+    {
+      "case": "inventory_query",
+      "variant": "after",
+      "sample": 42,
+      "elapsed_ms": 2.7366,
+      "policy_reads": 0
+    },
+    {
+      "case": "inventory_query",
+      "variant": "after",
+      "sample": 43,
+      "elapsed_ms": 1.7509,
+      "policy_reads": 0
+    },
+    {
+      "case": "inventory_query",
+      "variant": "before_reference_full_metadata_reduce",
+      "sample": 43,
+      "elapsed_ms": 11.6068,
+      "policy_reads": 0
+    },
+    {
+      "case": "inventory_query",
+      "variant": "before_reference_full_metadata_reduce",
+      "sample": 44,
+      "elapsed_ms": 11.3659,
+      "policy_reads": 0
+    },
+    {
+      "case": "inventory_query",
+      "variant": "after",
+      "sample": 44,
+      "elapsed_ms": 1.5834,
+      "policy_reads": 0
+    },
+    {
+      "case": "inventory_query",
+      "variant": "after",
+      "sample": 45,
+      "elapsed_ms": 1.4059,
+      "policy_reads": 0
+    },
+    {
+      "case": "inventory_query",
+      "variant": "before_reference_full_metadata_reduce",
+      "sample": 45,
+      "elapsed_ms": 11.7128,
+      "policy_reads": 0
+    },
+    {
+      "case": "inventory_query",
+      "variant": "before_reference_full_metadata_reduce",
+      "sample": 46,
+      "elapsed_ms": 13.4427,
+      "policy_reads": 0
+    },
+    {
+      "case": "inventory_query",
+      "variant": "after",
+      "sample": 46,
+      "elapsed_ms": 1.7617,
+      "policy_reads": 0
+    },
+    {
+      "case": "inventory_query",
+      "variant": "after",
+      "sample": 47,
+      "elapsed_ms": 1.5349,
+      "policy_reads": 0
+    },
+    {
+      "case": "inventory_query",
+      "variant": "before_reference_full_metadata_reduce",
+      "sample": 47,
+      "elapsed_ms": 11.4329,
+      "policy_reads": 0
+    },
+    {
+      "case": "inventory_query",
+      "variant": "before_reference_full_metadata_reduce",
+      "sample": 48,
+      "elapsed_ms": 11.5752,
+      "policy_reads": 0
+    },
+    {
+      "case": "inventory_query",
+      "variant": "after",
+      "sample": 48,
+      "elapsed_ms": 1.6582,
+      "policy_reads": 0
+    },
+    {
+      "case": "inventory_query",
+      "variant": "after",
+      "sample": 49,
+      "elapsed_ms": 1.5457,
+      "policy_reads": 0
+    },
+    {
+      "case": "inventory_query",
+      "variant": "before_reference_full_metadata_reduce",
+      "sample": 49,
+      "elapsed_ms": 12.0772,
+      "policy_reads": 0
+    },
+    {
+      "case": "waiting_work",
+      "variant": "before_callback_model",
+      "sample": 0,
+      "elapsed_ms": 0.9882,
+      "policy_reads": 0,
+      "waiting_callbacks": 30720
+    },
+    {
+      "case": "waiting_work",
+      "variant": "after_event_queue",
+      "sample": 0,
+      "elapsed_ms": 0.7625,
+      "policy_reads": 0,
+      "waiting_callbacks": 0
+    },
+    {
+      "case": "waiting_work",
+      "variant": "before_callback_model",
+      "sample": 1,
+      "elapsed_ms": 1.0037,
+      "policy_reads": 0,
+      "waiting_callbacks": 30720
+    },
+    {
+      "case": "waiting_work",
+      "variant": "after_event_queue",
+      "sample": 1,
+      "elapsed_ms": 0.4251,
+      "policy_reads": 0,
+      "waiting_callbacks": 0
+    },
+    {
+      "case": "waiting_work",
+      "variant": "before_callback_model",
+      "sample": 2,
+      "elapsed_ms": 0.5857,
+      "policy_reads": 0,
+      "waiting_callbacks": 30720
+    },
+    {
+      "case": "waiting_work",
+      "variant": "after_event_queue",
+      "sample": 2,
+      "elapsed_ms": 0.4133,
+      "policy_reads": 0,
+      "waiting_callbacks": 0
+    },
+    {
+      "case": "waiting_work",
+      "variant": "before_callback_model",
+      "sample": 3,
+      "elapsed_ms": 0.5736,
+      "policy_reads": 0,
+      "waiting_callbacks": 30720
+    },
+    {
+      "case": "waiting_work",
+      "variant": "after_event_queue",
+      "sample": 3,
+      "elapsed_ms": 0.4049,
+      "policy_reads": 0,
+      "waiting_callbacks": 0
+    },
+    {
+      "case": "waiting_work",
+      "variant": "before_callback_model",
+      "sample": 4,
+      "elapsed_ms": 0.5758,
+      "policy_reads": 0,
+      "waiting_callbacks": 30720
+    },
+    {
+      "case": "waiting_work",
+      "variant": "after_event_queue",
+      "sample": 4,
+      "elapsed_ms": 0.404,
+      "policy_reads": 0,
+      "waiting_callbacks": 0
+    },
+    {
+      "case": "waiting_work",
+      "variant": "before_callback_model",
+      "sample": 5,
+      "elapsed_ms": 0.5819,
+      "policy_reads": 0,
+      "waiting_callbacks": 30720
+    },
+    {
+      "case": "waiting_work",
+      "variant": "after_event_queue",
+      "sample": 5,
+      "elapsed_ms": 0.4047,
+      "policy_reads": 0,
+      "waiting_callbacks": 0
+    },
+    {
+      "case": "waiting_work",
+      "variant": "before_callback_model",
+      "sample": 6,
+      "elapsed_ms": 0.5748,
+      "policy_reads": 0,
+      "waiting_callbacks": 30720
+    },
+    {
+      "case": "waiting_work",
+      "variant": "after_event_queue",
+      "sample": 6,
+      "elapsed_ms": 0.4033,
+      "policy_reads": 0,
+      "waiting_callbacks": 0
+    },
+    {
+      "case": "waiting_work",
+      "variant": "before_callback_model",
+      "sample": 7,
+      "elapsed_ms": 0.5699,
+      "policy_reads": 0,
+      "waiting_callbacks": 30720
+    },
+    {
+      "case": "waiting_work",
+      "variant": "after_event_queue",
+      "sample": 7,
+      "elapsed_ms": 0.4021,
+      "policy_reads": 0,
+      "waiting_callbacks": 0
+    },
+    {
+      "case": "waiting_work",
+      "variant": "before_callback_model",
+      "sample": 8,
+      "elapsed_ms": 0.5725,
+      "policy_reads": 0,
+      "waiting_callbacks": 30720
+    },
+    {
+      "case": "waiting_work",
+      "variant": "after_event_queue",
+      "sample": 8,
+      "elapsed_ms": 0.4007,
+      "policy_reads": 0,
+      "waiting_callbacks": 0
+    },
+    {
+      "case": "waiting_work",
+      "variant": "before_callback_model",
+      "sample": 9,
+      "elapsed_ms": 0.5704,
+      "policy_reads": 0,
+      "waiting_callbacks": 30720
+    },
+    {
+      "case": "waiting_work",
+      "variant": "after_event_queue",
+      "sample": 9,
+      "elapsed_ms": 0.3983,
+      "policy_reads": 0,
+      "waiting_callbacks": 0
+    },
+    {
+      "case": "waiting_work",
+      "variant": "before_callback_model",
+      "sample": 10,
+      "elapsed_ms": 0.5723,
+      "policy_reads": 0,
+      "waiting_callbacks": 30720
+    },
+    {
+      "case": "waiting_work",
+      "variant": "after_event_queue",
+      "sample": 10,
+      "elapsed_ms": 0.4019,
+      "policy_reads": 0,
+      "waiting_callbacks": 0
+    },
+    {
+      "case": "waiting_work",
+      "variant": "before_callback_model",
+      "sample": 11,
+      "elapsed_ms": 0.5703,
+      "policy_reads": 0,
+      "waiting_callbacks": 30720
+    },
+    {
+      "case": "waiting_work",
+      "variant": "after_event_queue",
+      "sample": 11,
+      "elapsed_ms": 0.4001,
+      "policy_reads": 0,
+      "waiting_callbacks": 0
+    },
+    {
+      "case": "waiting_work",
+      "variant": "before_callback_model",
+      "sample": 12,
+      "elapsed_ms": 0.5746,
+      "policy_reads": 0,
+      "waiting_callbacks": 30720
+    },
+    {
+      "case": "waiting_work",
+      "variant": "after_event_queue",
+      "sample": 12,
+      "elapsed_ms": 0.4111,
+      "policy_reads": 0,
+      "waiting_callbacks": 0
+    },
+    {
+      "case": "waiting_work",
+      "variant": "before_callback_model",
+      "sample": 13,
+      "elapsed_ms": 0.6646,
+      "policy_reads": 0,
+      "waiting_callbacks": 30720
+    },
+    {
+      "case": "waiting_work",
+      "variant": "after_event_queue",
+      "sample": 13,
+      "elapsed_ms": 0.4191,
+      "policy_reads": 0,
+      "waiting_callbacks": 0
+    },
+    {
+      "case": "waiting_work",
+      "variant": "before_callback_model",
+      "sample": 14,
+      "elapsed_ms": 0.5764,
+      "policy_reads": 0,
+      "waiting_callbacks": 30720
+    },
+    {
+      "case": "waiting_work",
+      "variant": "after_event_queue",
+      "sample": 14,
+      "elapsed_ms": 0.4074,
+      "policy_reads": 0,
+      "waiting_callbacks": 0
+    },
+    {
+      "case": "waiting_work",
+      "variant": "before_callback_model",
+      "sample": 15,
+      "elapsed_ms": 0.5733,
+      "policy_reads": 0,
+      "waiting_callbacks": 30720
+    },
+    {
+      "case": "waiting_work",
+      "variant": "after_event_queue",
+      "sample": 15,
+      "elapsed_ms": 0.4077,
+      "policy_reads": 0,
+      "waiting_callbacks": 0
+    },
+    {
+      "case": "waiting_work",
+      "variant": "before_callback_model",
+      "sample": 16,
+      "elapsed_ms": 0.5811,
+      "policy_reads": 0,
+      "waiting_callbacks": 30720
+    },
+    {
+      "case": "waiting_work",
+      "variant": "after_event_queue",
+      "sample": 16,
+      "elapsed_ms": 0.4023,
+      "policy_reads": 0,
+      "waiting_callbacks": 0
+    },
+    {
+      "case": "waiting_work",
+      "variant": "before_callback_model",
+      "sample": 17,
+      "elapsed_ms": 0.5704,
+      "policy_reads": 0,
+      "waiting_callbacks": 30720
+    },
+    {
+      "case": "waiting_work",
+      "variant": "after_event_queue",
+      "sample": 17,
+      "elapsed_ms": 0.406,
+      "policy_reads": 0,
+      "waiting_callbacks": 0
+    },
+    {
+      "case": "waiting_work",
+      "variant": "before_callback_model",
+      "sample": 18,
+      "elapsed_ms": 0.5769,
+      "policy_reads": 0,
+      "waiting_callbacks": 30720
+    },
+    {
+      "case": "waiting_work",
+      "variant": "after_event_queue",
+      "sample": 18,
+      "elapsed_ms": 0.4706,
+      "policy_reads": 0,
+      "waiting_callbacks": 0
+    },
+    {
+      "case": "waiting_work",
+      "variant": "before_callback_model",
+      "sample": 19,
+      "elapsed_ms": 0.5734,
+      "policy_reads": 0,
+      "waiting_callbacks": 30720
+    },
+    {
+      "case": "waiting_work",
+      "variant": "after_event_queue",
+      "sample": 19,
+      "elapsed_ms": 0.4154,
+      "policy_reads": 0,
+      "waiting_callbacks": 0
+    },
+    {
+      "case": "waiting_work",
+      "variant": "before_callback_model",
+      "sample": 20,
+      "elapsed_ms": 0.5797,
+      "policy_reads": 0,
+      "waiting_callbacks": 30720
+    },
+    {
+      "case": "waiting_work",
+      "variant": "after_event_queue",
+      "sample": 20,
+      "elapsed_ms": 0.4088,
+      "policy_reads": 0,
+      "waiting_callbacks": 0
+    },
+    {
+      "case": "waiting_work",
+      "variant": "before_callback_model",
+      "sample": 21,
+      "elapsed_ms": 0.5747,
+      "policy_reads": 0,
+      "waiting_callbacks": 30720
+    },
+    {
+      "case": "waiting_work",
+      "variant": "after_event_queue",
+      "sample": 21,
+      "elapsed_ms": 0.6335,
+      "policy_reads": 0,
+      "waiting_callbacks": 0
+    },
+    {
+      "case": "waiting_work",
+      "variant": "before_callback_model",
+      "sample": 22,
+      "elapsed_ms": 0.8348,
+      "policy_reads": 0,
+      "waiting_callbacks": 30720
+    },
+    {
+      "case": "waiting_work",
+      "variant": "after_event_queue",
+      "sample": 22,
+      "elapsed_ms": 0.4297,
+      "policy_reads": 0,
+      "waiting_callbacks": 0
+    },
+    {
+      "case": "waiting_work",
+      "variant": "before_callback_model",
+      "sample": 23,
+      "elapsed_ms": 0.577,
+      "policy_reads": 0,
+      "waiting_callbacks": 30720
+    },
+    {
+      "case": "waiting_work",
+      "variant": "after_event_queue",
+      "sample": 23,
+      "elapsed_ms": 0.4071,
+      "policy_reads": 0,
+      "waiting_callbacks": 0
+    },
+    {
+      "case": "waiting_work",
+      "variant": "before_callback_model",
+      "sample": 24,
+      "elapsed_ms": 0.5666,
+      "policy_reads": 0,
+      "waiting_callbacks": 30720
+    },
+    {
+      "case": "waiting_work",
+      "variant": "after_event_queue",
+      "sample": 24,
+      "elapsed_ms": 0.4092,
+      "policy_reads": 0,
+      "waiting_callbacks": 0
+    },
+    {
+      "case": "waiting_work",
+      "variant": "before_callback_model",
+      "sample": 25,
+      "elapsed_ms": 0.5734,
+      "policy_reads": 0,
+      "waiting_callbacks": 30720
+    },
+    {
+      "case": "waiting_work",
+      "variant": "after_event_queue",
+      "sample": 25,
+      "elapsed_ms": 0.4018,
+      "policy_reads": 0,
+      "waiting_callbacks": 0
+    },
+    {
+      "case": "waiting_work",
+      "variant": "before_callback_model",
+      "sample": 26,
+      "elapsed_ms": 0.5661,
+      "policy_reads": 0,
+      "waiting_callbacks": 30720
+    },
+    {
+      "case": "waiting_work",
+      "variant": "after_event_queue",
+      "sample": 26,
+      "elapsed_ms": 0.398,
+      "policy_reads": 0,
+      "waiting_callbacks": 0
+    },
+    {
+      "case": "waiting_work",
+      "variant": "before_callback_model",
+      "sample": 27,
+      "elapsed_ms": 0.635,
+      "policy_reads": 0,
+      "waiting_callbacks": 30720
+    },
+    {
+      "case": "waiting_work",
+      "variant": "after_event_queue",
+      "sample": 27,
+      "elapsed_ms": 0.4092,
+      "policy_reads": 0,
+      "waiting_callbacks": 0
+    },
+    {
+      "case": "waiting_work",
+      "variant": "before_callback_model",
+      "sample": 28,
+      "elapsed_ms": 0.5665,
+      "policy_reads": 0,
+      "waiting_callbacks": 30720
+    },
+    {
+      "case": "waiting_work",
+      "variant": "after_event_queue",
+      "sample": 28,
+      "elapsed_ms": 0.3976,
+      "policy_reads": 0,
+      "waiting_callbacks": 0
+    },
+    {
+      "case": "waiting_work",
+      "variant": "before_callback_model",
+      "sample": 29,
+      "elapsed_ms": 0.5734,
+      "policy_reads": 0,
+      "waiting_callbacks": 30720
+    },
+    {
+      "case": "waiting_work",
+      "variant": "after_event_queue",
+      "sample": 29,
+      "elapsed_ms": 0.403,
+      "policy_reads": 0,
+      "waiting_callbacks": 0
+    },
+    {
+      "case": "waiting_work",
+      "variant": "before_callback_model",
+      "sample": 30,
+      "elapsed_ms": 0.5734,
+      "policy_reads": 0,
+      "waiting_callbacks": 30720
+    },
+    {
+      "case": "waiting_work",
+      "variant": "after_event_queue",
+      "sample": 30,
+      "elapsed_ms": 0.3996,
+      "policy_reads": 0,
+      "waiting_callbacks": 0
+    },
+    {
+      "case": "waiting_work",
+      "variant": "before_callback_model",
+      "sample": 31,
+      "elapsed_ms": 0.5755,
+      "policy_reads": 0,
+      "waiting_callbacks": 30720
+    },
+    {
+      "case": "waiting_work",
+      "variant": "after_event_queue",
+      "sample": 31,
+      "elapsed_ms": 0.4037,
+      "policy_reads": 0,
+      "waiting_callbacks": 0
+    },
+    {
+      "case": "waiting_work",
+      "variant": "before_callback_model",
+      "sample": 32,
+      "elapsed_ms": 0.5762,
+      "policy_reads": 0,
+      "waiting_callbacks": 30720
+    },
+    {
+      "case": "waiting_work",
+      "variant": "after_event_queue",
+      "sample": 32,
+      "elapsed_ms": 0.4018,
+      "policy_reads": 0,
+      "waiting_callbacks": 0
+    },
+    {
+      "case": "waiting_work",
+      "variant": "before_callback_model",
+      "sample": 33,
+      "elapsed_ms": 0.5596,
+      "policy_reads": 0,
+      "waiting_callbacks": 30720
+    },
+    {
+      "case": "waiting_work",
+      "variant": "after_event_queue",
+      "sample": 33,
+      "elapsed_ms": 0.3804,
+      "policy_reads": 0,
+      "waiting_callbacks": 0
+    },
+    {
+      "case": "waiting_work",
+      "variant": "before_callback_model",
+      "sample": 34,
+      "elapsed_ms": 0.561,
+      "policy_reads": 0,
+      "waiting_callbacks": 30720
+    },
+    {
+      "case": "waiting_work",
+      "variant": "after_event_queue",
+      "sample": 34,
+      "elapsed_ms": 0.4006,
+      "policy_reads": 0,
+      "waiting_callbacks": 0
+    },
+    {
+      "case": "waiting_work",
+      "variant": "before_callback_model",
+      "sample": 35,
+      "elapsed_ms": 0.5764,
+      "policy_reads": 0,
+      "waiting_callbacks": 30720
+    },
+    {
+      "case": "waiting_work",
+      "variant": "after_event_queue",
+      "sample": 35,
+      "elapsed_ms": 0.3935,
+      "policy_reads": 0,
+      "waiting_callbacks": 0
+    },
+    {
+      "case": "waiting_work",
+      "variant": "before_callback_model",
+      "sample": 36,
+      "elapsed_ms": 0.5696,
+      "policy_reads": 0,
+      "waiting_callbacks": 30720
+    },
+    {
+      "case": "waiting_work",
+      "variant": "after_event_queue",
+      "sample": 36,
+      "elapsed_ms": 0.3976,
+      "policy_reads": 0,
+      "waiting_callbacks": 0
+    },
+    {
+      "case": "waiting_work",
+      "variant": "before_callback_model",
+      "sample": 37,
+      "elapsed_ms": 0.5714,
+      "policy_reads": 0,
+      "waiting_callbacks": 30720
+    },
+    {
+      "case": "waiting_work",
+      "variant": "after_event_queue",
+      "sample": 37,
+      "elapsed_ms": 0.3981,
+      "policy_reads": 0,
+      "waiting_callbacks": 0
+    },
+    {
+      "case": "waiting_work",
+      "variant": "before_callback_model",
+      "sample": 38,
+      "elapsed_ms": 0.5816,
+      "policy_reads": 0,
+      "waiting_callbacks": 30720
+    },
+    {
+      "case": "waiting_work",
+      "variant": "after_event_queue",
+      "sample": 38,
+      "elapsed_ms": 0.3998,
+      "policy_reads": 0,
+      "waiting_callbacks": 0
+    },
+    {
+      "case": "waiting_work",
+      "variant": "before_callback_model",
+      "sample": 39,
+      "elapsed_ms": 0.805,
+      "policy_reads": 0,
+      "waiting_callbacks": 30720
+    },
+    {
+      "case": "waiting_work",
+      "variant": "after_event_queue",
+      "sample": 39,
+      "elapsed_ms": 0.4442,
+      "policy_reads": 0,
+      "waiting_callbacks": 0
+    },
+    {
+      "case": "waiting_work",
+      "variant": "before_callback_model",
+      "sample": 40,
+      "elapsed_ms": 0.5804,
+      "policy_reads": 0,
+      "waiting_callbacks": 30720
+    },
+    {
+      "case": "waiting_work",
+      "variant": "after_event_queue",
+      "sample": 40,
+      "elapsed_ms": 0.4032,
+      "policy_reads": 0,
+      "waiting_callbacks": 0
+    },
+    {
+      "case": "waiting_work",
+      "variant": "before_callback_model",
+      "sample": 41,
+      "elapsed_ms": 0.5819,
+      "policy_reads": 0,
+      "waiting_callbacks": 30720
+    },
+    {
+      "case": "waiting_work",
+      "variant": "after_event_queue",
+      "sample": 41,
+      "elapsed_ms": 0.4005,
+      "policy_reads": 0,
+      "waiting_callbacks": 0
+    },
+    {
+      "case": "waiting_work",
+      "variant": "before_callback_model",
+      "sample": 42,
+      "elapsed_ms": 0.5804,
+      "policy_reads": 0,
+      "waiting_callbacks": 30720
+    },
+    {
+      "case": "waiting_work",
+      "variant": "after_event_queue",
+      "sample": 42,
+      "elapsed_ms": 0.4015,
+      "policy_reads": 0,
+      "waiting_callbacks": 0
+    },
+    {
+      "case": "waiting_work",
+      "variant": "before_callback_model",
+      "sample": 43,
+      "elapsed_ms": 0.58,
+      "policy_reads": 0,
+      "waiting_callbacks": 30720
+    },
+    {
+      "case": "waiting_work",
+      "variant": "after_event_queue",
+      "sample": 43,
+      "elapsed_ms": 0.4005,
+      "policy_reads": 0,
+      "waiting_callbacks": 0
+    },
+    {
+      "case": "waiting_work",
+      "variant": "before_callback_model",
+      "sample": 44,
+      "elapsed_ms": 0.5906,
+      "policy_reads": 0,
+      "waiting_callbacks": 30720
+    },
+    {
+      "case": "waiting_work",
+      "variant": "after_event_queue",
+      "sample": 44,
+      "elapsed_ms": 0.4026,
+      "policy_reads": 0,
+      "waiting_callbacks": 0
+    },
+    {
+      "case": "waiting_work",
+      "variant": "before_callback_model",
+      "sample": 45,
+      "elapsed_ms": 0.5802,
+      "policy_reads": 0,
+      "waiting_callbacks": 30720
+    },
+    {
+      "case": "waiting_work",
+      "variant": "after_event_queue",
+      "sample": 45,
+      "elapsed_ms": 0.4026,
+      "policy_reads": 0,
+      "waiting_callbacks": 0
+    },
+    {
+      "case": "waiting_work",
+      "variant": "before_callback_model",
+      "sample": 46,
+      "elapsed_ms": 0.5798,
+      "policy_reads": 0,
+      "waiting_callbacks": 30720
+    },
+    {
+      "case": "waiting_work",
+      "variant": "after_event_queue",
+      "sample": 46,
+      "elapsed_ms": 0.3986,
+      "policy_reads": 0,
+      "waiting_callbacks": 0
+    },
+    {
+      "case": "waiting_work",
+      "variant": "before_callback_model",
+      "sample": 47,
+      "elapsed_ms": 0.5798,
+      "policy_reads": 0,
+      "waiting_callbacks": 30720
+    },
+    {
+      "case": "waiting_work",
+      "variant": "after_event_queue",
+      "sample": 47,
+      "elapsed_ms": 0.4029,
+      "policy_reads": 0,
+      "waiting_callbacks": 0
+    },
+    {
+      "case": "waiting_work",
+      "variant": "before_callback_model",
+      "sample": 48,
+      "elapsed_ms": 0.5797,
+      "policy_reads": 0,
+      "waiting_callbacks": 30720
+    },
+    {
+      "case": "waiting_work",
+      "variant": "after_event_queue",
+      "sample": 48,
+      "elapsed_ms": 0.3974,
+      "policy_reads": 0,
+      "waiting_callbacks": 0
+    },
+    {
+      "case": "waiting_work",
+      "variant": "before_callback_model",
+      "sample": 49,
+      "elapsed_ms": 0.5816,
+      "policy_reads": 0,
+      "waiting_callbacks": 30720
+    },
+    {
+      "case": "waiting_work",
+      "variant": "after_event_queue",
+      "sample": 49,
+      "elapsed_ms": 0.3992,
+      "policy_reads": 0,
+      "waiting_callbacks": 0
+    },
+    {
+      "case": "foreground_read",
+      "variant": "foreground_only",
+      "sample": 0,
+      "elapsed_ms": 52.6317,
+      "policy_reads": 0,
+      "bytes_verified_and_read": 33554432
+    },
+    {
+      "case": "foreground_read",
+      "variant": "background_enabled",
+      "sample": 0,
+      "elapsed_ms": 56.8632,
+      "policy_reads": 0,
+      "bytes_verified_and_read": 33554432,
+      "background_deferred": true
+    },
+    {
+      "case": "foreground_read",
+      "variant": "background_enabled",
+      "sample": 1,
+      "elapsed_ms": 55.0757,
+      "policy_reads": 0,
+      "bytes_verified_and_read": 33554432,
+      "background_deferred": true
+    },
+    {
+      "case": "foreground_read",
+      "variant": "foreground_only",
+      "sample": 1,
+      "elapsed_ms": 56.7556,
+      "policy_reads": 0,
+      "bytes_verified_and_read": 33554432
+    },
+    {
+      "case": "foreground_read",
+      "variant": "foreground_only",
+      "sample": 2,
+      "elapsed_ms": 48.4185,
+      "policy_reads": 0,
+      "bytes_verified_and_read": 33554432
+    },
+    {
+      "case": "foreground_read",
+      "variant": "background_enabled",
+      "sample": 2,
+      "elapsed_ms": 58.8737,
+      "policy_reads": 0,
+      "bytes_verified_and_read": 33554432,
+      "background_deferred": true
+    },
+    {
+      "case": "foreground_read",
+      "variant": "background_enabled",
+      "sample": 3,
+      "elapsed_ms": 51.3403,
+      "policy_reads": 0,
+      "bytes_verified_and_read": 33554432,
+      "background_deferred": true
+    },
+    {
+      "case": "foreground_read",
+      "variant": "foreground_only",
+      "sample": 3,
+      "elapsed_ms": 52.942,
+      "policy_reads": 0,
+      "bytes_verified_and_read": 33554432
+    },
+    {
+      "case": "foreground_read",
+      "variant": "foreground_only",
+      "sample": 4,
+      "elapsed_ms": 45.343,
+      "policy_reads": 0,
+      "bytes_verified_and_read": 33554432
+    },
+    {
+      "case": "foreground_read",
+      "variant": "background_enabled",
+      "sample": 4,
+      "elapsed_ms": 49.1728,
+      "policy_reads": 0,
+      "bytes_verified_and_read": 33554432,
+      "background_deferred": true
+    },
+    {
+      "case": "foreground_read",
+      "variant": "background_enabled",
+      "sample": 5,
+      "elapsed_ms": 42.6409,
+      "policy_reads": 0,
+      "bytes_verified_and_read": 33554432,
+      "background_deferred": true
+    },
+    {
+      "case": "foreground_read",
+      "variant": "foreground_only",
+      "sample": 5,
+      "elapsed_ms": 45.653,
+      "policy_reads": 0,
+      "bytes_verified_and_read": 33554432
+    },
+    {
+      "case": "foreground_read",
+      "variant": "foreground_only",
+      "sample": 6,
+      "elapsed_ms": 53.7303,
+      "policy_reads": 0,
+      "bytes_verified_and_read": 33554432
+    },
+    {
+      "case": "foreground_read",
+      "variant": "background_enabled",
+      "sample": 6,
+      "elapsed_ms": 51.9572,
+      "policy_reads": 0,
+      "bytes_verified_and_read": 33554432,
+      "background_deferred": true
+    },
+    {
+      "case": "foreground_read",
+      "variant": "background_enabled",
+      "sample": 7,
+      "elapsed_ms": 64.4287,
+      "policy_reads": 0,
+      "bytes_verified_and_read": 33554432,
+      "background_deferred": true
+    },
+    {
+      "case": "foreground_read",
+      "variant": "foreground_only",
+      "sample": 7,
+      "elapsed_ms": 62.2802,
+      "policy_reads": 0,
+      "bytes_verified_and_read": 33554432
+    },
+    {
+      "case": "foreground_read",
+      "variant": "foreground_only",
+      "sample": 8,
+      "elapsed_ms": 57.1923,
+      "policy_reads": 0,
+      "bytes_verified_and_read": 33554432
+    },
+    {
+      "case": "foreground_read",
+      "variant": "background_enabled",
+      "sample": 8,
+      "elapsed_ms": 55.1806,
+      "policy_reads": 0,
+      "bytes_verified_and_read": 33554432,
+      "background_deferred": true
+    },
+    {
+      "case": "foreground_read",
+      "variant": "background_enabled",
+      "sample": 9,
+      "elapsed_ms": 57.4501,
+      "policy_reads": 0,
+      "bytes_verified_and_read": 33554432,
+      "background_deferred": true
+    },
+    {
+      "case": "foreground_read",
+      "variant": "foreground_only",
+      "sample": 9,
+      "elapsed_ms": 53.4361,
+      "policy_reads": 0,
+      "bytes_verified_and_read": 33554432
+    },
+    {
+      "case": "foreground_read",
+      "variant": "foreground_only",
+      "sample": 10,
+      "elapsed_ms": 49.8542,
+      "policy_reads": 0,
+      "bytes_verified_and_read": 33554432
+    },
+    {
+      "case": "foreground_read",
+      "variant": "background_enabled",
+      "sample": 10,
+      "elapsed_ms": 45.8317,
+      "policy_reads": 0,
+      "bytes_verified_and_read": 33554432,
+      "background_deferred": true
+    },
+    {
+      "case": "foreground_read",
+      "variant": "background_enabled",
+      "sample": 11,
+      "elapsed_ms": 51.5293,
+      "policy_reads": 0,
+      "bytes_verified_and_read": 33554432,
+      "background_deferred": true
+    },
+    {
+      "case": "foreground_read",
+      "variant": "foreground_only",
+      "sample": 11,
+      "elapsed_ms": 49.3506,
+      "policy_reads": 0,
+      "bytes_verified_and_read": 33554432
+    },
+    {
+      "case": "foreground_read",
+      "variant": "foreground_only",
+      "sample": 12,
+      "elapsed_ms": 52.9659,
+      "policy_reads": 0,
+      "bytes_verified_and_read": 33554432
+    },
+    {
+      "case": "foreground_read",
+      "variant": "background_enabled",
+      "sample": 12,
+      "elapsed_ms": 62.2759,
+      "policy_reads": 0,
+      "bytes_verified_and_read": 33554432,
+      "background_deferred": true
+    },
+    {
+      "case": "foreground_read",
+      "variant": "background_enabled",
+      "sample": 13,
+      "elapsed_ms": 60.2299,
+      "policy_reads": 0,
+      "bytes_verified_and_read": 33554432,
+      "background_deferred": true
+    },
+    {
+      "case": "foreground_read",
+      "variant": "foreground_only",
+      "sample": 13,
+      "elapsed_ms": 50.3642,
+      "policy_reads": 0,
+      "bytes_verified_and_read": 33554432
+    },
+    {
+      "case": "foreground_read",
+      "variant": "foreground_only",
+      "sample": 14,
+      "elapsed_ms": 49.4413,
+      "policy_reads": 0,
+      "bytes_verified_and_read": 33554432
+    },
+    {
+      "case": "foreground_read",
+      "variant": "background_enabled",
+      "sample": 14,
+      "elapsed_ms": 56.2672,
+      "policy_reads": 0,
+      "bytes_verified_and_read": 33554432,
+      "background_deferred": true
+    },
+    {
+      "case": "foreground_read",
+      "variant": "background_enabled",
+      "sample": 15,
+      "elapsed_ms": 50.7035,
+      "policy_reads": 0,
+      "bytes_verified_and_read": 33554432,
+      "background_deferred": true
+    },
+    {
+      "case": "foreground_read",
+      "variant": "foreground_only",
+      "sample": 15,
+      "elapsed_ms": 48.3421,
+      "policy_reads": 0,
+      "bytes_verified_and_read": 33554432
+    },
+    {
+      "case": "foreground_read",
+      "variant": "foreground_only",
+      "sample": 16,
+      "elapsed_ms": 47.2764,
+      "policy_reads": 0,
+      "bytes_verified_and_read": 33554432
+    },
+    {
+      "case": "foreground_read",
+      "variant": "background_enabled",
+      "sample": 16,
+      "elapsed_ms": 49.8837,
+      "policy_reads": 0,
+      "bytes_verified_and_read": 33554432,
+      "background_deferred": true
+    },
+    {
+      "case": "foreground_read",
+      "variant": "background_enabled",
+      "sample": 17,
+      "elapsed_ms": 48.7234,
+      "policy_reads": 0,
+      "bytes_verified_and_read": 33554432,
+      "background_deferred": true
+    },
+    {
+      "case": "foreground_read",
+      "variant": "foreground_only",
+      "sample": 17,
+      "elapsed_ms": 50.6663,
+      "policy_reads": 0,
+      "bytes_verified_and_read": 33554432
+    },
+    {
+      "case": "foreground_read",
+      "variant": "foreground_only",
+      "sample": 18,
+      "elapsed_ms": 54.9363,
+      "policy_reads": 0,
+      "bytes_verified_and_read": 33554432
+    },
+    {
+      "case": "foreground_read",
+      "variant": "background_enabled",
+      "sample": 18,
+      "elapsed_ms": 51.9544,
+      "policy_reads": 0,
+      "bytes_verified_and_read": 33554432,
+      "background_deferred": true
+    },
+    {
+      "case": "foreground_read",
+      "variant": "background_enabled",
+      "sample": 19,
+      "elapsed_ms": 51.1119,
+      "policy_reads": 0,
+      "bytes_verified_and_read": 33554432,
+      "background_deferred": true
+    },
+    {
+      "case": "foreground_read",
+      "variant": "foreground_only",
+      "sample": 19,
+      "elapsed_ms": 48.2006,
+      "policy_reads": 0,
+      "bytes_verified_and_read": 33554432
+    },
+    {
+      "case": "foreground_read",
+      "variant": "foreground_only",
+      "sample": 20,
+      "elapsed_ms": 51.8825,
+      "policy_reads": 0,
+      "bytes_verified_and_read": 33554432
+    },
+    {
+      "case": "foreground_read",
+      "variant": "background_enabled",
+      "sample": 20,
+      "elapsed_ms": 50.7902,
+      "policy_reads": 0,
+      "bytes_verified_and_read": 33554432,
+      "background_deferred": true
+    },
+    {
+      "case": "foreground_read",
+      "variant": "background_enabled",
+      "sample": 21,
+      "elapsed_ms": 50.7607,
+      "policy_reads": 0,
+      "bytes_verified_and_read": 33554432,
+      "background_deferred": true
+    },
+    {
+      "case": "foreground_read",
+      "variant": "foreground_only",
+      "sample": 21,
+      "elapsed_ms": 52.8139,
+      "policy_reads": 0,
+      "bytes_verified_and_read": 33554432
+    },
+    {
+      "case": "foreground_read",
+      "variant": "foreground_only",
+      "sample": 22,
+      "elapsed_ms": 54.6476,
+      "policy_reads": 0,
+      "bytes_verified_and_read": 33554432
+    },
+    {
+      "case": "foreground_read",
+      "variant": "background_enabled",
+      "sample": 22,
+      "elapsed_ms": 54.2134,
+      "policy_reads": 0,
+      "bytes_verified_and_read": 33554432,
+      "background_deferred": true
+    },
+    {
+      "case": "foreground_read",
+      "variant": "background_enabled",
+      "sample": 23,
+      "elapsed_ms": 66.2828,
+      "policy_reads": 0,
+      "bytes_verified_and_read": 33554432,
+      "background_deferred": true
+    },
+    {
+      "case": "foreground_read",
+      "variant": "foreground_only",
+      "sample": 23,
+      "elapsed_ms": 63.9675,
+      "policy_reads": 0,
+      "bytes_verified_and_read": 33554432
+    },
+    {
+      "case": "foreground_read",
+      "variant": "foreground_only",
+      "sample": 24,
+      "elapsed_ms": 61.5608,
+      "policy_reads": 0,
+      "bytes_verified_and_read": 33554432
+    },
+    {
+      "case": "foreground_read",
+      "variant": "background_enabled",
+      "sample": 24,
+      "elapsed_ms": 64.0966,
+      "policy_reads": 0,
+      "bytes_verified_and_read": 33554432,
+      "background_deferred": true
+    },
+    {
+      "case": "foreground_read",
+      "variant": "background_enabled",
+      "sample": 25,
+      "elapsed_ms": 119.5123,
+      "policy_reads": 0,
+      "bytes_verified_and_read": 33554432,
+      "background_deferred": true
+    },
+    {
+      "case": "foreground_read",
+      "variant": "foreground_only",
+      "sample": 25,
+      "elapsed_ms": 64.0688,
+      "policy_reads": 0,
+      "bytes_verified_and_read": 33554432
+    },
+    {
+      "case": "foreground_read",
+      "variant": "foreground_only",
+      "sample": 26,
+      "elapsed_ms": 87.508,
+      "policy_reads": 0,
+      "bytes_verified_and_read": 33554432
+    },
+    {
+      "case": "foreground_read",
+      "variant": "background_enabled",
+      "sample": 26,
+      "elapsed_ms": 59.5719,
+      "policy_reads": 0,
+      "bytes_verified_and_read": 33554432,
+      "background_deferred": true
+    },
+    {
+      "case": "foreground_read",
+      "variant": "background_enabled",
+      "sample": 27,
+      "elapsed_ms": 58.3933,
+      "policy_reads": 0,
+      "bytes_verified_and_read": 33554432,
+      "background_deferred": true
+    },
+    {
+      "case": "foreground_read",
+      "variant": "foreground_only",
+      "sample": 27,
+      "elapsed_ms": 62.0766,
+      "policy_reads": 0,
+      "bytes_verified_and_read": 33554432
+    },
+    {
+      "case": "foreground_read",
+      "variant": "foreground_only",
+      "sample": 28,
+      "elapsed_ms": 52.3337,
+      "policy_reads": 0,
+      "bytes_verified_and_read": 33554432
+    },
+    {
+      "case": "foreground_read",
+      "variant": "background_enabled",
+      "sample": 28,
+      "elapsed_ms": 55.3076,
+      "policy_reads": 0,
+      "bytes_verified_and_read": 33554432,
+      "background_deferred": true
+    },
+    {
+      "case": "foreground_read",
+      "variant": "background_enabled",
+      "sample": 29,
+      "elapsed_ms": 131.7426,
+      "policy_reads": 0,
+      "bytes_verified_and_read": 33554432,
+      "background_deferred": true
+    },
+    {
+      "case": "foreground_read",
+      "variant": "foreground_only",
+      "sample": 29,
+      "elapsed_ms": 96.8879,
+      "policy_reads": 0,
+      "bytes_verified_and_read": 33554432
+    },
+    {
+      "case": "foreground_read",
+      "variant": "foreground_only",
+      "sample": 30,
+      "elapsed_ms": 84.9113,
+      "policy_reads": 0,
+      "bytes_verified_and_read": 33554432
+    },
+    {
+      "case": "foreground_read",
+      "variant": "background_enabled",
+      "sample": 30,
+      "elapsed_ms": 86.8769,
+      "policy_reads": 0,
+      "bytes_verified_and_read": 33554432,
+      "background_deferred": true
+    },
+    {
+      "case": "foreground_read",
+      "variant": "background_enabled",
+      "sample": 31,
+      "elapsed_ms": 97.8685,
+      "policy_reads": 0,
+      "bytes_verified_and_read": 33554432,
+      "background_deferred": true
+    },
+    {
+      "case": "foreground_read",
+      "variant": "foreground_only",
+      "sample": 31,
+      "elapsed_ms": 78.5921,
+      "policy_reads": 0,
+      "bytes_verified_and_read": 33554432
+    },
+    {
+      "case": "foreground_read",
+      "variant": "foreground_only",
+      "sample": 32,
+      "elapsed_ms": 63.788,
+      "policy_reads": 0,
+      "bytes_verified_and_read": 33554432
+    },
+    {
+      "case": "foreground_read",
+      "variant": "background_enabled",
+      "sample": 32,
+      "elapsed_ms": 68.5913,
+      "policy_reads": 0,
+      "bytes_verified_and_read": 33554432,
+      "background_deferred": true
+    },
+    {
+      "case": "foreground_read",
+      "variant": "background_enabled",
+      "sample": 33,
+      "elapsed_ms": 68.6211,
+      "policy_reads": 0,
+      "bytes_verified_and_read": 33554432,
+      "background_deferred": true
+    },
+    {
+      "case": "foreground_read",
+      "variant": "foreground_only",
+      "sample": 33,
+      "elapsed_ms": 90.3861,
+      "policy_reads": 0,
+      "bytes_verified_and_read": 33554432
+    },
+    {
+      "case": "foreground_read",
+      "variant": "foreground_only",
+      "sample": 34,
+      "elapsed_ms": 54.3586,
+      "policy_reads": 0,
+      "bytes_verified_and_read": 33554432
+    },
+    {
+      "case": "foreground_read",
+      "variant": "background_enabled",
+      "sample": 34,
+      "elapsed_ms": 66.8359,
+      "policy_reads": 0,
+      "bytes_verified_and_read": 33554432,
+      "background_deferred": true
+    },
+    {
+      "case": "foreground_read",
+      "variant": "background_enabled",
+      "sample": 35,
+      "elapsed_ms": 59.6928,
+      "policy_reads": 0,
+      "bytes_verified_and_read": 33554432,
+      "background_deferred": true
+    },
+    {
+      "case": "foreground_read",
+      "variant": "foreground_only",
+      "sample": 35,
+      "elapsed_ms": 52.3361,
+      "policy_reads": 0,
+      "bytes_verified_and_read": 33554432
+    },
+    {
+      "case": "foreground_read",
+      "variant": "foreground_only",
+      "sample": 36,
+      "elapsed_ms": 63.1782,
+      "policy_reads": 0,
+      "bytes_verified_and_read": 33554432
+    },
+    {
+      "case": "foreground_read",
+      "variant": "background_enabled",
+      "sample": 36,
+      "elapsed_ms": 58.5833,
+      "policy_reads": 0,
+      "bytes_verified_and_read": 33554432,
+      "background_deferred": true
+    },
+    {
+      "case": "foreground_read",
+      "variant": "background_enabled",
+      "sample": 37,
+      "elapsed_ms": 56.3532,
+      "policy_reads": 0,
+      "bytes_verified_and_read": 33554432,
+      "background_deferred": true
+    },
+    {
+      "case": "foreground_read",
+      "variant": "foreground_only",
+      "sample": 37,
+      "elapsed_ms": 57.0472,
+      "policy_reads": 0,
+      "bytes_verified_and_read": 33554432
+    },
+    {
+      "case": "foreground_read",
+      "variant": "foreground_only",
+      "sample": 38,
+      "elapsed_ms": 75.5938,
+      "policy_reads": 0,
+      "bytes_verified_and_read": 33554432
+    },
+    {
+      "case": "foreground_read",
+      "variant": "background_enabled",
+      "sample": 38,
+      "elapsed_ms": 71.5882,
+      "policy_reads": 0,
+      "bytes_verified_and_read": 33554432,
+      "background_deferred": true
+    },
+    {
+      "case": "foreground_read",
+      "variant": "background_enabled",
+      "sample": 39,
+      "elapsed_ms": 57.6669,
+      "policy_reads": 0,
+      "bytes_verified_and_read": 33554432,
+      "background_deferred": true
+    },
+    {
+      "case": "foreground_read",
+      "variant": "foreground_only",
+      "sample": 39,
+      "elapsed_ms": 49.6203,
+      "policy_reads": 0,
+      "bytes_verified_and_read": 33554432
+    },
+    {
+      "case": "foreground_read",
+      "variant": "foreground_only",
+      "sample": 40,
+      "elapsed_ms": 52.4342,
+      "policy_reads": 0,
+      "bytes_verified_and_read": 33554432
+    },
+    {
+      "case": "foreground_read",
+      "variant": "background_enabled",
+      "sample": 40,
+      "elapsed_ms": 56.9247,
+      "policy_reads": 0,
+      "bytes_verified_and_read": 33554432,
+      "background_deferred": true
+    },
+    {
+      "case": "foreground_read",
+      "variant": "background_enabled",
+      "sample": 41,
+      "elapsed_ms": 50.7728,
+      "policy_reads": 0,
+      "bytes_verified_and_read": 33554432,
+      "background_deferred": true
+    },
+    {
+      "case": "foreground_read",
+      "variant": "foreground_only",
+      "sample": 41,
+      "elapsed_ms": 49.9357,
+      "policy_reads": 0,
+      "bytes_verified_and_read": 33554432
+    },
+    {
+      "case": "foreground_read",
+      "variant": "foreground_only",
+      "sample": 42,
+      "elapsed_ms": 58.5891,
+      "policy_reads": 0,
+      "bytes_verified_and_read": 33554432
+    },
+    {
+      "case": "foreground_read",
+      "variant": "background_enabled",
+      "sample": 42,
+      "elapsed_ms": 62.3499,
+      "policy_reads": 0,
+      "bytes_verified_and_read": 33554432,
+      "background_deferred": true
+    },
+    {
+      "case": "foreground_read",
+      "variant": "background_enabled",
+      "sample": 43,
+      "elapsed_ms": 72.096,
+      "policy_reads": 0,
+      "bytes_verified_and_read": 33554432,
+      "background_deferred": true
+    },
+    {
+      "case": "foreground_read",
+      "variant": "foreground_only",
+      "sample": 43,
+      "elapsed_ms": 66.7567,
+      "policy_reads": 0,
+      "bytes_verified_and_read": 33554432
+    },
+    {
+      "case": "foreground_read",
+      "variant": "foreground_only",
+      "sample": 44,
+      "elapsed_ms": 59.1674,
+      "policy_reads": 0,
+      "bytes_verified_and_read": 33554432
+    },
+    {
+      "case": "foreground_read",
+      "variant": "background_enabled",
+      "sample": 44,
+      "elapsed_ms": 51.5299,
+      "policy_reads": 0,
+      "bytes_verified_and_read": 33554432,
+      "background_deferred": true
+    },
+    {
+      "case": "foreground_read",
+      "variant": "background_enabled",
+      "sample": 45,
+      "elapsed_ms": 58.1641,
+      "policy_reads": 0,
+      "bytes_verified_and_read": 33554432,
+      "background_deferred": true
+    },
+    {
+      "case": "foreground_read",
+      "variant": "foreground_only",
+      "sample": 45,
+      "elapsed_ms": 89.3193,
+      "policy_reads": 0,
+      "bytes_verified_and_read": 33554432
+    },
+    {
+      "case": "foreground_read",
+      "variant": "foreground_only",
+      "sample": 46,
+      "elapsed_ms": 69.7992,
+      "policy_reads": 0,
+      "bytes_verified_and_read": 33554432
+    },
+    {
+      "case": "foreground_read",
+      "variant": "background_enabled",
+      "sample": 46,
+      "elapsed_ms": 56.8615,
+      "policy_reads": 0,
+      "bytes_verified_and_read": 33554432,
+      "background_deferred": true
+    },
+    {
+      "case": "foreground_read",
+      "variant": "background_enabled",
+      "sample": 47,
+      "elapsed_ms": 60.753,
+      "policy_reads": 0,
+      "bytes_verified_and_read": 33554432,
+      "background_deferred": true
+    },
+    {
+      "case": "foreground_read",
+      "variant": "foreground_only",
+      "sample": 47,
+      "elapsed_ms": 74.933,
+      "policy_reads": 0,
+      "bytes_verified_and_read": 33554432
+    },
+    {
+      "case": "foreground_read",
+      "variant": "foreground_only",
+      "sample": 48,
+      "elapsed_ms": 66.1527,
+      "policy_reads": 0,
+      "bytes_verified_and_read": 33554432
+    },
+    {
+      "case": "foreground_read",
+      "variant": "background_enabled",
+      "sample": 48,
+      "elapsed_ms": 70.2971,
+      "policy_reads": 0,
+      "bytes_verified_and_read": 33554432,
+      "background_deferred": true
+    },
+    {
+      "case": "foreground_read",
+      "variant": "background_enabled",
+      "sample": 49,
+      "elapsed_ms": 52.0411,
+      "policy_reads": 0,
+      "bytes_verified_and_read": 33554432,
+      "background_deferred": true
+    },
+    {
+      "case": "foreground_read",
+      "variant": "foreground_only",
+      "sample": 49,
+      "elapsed_ms": 50.4892,
+      "policy_reads": 0,
+      "bytes_verified_and_read": 33554432
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "foreground_only",
+      "sample": 0,
+      "elapsed_ms": 8.9718,
+      "policy_reads": 8
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "background_enabled",
+      "sample": 0,
+      "elapsed_ms": 7.8366,
+      "policy_reads": 8
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "background_enabled",
+      "sample": 1,
+      "elapsed_ms": 6.1472,
+      "policy_reads": 8
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "foreground_only",
+      "sample": 1,
+      "elapsed_ms": 5.2275,
+      "policy_reads": 8
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "foreground_only",
+      "sample": 2,
+      "elapsed_ms": 5.2377,
+      "policy_reads": 8
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "background_enabled",
+      "sample": 2,
+      "elapsed_ms": 7.308,
+      "policy_reads": 8
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "background_enabled",
+      "sample": 3,
+      "elapsed_ms": 6.0005,
+      "policy_reads": 8
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "foreground_only",
+      "sample": 3,
+      "elapsed_ms": 4.858,
+      "policy_reads": 8
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "foreground_only",
+      "sample": 4,
+      "elapsed_ms": 5.3365,
+      "policy_reads": 8
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "background_enabled",
+      "sample": 4,
+      "elapsed_ms": 5.9741,
+      "policy_reads": 8
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "background_enabled",
+      "sample": 5,
+      "elapsed_ms": 5.7043,
+      "policy_reads": 8
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "foreground_only",
+      "sample": 5,
+      "elapsed_ms": 5.1686,
+      "policy_reads": 8
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "foreground_only",
+      "sample": 6,
+      "elapsed_ms": 4.8824,
+      "policy_reads": 8
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "background_enabled",
+      "sample": 6,
+      "elapsed_ms": 5.6095,
+      "policy_reads": 8
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "background_enabled",
+      "sample": 7,
+      "elapsed_ms": 7.1739,
+      "policy_reads": 8
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "foreground_only",
+      "sample": 7,
+      "elapsed_ms": 5.1891,
+      "policy_reads": 8
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "foreground_only",
+      "sample": 8,
+      "elapsed_ms": 4.8924,
+      "policy_reads": 8
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "background_enabled",
+      "sample": 8,
+      "elapsed_ms": 5.2727,
+      "policy_reads": 8
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "background_enabled",
+      "sample": 9,
+      "elapsed_ms": 5.6261,
+      "policy_reads": 8
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "foreground_only",
+      "sample": 9,
+      "elapsed_ms": 5.2575,
+      "policy_reads": 8
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "foreground_only",
+      "sample": 10,
+      "elapsed_ms": 5.483,
+      "policy_reads": 8
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "background_enabled",
+      "sample": 10,
+      "elapsed_ms": 7.1101,
+      "policy_reads": 8
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "background_enabled",
+      "sample": 11,
+      "elapsed_ms": 6.5866,
+      "policy_reads": 8
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "foreground_only",
+      "sample": 11,
+      "elapsed_ms": 5.3053,
+      "policy_reads": 8
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "foreground_only",
+      "sample": 12,
+      "elapsed_ms": 5.5302,
+      "policy_reads": 8
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "background_enabled",
+      "sample": 12,
+      "elapsed_ms": 7.086,
+      "policy_reads": 8
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "background_enabled",
+      "sample": 13,
+      "elapsed_ms": 5.3195,
+      "policy_reads": 8
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "foreground_only",
+      "sample": 13,
+      "elapsed_ms": 5.1939,
+      "policy_reads": 8
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "foreground_only",
+      "sample": 14,
+      "elapsed_ms": 5.2358,
+      "policy_reads": 8
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "background_enabled",
+      "sample": 14,
+      "elapsed_ms": 5.453,
+      "policy_reads": 8
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "background_enabled",
+      "sample": 15,
+      "elapsed_ms": 10.7025,
+      "policy_reads": 8
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "foreground_only",
+      "sample": 15,
+      "elapsed_ms": 6.044,
+      "policy_reads": 8
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "foreground_only",
+      "sample": 16,
+      "elapsed_ms": 5.5975,
+      "policy_reads": 8
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "background_enabled",
+      "sample": 16,
+      "elapsed_ms": 5.7947,
+      "policy_reads": 8
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "background_enabled",
+      "sample": 17,
+      "elapsed_ms": 5.4853,
+      "policy_reads": 8
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "foreground_only",
+      "sample": 17,
+      "elapsed_ms": 5.9576,
+      "policy_reads": 8
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "foreground_only",
+      "sample": 18,
+      "elapsed_ms": 5.4142,
+      "policy_reads": 8
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "background_enabled",
+      "sample": 18,
+      "elapsed_ms": 5.4624,
+      "policy_reads": 8
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "background_enabled",
+      "sample": 19,
+      "elapsed_ms": 5.4617,
+      "policy_reads": 8
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "foreground_only",
+      "sample": 19,
+      "elapsed_ms": 5.1093,
+      "policy_reads": 8
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "foreground_only",
+      "sample": 20,
+      "elapsed_ms": 4.8048,
+      "policy_reads": 8
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "background_enabled",
+      "sample": 20,
+      "elapsed_ms": 8.3293,
+      "policy_reads": 8
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "background_enabled",
+      "sample": 21,
+      "elapsed_ms": 6.0041,
+      "policy_reads": 8
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "foreground_only",
+      "sample": 21,
+      "elapsed_ms": 5.9327,
+      "policy_reads": 8
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "foreground_only",
+      "sample": 22,
+      "elapsed_ms": 6.0967,
+      "policy_reads": 8
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "background_enabled",
+      "sample": 22,
+      "elapsed_ms": 5.8635,
+      "policy_reads": 8
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "background_enabled",
+      "sample": 23,
+      "elapsed_ms": 7.4902,
+      "policy_reads": 8
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "foreground_only",
+      "sample": 23,
+      "elapsed_ms": 5.1143,
+      "policy_reads": 8
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "foreground_only",
+      "sample": 24,
+      "elapsed_ms": 5.397,
+      "policy_reads": 8
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "background_enabled",
+      "sample": 24,
+      "elapsed_ms": 5.6624,
+      "policy_reads": 8
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "background_enabled",
+      "sample": 25,
+      "elapsed_ms": 5.492,
+      "policy_reads": 8
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "foreground_only",
+      "sample": 25,
+      "elapsed_ms": 5.3997,
+      "policy_reads": 8
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "foreground_only",
+      "sample": 26,
+      "elapsed_ms": 4.906,
+      "policy_reads": 8
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "background_enabled",
+      "sample": 26,
+      "elapsed_ms": 7.8316,
+      "policy_reads": 8
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "background_enabled",
+      "sample": 27,
+      "elapsed_ms": 5.6903,
+      "policy_reads": 8
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "foreground_only",
+      "sample": 27,
+      "elapsed_ms": 5.4741,
+      "policy_reads": 8
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "foreground_only",
+      "sample": 28,
+      "elapsed_ms": 5.8505,
+      "policy_reads": 8
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "background_enabled",
+      "sample": 28,
+      "elapsed_ms": 7.8763,
+      "policy_reads": 8
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "background_enabled",
+      "sample": 29,
+      "elapsed_ms": 25.1518,
+      "policy_reads": 8
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "foreground_only",
+      "sample": 29,
+      "elapsed_ms": 20.5838,
+      "policy_reads": 8
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "foreground_only",
+      "sample": 30,
+      "elapsed_ms": 5.1035,
+      "policy_reads": 8
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "background_enabled",
+      "sample": 30,
+      "elapsed_ms": 5.2187,
+      "policy_reads": 8
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "background_enabled",
+      "sample": 31,
+      "elapsed_ms": 5.2812,
+      "policy_reads": 8
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "foreground_only",
+      "sample": 31,
+      "elapsed_ms": 7.5577,
+      "policy_reads": 8
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "foreground_only",
+      "sample": 32,
+      "elapsed_ms": 5.414,
+      "policy_reads": 8
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "background_enabled",
+      "sample": 32,
+      "elapsed_ms": 5.7334,
+      "policy_reads": 8
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "background_enabled",
+      "sample": 33,
+      "elapsed_ms": 10.1929,
+      "policy_reads": 8
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "foreground_only",
+      "sample": 33,
+      "elapsed_ms": 10.558,
+      "policy_reads": 8
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "foreground_only",
+      "sample": 34,
+      "elapsed_ms": 10.6774,
+      "policy_reads": 8
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "background_enabled",
+      "sample": 34,
+      "elapsed_ms": 8.9657,
+      "policy_reads": 8
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "background_enabled",
+      "sample": 35,
+      "elapsed_ms": 5.0002,
+      "policy_reads": 8
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "foreground_only",
+      "sample": 35,
+      "elapsed_ms": 4.7792,
+      "policy_reads": 8
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "foreground_only",
+      "sample": 36,
+      "elapsed_ms": 5.0107,
+      "policy_reads": 8
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "background_enabled",
+      "sample": 36,
+      "elapsed_ms": 5.2098,
+      "policy_reads": 8
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "background_enabled",
+      "sample": 37,
+      "elapsed_ms": 5.1468,
+      "policy_reads": 8
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "foreground_only",
+      "sample": 37,
+      "elapsed_ms": 9.6015,
+      "policy_reads": 8
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "foreground_only",
+      "sample": 38,
+      "elapsed_ms": 7.2184,
+      "policy_reads": 8
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "background_enabled",
+      "sample": 38,
+      "elapsed_ms": 14.8323,
+      "policy_reads": 8
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "background_enabled",
+      "sample": 39,
+      "elapsed_ms": 11.6143,
+      "policy_reads": 8
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "foreground_only",
+      "sample": 39,
+      "elapsed_ms": 5.4928,
+      "policy_reads": 8
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "foreground_only",
+      "sample": 40,
+      "elapsed_ms": 5.3263,
+      "policy_reads": 8
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "background_enabled",
+      "sample": 40,
+      "elapsed_ms": 6.2899,
+      "policy_reads": 8
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "background_enabled",
+      "sample": 41,
+      "elapsed_ms": 11.4514,
+      "policy_reads": 8
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "foreground_only",
+      "sample": 41,
+      "elapsed_ms": 24.5567,
+      "policy_reads": 8
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "foreground_only",
+      "sample": 42,
+      "elapsed_ms": 5.8569,
+      "policy_reads": 8
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "background_enabled",
+      "sample": 42,
+      "elapsed_ms": 6.134,
+      "policy_reads": 8
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "background_enabled",
+      "sample": 43,
+      "elapsed_ms": 5.7778,
+      "policy_reads": 8
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "foreground_only",
+      "sample": 43,
+      "elapsed_ms": 5.6286,
+      "policy_reads": 8
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "foreground_only",
+      "sample": 44,
+      "elapsed_ms": 5.2764,
+      "policy_reads": 8
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "background_enabled",
+      "sample": 44,
+      "elapsed_ms": 5.5932,
+      "policy_reads": 8
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "background_enabled",
+      "sample": 45,
+      "elapsed_ms": 5.5294,
+      "policy_reads": 8
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "foreground_only",
+      "sample": 45,
+      "elapsed_ms": 4.9106,
+      "policy_reads": 8
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "foreground_only",
+      "sample": 46,
+      "elapsed_ms": 4.9607,
+      "policy_reads": 8
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "background_enabled",
+      "sample": 46,
+      "elapsed_ms": 5.6432,
+      "policy_reads": 8
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "background_enabled",
+      "sample": 47,
+      "elapsed_ms": 7.2331,
+      "policy_reads": 8
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "foreground_only",
+      "sample": 47,
+      "elapsed_ms": 8.7288,
+      "policy_reads": 8
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "foreground_only",
+      "sample": 48,
+      "elapsed_ms": 19.4537,
+      "policy_reads": 8
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "background_enabled",
+      "sample": 48,
+      "elapsed_ms": 15.1536,
+      "policy_reads": 8
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "background_enabled",
+      "sample": 49,
+      "elapsed_ms": 11.3422,
+      "policy_reads": 8
+    },
+    {
+      "case": "dispatch_with_background",
+      "variant": "foreground_only",
+      "sample": 49,
+      "elapsed_ms": 6.542,
+      "policy_reads": 8
+    }
+  ]
+}

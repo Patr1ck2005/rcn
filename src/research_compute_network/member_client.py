@@ -158,6 +158,9 @@ class MemberBroker:
         self.online = False
         self.connection_error = None
         self.collection_timers = {}
+        from .transfer_queue import TransferQueue
+        self.collection_queue = TransferQueue(self._drain_collections, lock=self.lock)
+        self.collection_targets = {}
         self.collection_active = None
         self.collection_cancels = {}
 
@@ -367,6 +370,11 @@ class MemberBroker:
             return value
 
     def present(self, value):
+        canonical = value.get("collection_control", {}).get("canonical_operation_id")
+        if canonical and canonical != value["operation_id"] and value.get("collection_control", {}).get("state") != "user_paused":
+            current = self.read_operation(canonical)
+            value = {**value, "phase": current.get("phase"), "collection": current.get("collection"),
+                     "collection_control": {**current.get("collection_control", {}), "canonical_operation_id": canonical}}
         result = {key: item for key, item in value.items()
                   if key not in {"center_operation", "center_url", "actor_id", "plan_options", "collection_request"}}
         result["can_confirm"] = bool(not value.get("job_id") and value.get("center_operation"))
@@ -460,11 +468,29 @@ class MemberBroker:
                 control = value.get("collection_control", {})
                 if _automatic and control.get("state") in {"user_paused", "fault_paused", "complete"}:
                     return self.present(value)
+                target_key = self._collection_target(value)
+                canonical = self.collection_targets.setdefault(target_key, operation_id)
+                if canonical != operation_id:
+                    original = self.read_operation(canonical)
+                    frozen = value.get("collection_request")
+                    original_request = original.get("collection_request")
+                    if original.get("collection_control", {}).get("state") == "complete" and frozen is None:
+                        # A completed cached request still needs current owner/producer authorization.
+                        client = self.client()
+                        frozen = {"job": _collection_job_contract(client, value["job_id"]),
+                                  "manifests": client.collect_artifacts(value["job_id"])}
+                    if frozen is not None and original_request is not None and frozen != original_request:
+                        raise HTTPException(409, "同一目标的结果身份已改变，不能合并旧回收")
+                    if control.get("canonical_operation_id") != canonical or control.get("state") != "attached":
+                        value = self.update(operation_id, collection_control={**control,
+                            "canonical_operation_id": canonical, "state": "attached"})
+                    return self.present(value)
                 if self.collection_active is not None:
-                    self.update(operation_id, phase="collection-waiting", collection_control={**control,
-                        "operation_id": control.get("operation_id", "member-collection-" + operation_id), "state": "waiting"})
-                    self._schedule_collection(operation_id, 1)
+                    if self.collection_queue.enqueue(operation_id):
+                        self.update(operation_id, phase="collection-waiting", collection_control={**control,
+                            "operation_id": control.get("operation_id", "member-collection-" + operation_id), "state": "waiting"})
                     return self.present(self.read_operation(operation_id))
+                self.collection_queue.discard(operation_id)
                 self.collection_active = operation_id
                 self.collection_cancels[operation_id] = threading.Event()
                 control = {**control, "operation_id": control.get("operation_id", "member-collection-" + operation_id),
@@ -572,32 +598,33 @@ class MemberBroker:
                 if collect and self.collection_active == operation_id:
                     self.collection_active = None
                     self.collection_cancels.pop(operation_id, None)
+                if collect:
+                    self._drain_collections()
 
-    def _schedule_collection(self, operation_id, delay):
-        """A timer wakes the existing executor; no sleeping transfer occupies it."""
+    def _drain_collections(self):
         with self.lock:
-            previous = self.collection_timers.pop(operation_id, None)
-            if previous is not None:
-                previous.cancel()
-            if self.closed:
-                return
-            def resume():
-                with self.lock:
-                    self.collection_timers.pop(operation_id, None)
+            while not self.closed and self.collection_active is None:
+                operation_id = self.collection_queue.take()
+                if operation_id is None:
+                    return
                 try:
                     self.start_transfer(operation_id, collect=True, _automatic=True)
                 except (HTTPException, OSError, ValueError):
-                    # Identity/session errors remain bound to their own journal.
-                    return
-            timer = threading.Timer(max(.05, delay), resume)
-            timer.daemon = True
-            self.collection_timers[operation_id] = timer
-            timer.start()
+                    continue
+
+    def _schedule_collection(self, operation_id, delay):
+        """Only actual fault backoff owns the one earliest-deadline timer."""
+        self.collection_queue.retry(operation_id, delay)
+
+    def _collection_target(self, value):
+        return (value.get("actor_id"), value.get("center_url"), value["job_id"],
+                str(self.root / "results" / value["job_id"]))
 
     def recover_collections(self):
         """Restore only owner-bound original collections, never uploads or compute."""
         if not self.login or not self.actor or self.closed:
             return
+        recovered = []
         for path in sorted((self.root / "operations").glob("*.json")):
             if path.name.endswith(".collection.json"):
                 continue
@@ -605,10 +632,22 @@ class MemberBroker:
                 value = _read_json(path)
                 control = value.get("collection_control", {})
                 if (value.get("actor_id") != self.actor["actor_id"] or value.get("center_url") != self.login["center_url"]
-                    or value.get("phase") not in {"collecting", "collection-interrupted", "collection-waiting"}
-                    or control.get("state") in {"user_paused", "fault_paused", "complete"}):
+                    or not value.get("job_id") or not control):
                     continue
                 _uuid(value["operation_id"])
+                recovered.append(value)
+            except (ValueError, OSError, KeyError, TypeError, HTTPException):
+                continue
+        # Rebuild target ownership before any timer can resume a duplicate journal.
+        for value in sorted(recovered, key=lambda item: item.get("created_at", "")):
+            if not value["collection_control"].get("canonical_operation_id"):
+                self.collection_targets.setdefault(self._collection_target(value), value["operation_id"])
+        for value in recovered:
+            try:
+                control = value["collection_control"]
+                if (value.get("phase") not in {"collecting", "collection-interrupted", "collection-waiting"}
+                    or control.get("state") in {"user_paused", "fault_paused", "complete", "attached"}):
+                    continue
                 delay = max(0, min(360, (control.get("next_retry_at") or 0) - time.time()))
                 self._schedule_collection(value["operation_id"], delay)
             except (ValueError, OSError, KeyError, TypeError, HTTPException):
@@ -618,6 +657,7 @@ class MemberBroker:
     def pause_collection(self, operation_id):
         value = self.read_operation(operation_id)
         control = value.get("collection_control", {})
+        self.collection_queue.discard(operation_id)
         timer = self.collection_timers.pop(operation_id, None)
         if timer is not None:
             timer.cancel()
@@ -655,6 +695,7 @@ class MemberBroker:
     def close(self):
         with self.lock:
             self.closed = True
+            self.collection_queue.close()
             for timer in self.collection_timers.values():
                 timer.cancel()
             self.collection_timers.clear()
@@ -693,6 +734,9 @@ def _collection_job_contract(client, job_id):
 
 def _collection_retryable(exc):
     status = getattr(exc, "status", None)
+    if status == 409 and getattr(exc, "reason_code", None) in {
+        "preparation_expired", "preparation_process_restarted", "preparation_process_stopped"}:
+        return True
     if status is not None:
         return status in {0, 408, 425, 429, 500, 502, 503, 504}
     if isinstance(exc, PermissionError):
@@ -702,7 +746,7 @@ def _collection_retryable(exc):
     if isinstance(exc, OSError):
         return exc.errno in {None, errno.ENOSPC, errno.ECONNRESET, errno.ECONNABORTED, errno.ETIMEDOUT}
     return getattr(exc, "reason_code", "") in {"origin_result_disk_reserve", "collection_volume_busy", "collection_owner_active", "storage_metadata_busy",
-        "storage_holder_busy", "storage_capacity_unavailable", "storage_budget_busy", "storage_ledger_busy", "collection_paused_by_owner"}
+        "storage_holder_busy", "storage_capacity_unavailable", "storage_budget_busy", "storage_ledger_busy", "collection_paused_by_owner", "storage_background_deferred", "restore_source_unavailable"}
 
 
 class MemberStorageError(ValueError):

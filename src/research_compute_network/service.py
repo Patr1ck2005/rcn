@@ -7,6 +7,7 @@ from .mutation_receipts import (credential_confirmation, admin_confirmation,
     solver_approval_confirmation, alert_transition_confirmation)
 from .pressure_transactions import pressure_confirmation
 from .unit_reassignment import fenced_reassignment
+from .storage_io import io_priority
 
 import copy
 import hashlib
@@ -4317,6 +4318,7 @@ class NetworkService:
             return too_long('total_work_exceeds_maximum_capacity_time_budget')
         return estimate_parallel_batch(capacity, job, units=units, now=now)
 
+    @io_priority.foreground(quiet_after=.25)
     def _sort_dispatch_jobs(self, jobs: list[JobEnvelope], now: datetime, *, policy=None) -> None:
         from .dispatch_policy import policy_for, dispatch_order
         policy = policy or policy_for(self.repository)
@@ -4332,7 +4334,7 @@ class NetworkService:
                 job, remaining=True, now=now, policy=policy, capacity_snapshot=capacity) for job in jobs}
         from .personal_runtime import policy_store
         store = policy_store(self)
-        person_policies = {job.user_id: store.get_policy(job.user_id) for job in jobs}
+        person_policies = {user_id: store.get_policy(user_id) for user_id in {job.user_id for job in jobs}}
         credits = self._compute_credits if hasattr(self, "_compute_credits") else None
         metered = bool(credits and credits.settings()["metering_enabled"])
         balances = {uid: credits.balance(uid) for uid, value in person_policies.items() if metered and value}

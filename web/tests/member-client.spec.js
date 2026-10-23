@@ -6,6 +6,23 @@ async function expectNoOverflow(page) {
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1)).toBe(true);
 }
 
+test("archive retrieval stays visible and browsing never starts another transfer", async ({ page }) => {
+  const fixture = await memberApiFixture(page);
+  fixture.operations.set("restore-original", {
+    operation_id: "restore-original", phase: "collecting", job_id: "job-alice-1",
+    job: { status: "completed", completed_units: 2, total_units: 2 },
+    collection: { state: "downloading", stage: "restore_pending", verified_files: 1, total_files: 2 },
+    collection_control: { state: "active" }, can_confirm: false, can_upload: false, can_collect: false,
+  });
+  await page.goto("/app/runs");
+  await expect(page.locator(".member-badge")).toHaveText("等待归档取回");
+  await expect(page.getByText("原下载记录和已核验文件会保留。", { exact: false })).toBeVisible();
+  await expect(page.getByRole("button", { name: "暂停结果下载" })).toBeVisible();
+  expect(fixture.calls.filter((call) => call.method !== "GET")).toEqual([]);
+  expect(fixture.jobsCreated()).toBe(0);
+  await expectNoOverflow(page);
+});
+
 for (const mode of ["https", "managed-ssh"]) {
   // Frontend compatibility contract only: the current broker uses ordinary
   // HTTPS and does not emit configured_connection or accept rcn-managed URIs.

@@ -287,6 +287,22 @@ class StorageLifecycle:
         self.origin_retirement = OriginRetirement(self)
         from .derived_input_retention import DerivedInputRetention
         self.derived_inputs = DerivedInputRetention(self)
+        from .storage_projection import StorageProjection, ensure_schema
+        with self._transaction() as db:
+            ensure_schema(db)
+            db.execute("""CREATE TRIGGER IF NOT EXISTS storage_inventory_science_intent
+                AFTER INSERT ON storage_lifecycle_intents WHEN NEW.operation_kind<>'relay_copy'
+                BEGIN INSERT INTO storage_inventory_dirty
+                  SELECT NEW.job_id,NEW.unit_id,NEW.attempt_id,project_id,1 FROM storage_inventory_files
+                  WHERE job_id=NEW.job_id AND unit_id=NEW.unit_id AND attempt_id=NEW.attempt_id
+                  GROUP BY project_id
+                  ON CONFLICT(job_id,unit_id,attempt_id) DO UPDATE SET revision=revision+1;
+                END""")
+            if self.center_binding is not None:
+                db.execute("INSERT INTO storage_inventory_locations VALUES('center',?) "
+                           "ON CONFLICT(location) DO UPDATE SET payload=excluded.payload",
+                           (json.dumps(self.center_binding.model_dump(mode="json"), sort_keys=True),))
+        self.inventory = StorageProjection(self)
 
     def _open_connection(self, *, busy_timeout_ms=5000):
         db = sqlite3.connect(self.database, timeout=busy_timeout_ms / 1000, isolation_level=None)
@@ -410,6 +426,9 @@ class StorageLifecycle:
                        (policy.project_id, self._json(policy.model_dump(mode="json")), _now(), actor_id))
             self._audit(db, "storage.policy_registered", actor_id, policy.project_id,
                         policy=policy.model_dump(mode="json"))
+            from .storage_projection import mark_dirty
+            for row in db.execute("SELECT DISTINCT job_id,unit_id,attempt_id FROM storage_inventory_files WHERE project_id=? AND location='center'", (policy.project_id,)).fetchall():
+                mark_dirty(db, policy.project_id, *row)
         return policy
 
     def get_policy(self, project_id):
@@ -478,6 +497,8 @@ class StorageLifecycle:
                         evidence_kind="authenticated_origin_adapter_assertion",
                         manifest_sha256=receipt.manifest_sha256,
                         inventory_sha256=receipt.inventory_sha256)
+            from .storage_projection import mark_dirty
+            mark_dirty(db, job.project_id, job.job_id, manifest.work_unit_id, attempt.attempt_id)
         return {"receipt_id": receipt_id, "receipt": payload, "revoked": False,
                 "already_present": False}
 
@@ -493,6 +514,9 @@ class StorageLifecycle:
                 db.execute("UPDATE storage_lifecycle_receipts SET revoked_at=?,revoked_by=?,revoke_reason=? "
                            "WHERE receipt_id=?", (_now(), actor_id, reason, receipt_id))
                 self._audit(db, "storage.custody_revoked", actor_id, receipt_id, reason=reason)
+                from .storage_projection import mark_dirty
+                identity = db.execute("SELECT job_id,unit_id,attempt_id,json_extract(payload,'$.project_id') FROM storage_lifecycle_receipts WHERE receipt_id=?", (receipt_id,)).fetchone()
+                mark_dirty(db, identity[3], *identity[:3])
 
     def list_receipts(self, job_id, unit_id, attempt_id):
         with self._connect() as db:
@@ -649,18 +673,20 @@ class StorageLifecycle:
         if stop_event is not None and stop_event.is_set():
             raise LifecycleError("gc_stop_requested")
 
-    @classmethod
-    def _verify_source(cls, path, record, *, stop_event=None):
+    def _verify_source(self, path, record, *, stop_event=None):
         """Read every actual byte, with cancellation between bounded chunks."""
-        cls._check_stop(stop_event)
+        self._check_stop(stop_event)
+        from .storage_io import BackgroundBudget, BACKGROUND_CHUNK_BYTES
+        background = BackgroundBudget(self.database)
         if not path.is_file() or path.stat().st_size != record["size_bytes"]:
             raise LifecycleError("source_file_integrity_failed")
         checksum, received = hashlib.sha256(), 0
         with path.open("rb") as stream:
             while True:
-                cls._check_stop(stop_event)
-                chunk = stream.read(CHUNK_BYTES)
-                cls._check_stop(stop_event)
+                self._check_stop(stop_event)
+                background.checkpoint()
+                chunk = stream.read(BACKGROUND_CHUNK_BYTES)
+                self._check_stop(stop_event)
                 if not chunk:
                     break
                 received += len(chunk)
@@ -695,6 +721,11 @@ class StorageLifecycle:
                              (intent_id,)).fetchone()
         if current is None:
             raise LifecycleError("intent_not_found")
+        if db.execute("SELECT 1 FROM sqlite_master WHERE name='storage_restore_readers'").fetchone():
+            if db.execute("SELECT 1 FROM storage_restore_readers p JOIN storage_restore_receipt_evidence r "
+                "ON r.receipt_id=p.receipt_id WHERE r.job_id=? AND r.unit_id=? AND r.attempt_id=? AND p.file=? LIMIT 1",
+                (*current, relative_path)).fetchone():
+                raise LifecycleError("live_readers")
         others = db.execute("SELECT p.* FROM storage_lifecycle_writer_permits p JOIN storage_lifecycle_intents i "
             "ON i.intent_id=p.intent_id WHERE i.job_id=? AND i.unit_id=? AND i.attempt_id=? "
             "AND p.relative_path=? AND p.intent_id<>?", (*current, relative_path, intent_id)).fetchall()
@@ -831,6 +862,9 @@ class StorageLifecycle:
                     with self._transaction() as db:
                         db.execute("UPDATE storage_lifecycle_deletions SET state=?,updated_at=? "
                             "WHERE intent_id=? AND relative_path=?", (result, _now(), intent_id, record["relative_path"]))
+                        from .storage_projection import retire_file
+                        retire_file(db, payload["job_id"], payload["work_unit_id"],
+                                    payload["producer_attempt_id"], record["relative_path"])
                         self._audit(db, "storage.file_retired", actor_id, intent_id,
                                     relative_path=record["relative_path"], result=result,
                                     size_bytes=record["size_bytes"], sha256=record["sha256"])
@@ -922,6 +956,13 @@ class StorageLifecycle:
                     self._audit(db, "storage.dead_reader_reconciled", "storage-gc", row["pin_id"],
                                 process_id=row["process_id"], process_started=row["process_started"])
                     released += 1
+            if db.execute("SELECT 1 FROM sqlite_master WHERE name='storage_restore_readers'").fetchone():
+                for row in db.execute("SELECT * FROM storage_restore_readers WHERE process_host=?", (self.process_host,)).fetchall():
+                    if not self._process_alive(row["process_id"], row["process_started"]):
+                        db.execute("DELETE FROM storage_restore_readers WHERE token=?", (row["token"],))
+                        self._audit(db, "storage.dead_restore_reader_reconciled", "storage-gc", row["token"],
+                                    process_id=row["process_id"], process_started=row["process_started"])
+                        released += 1
         return released
 
     def state(self, job_id, unit_id, attempt_id):
@@ -967,9 +1008,30 @@ class StorageLifecycle:
             raise ValueError("GC batch limits are outside the supported bounds")
         if stop_event is not None and stop_event.is_set():
             return [{"eligible": False, "reason_code": "gc_stop_requested"}]
+        # Constant-size volume/claim metadata can observe admitted writers. Byte
+        # scanning and accounting backfill below still yield to their claims.
+        try:
+            self.inventory.sample_volume(self._root())
+            self.inventory.sample_registered_volumes(limit=1)
+        except (OSError, ValueError):
+            pass
+        from .storage_io import BackgroundBudget, BackgroundDeferred
+        try:
+            BackgroundBudget(self.database).checkpoint()
+        except BackgroundDeferred as exc:
+            return [{"eligible": False, "reason_code": exc.reason_code}]
         with self._gc_gate() as acquired:
             if not acquired:
                 return [{"eligible": False, "reason_code": "gc_already_running"}]
+            # The existing maintenance callback advances a finite metadata page;
+            # API readers neither enumerate files nor rebuild on demand.
+            try:
+                self.inventory.backfill(limit=32)
+                self.inventory.refresh_categories(limit=32)
+                from .storage_occupancy import OccupancyInventory
+                OccupancyInventory(self).advance(max_files=8, time_budget_ms=10)
+            except (OSError, ValueError):
+                pass  # Preserve last observed metadata with its real timestamp.
             models = self.scientific.run_gc_batch(max_units=max_units, max_files=max_files, stop_event=stop_event)
             # Each loop is independently finite. Scientific data-copy GC keeps
             # its original surviving-device policy and authorization path.

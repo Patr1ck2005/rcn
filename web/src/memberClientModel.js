@@ -12,9 +12,19 @@ export function operationLabel(operation) {
   if (recovery === "user_paused") return "结果下载已暂停";
   if (recovery === "retry_wait") return "等待自动续传";
   if (recovery === "fault_paused") return "下载需要处理";
+  if (operation.phase === "collection-waiting" || recovery === "waiting") return "等待结果下载";
+  if ((operation.collection?.stage || operation.collection?.state) === "restore_pending") return "等待归档取回";
   const phase = ["verified", "complete", "completed"].includes(operation.collection?.state) ? "collected"
     : ["uploaded", "submitted"].includes(operation.phase) && operation.job?.status ? operation.job.status : operation.phase;
   return operationLabels[phase] || phase || "等待确认";
+}
+
+export function collectionProgress(operation) {
+  const progress = operation.collection;
+  if (!progress) return progress;
+  const states = { user_paused: "paused", retry_wait: "retry_wait", fault_paused: "conflict", waiting: "waiting" };
+  const stage = states[operation.collection_control?.state] || (operation.phase === "collection-waiting" ? "waiting" : null);
+  return stage ? { ...progress, stage, message: "" } : progress;
 }
 
 export function operationActions(operation) {

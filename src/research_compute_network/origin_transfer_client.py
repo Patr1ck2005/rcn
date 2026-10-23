@@ -7,6 +7,7 @@ import gzip
 import ipaddress
 import json
 import os
+import re
 import shutil
 import tempfile
 import time
@@ -78,7 +79,7 @@ class OriginTransferClient:
             except HTTPError as exc:
                 reason_code = None
                 retry_after = None
-                if exc.code in (422, 503):
+                if exc.code in (400, 401, 403, 404, 409, 410, 422, 429, 503, 507):
                     try:
                         raw = exc.read(16385)
                         body = json.loads(raw) if len(raw) <= 16384 else None
@@ -89,9 +90,9 @@ class OriginTransferClient:
                                 and row.get("msg") == "Value error, evidence time cannot be in the future"
                                 for row in detail)):
                             reason_code = "receipt_evidence_clock_skew"
-                        elif (exc.code == 503 and isinstance(detail, dict)
-                              and detail.get("reason_code") in {"storage_metadata_busy", "release_draining"}):
+                        elif isinstance(detail, dict) and isinstance(detail.get("reason_code"), str) and re.fullmatch(r"[a-z][a-z0-9_]{0,127}", detail["reason_code"]):
                             reason_code = detail["reason_code"]
+                        if exc.code == 503 and reason_code in {"storage_metadata_busy", "release_draining"}:
                             selected_delay = exc.headers.get("Retry-After", "1")
                             if selected_delay.isascii() and selected_delay.isdigit():
                                 delay = int(selected_delay)
@@ -287,15 +288,15 @@ class OriginTransferClient:
 
     def download_results(self, job: dict, manifests: list[dict], spool_root: str | Path, *,
                          reserve_free_bytes: int = 0, operation_id=None, progress=None,
-                         durable=None, cancel_event=None):
+                         durable=None, cancel_event=None, local_sources=None):
         # An explicitly durable operation can be complete locally even when
         # the center is offline. Let its frozen contract select that path.
         capabilities = None if durable is True or operation_id is not None else self.require_available()
-        if durable is True or operation_id is not None or (capabilities or {}).get('result_preparations') is True:
+        if local_sources is not None or durable is True or operation_id is not None or (capabilities or {}).get('result_preparations') is True:
             from .collection import CollectionRunner
             return CollectionRunner(self, job, manifests, spool_root,
                 reserve_free_bytes=reserve_free_bytes, operation_id=operation_id,
-                progress=progress, capabilities=capabilities, cancel_event=cancel_event).run()
+                progress=progress, capabilities=capabilities, cancel_event=cancel_event, local_sources=local_sources).run()
         return self._download_results_legacy(job, manifests, spool_root,
                                              reserve_free_bytes=reserve_free_bytes)
 
