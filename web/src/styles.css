@@ -590,6 +590,7 @@ input:focus, select:focus { border-color: var(--green); box-shadow: 0 0 0 3px rg
 .help-article .doc-heading h1 { font-size: 1.85rem; }
 .help-article .doc-heading p { font-size: .9rem; }
 .help-article .markdown { font-size: .86rem; line-height: 1.75; }
+.help-article .markdown pre { max-width: 100%; overflow-x: auto; }
 .help-article .markdown h2 { font-size: 1.02rem; }
 .help-process { margin: 1.3rem 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
 .help-process > header { display: flex; align-items: center; gap: .45rem; padding: .65rem 0; }

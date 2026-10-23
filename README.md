@@ -6,11 +6,11 @@
 
 RCN coordinates research jobs across a group of contributed machines. It provides a Python control plane, resource-aware scheduler, dispatcher, browser console, Windows member client, and a CLI for personal Agent access. Projects submit structured jobs through registered execution profiles; RCN tracks placement, attempts, recovery, result manifests, and audit events.
 
-This is **0.15.0a1, a public preview** extracted from a system used in a private research group. The source includes real scheduling and operations code. Public examples and the local demo use synthetic data. Internal use does not establish unattended deployment or acceptance in another lab.
+This is **0.15.0a2, a public preview** extracted from a system used in a private research group. The source includes real scheduling and operations code. Public examples and the local demo use synthetic data. Internal use does not establish unattended deployment or acceptance in another lab.
 
 ![Synthetic RCN overview; no production data](https://github.com/Patr1ck2005/rcn/releases/download/v0.15.0-alpha.1/rcn-overview-demo.png)
 
-[Download the public preview](https://github.com/Patr1ck2005/rcn/releases/tag/v0.15.0-alpha.1). Python wheels include the built console; the Windows client installer includes Python and client dependencies.
+[Download the public preview](https://github.com/Patr1ck2005/rcn/releases/tag/v0.15.0-alpha.2). Python wheels include the built console; the Windows client installer includes Python and client dependencies.
 
 ## What it does
 
@@ -67,8 +67,10 @@ npm --prefix web test
 npm --prefix web run build
 ```
 
-The frontend build writes generated assets into the Python package for local use and wheel assembly. Keep generated assets, screenshots, runtime archives, credentials, and local state out of source commits. See [contributing](docs/contributing.md), [security](docs/security.md), and the [preview release notes](docs/releases/0.15.0a1.md).
+The frontend build writes generated assets into the Python package for local use and wheel assembly. Keep generated assets, screenshots, runtime archives, credentials, and local state out of source commits. See [contributing](docs/contributing.md), [security](docs/security.md), and the [preview release notes](docs/releases/0.15.0a2.md).
 
 ## License
 
 RCN source is licensed under [MIT](LICENSE), copyright 2026 Patr1ck2005. Dependencies retain their own licenses; the RCN MIT license does not relicense third-party code, bundled components, external runtimes, or commercial solvers. See [third-party notices](docs/third-party-notices.md).
+
+Member task-package preparation: [offline/client and Agent guide](docs/member-task-package-guide.zh.md). Release sharing and artifact checks: [public export contract](docs/public-export.md).

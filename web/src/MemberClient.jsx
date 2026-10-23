@@ -8,7 +8,7 @@ import { MyPersonalAccess } from "./PersonalAccess";
 import MemberAgentSetup from "./MemberAgentSetup";
 import { usePageRefresh } from "./usePageRefresh";
 import { DATA_REFRESH_EVENT, watchPageReturn } from "./freshness";
-import { HelpCenter } from "./HelpSystem";
+import { HelpCenter, rememberHelpReturn } from "./HelpSystem";
 import { mutateAndRecover, operationActions, operationLabel, requiresUnitCount, validateUnitCount } from "./memberClientModel";
 import { contributionScope, contributionNotFound, loadContributionCheckpoints, saveContributionCheckpoints, readContributionOriginal, submitContribution } from "./memberContributionCheckpoint";
 import "./memberClient.css";
@@ -75,7 +75,7 @@ export default function MemberClient({ capabilities }) {
       <Route path="/app/overview" element={<main className="app-page"><ClusterInsights /></main>} />
       <Route path="/app/help" element={<HelpCenter embedded />} />
       <Route path="/app/help/:slug" element={<HelpCenter embedded />} />
-      <Route path="/help/*" element={<Navigate to="/app/help" replace />} />
+      <Route path="/help/*" element={<Navigate to={`/app${location.pathname}${location.search}${location.hash}`} replace />} />
       <Route path="*" element={<Navigate to="/app/submit" replace state={{ from: location.pathname }} />} />
     </Routes></Suspense>
   </section></div>;
@@ -121,6 +121,7 @@ function PackagePreview({ preview, filename }) {
 }
 
 function MemberSubmission({ actor, online }) {
+  const location = useLocation();
   const [selected, setSelected] = useState(null);
   const [operation, setOperation] = useState(null);
   const [unitCount, setUnitCount] = useState("");
@@ -158,7 +159,7 @@ function MemberSubmission({ actor, online }) {
   return <main className="app-page member-page"><div className="page-title"><div><span>MEMBER / SUBMIT</span><h1>提交科研任务</h1><p>导入 Workbench 准备的任务包，按原提交记录上传、计算和回收。</p></div></div>
     <MyPersonalAccess enabled={online} />
     <ol className="member-steps" aria-label="提交流程"><li className={!selected ? "current" : "done"}>选择任务包</li><li className={selected && !operation ? "current" : operation ? "done" : ""}>校验与预览</li><li className={operation ? "current" : ""}>确认、上传与计算</li><li>下载核验结果</li></ol>
-    <section className="member-panel member-import"><div><FolderOpen size={24} /><h2>选择任务 ZIP</h2><p>任务包应绑定你的个人身份、获授权项目、执行 Profile 和输出合同。</p></div><label className={`button button-primary member-file-button${busy ? " disabled" : ""}`}><Upload size={16} />{busy === "import" ? "正在导入与核验" : "选择任务包"}<input aria-label="选择任务包" type="file" accept=".zip,application/zip" onChange={importPackage} disabled={Boolean(busy)} /></label></section>
+    <section className="member-panel member-import"><div><FolderOpen size={24} /><h2>选择任务 ZIP</h2><p>任务包应绑定你的个人身份、获授权项目、执行 Profile 和输出合同。</p><p>还没有任务包？让本机 Agent 按指南准备，再在这里预览与提交。</p><Link className="button small" to="/app/help/member-task-package" onClick={() => rememberHelpReturn(location)}><BookOpen size={16} />如何准备任务包</Link></div><label className={`button button-primary member-file-button${busy ? " disabled" : ""}`}><Upload size={16} />{busy === "import" ? "正在导入与核验" : "选择任务包"}<input aria-label="选择任务包" type="file" accept=".zip,application/zip" onChange={importPackage} disabled={Boolean(busy)} /></label></section>
     {error && <div className="inline-error" role="alert">{error}</div>}
     {selected && <PackagePreview preview={previewOf(selected)} filename={selected.filename} />}
     {selected && !operation && <form className="member-panel member-plan" onSubmit={plan}>

@@ -1,0 +1,102 @@
+{
+  "schema_version": 1,
+  "common_files": [
+    "scripts/release_parity.py",
+    "manifests/public-export.json",
+    "tests/test_release_parity.py",
+    "docs/public-export.md",
+    "src/research_compute_network/collection.py",
+    "src/research_compute_network/collection_cli.py",
+    "src/research_compute_network/volume_budget.py",
+    "src/research_compute_network/result_preparations.py",
+    "src/research_compute_network/release_source.py",
+    "src/research_compute_network/help.py",
+    "src/research_compute_network/member_admission_client.py",
+    "src/research_compute_network/member_agent_config.py",
+    "src/research_compute_network/member_async_audit.py",
+    "src/research_compute_network/member_channel_verification.py",
+    "src/research_compute_network/member_client.py",
+    "src/research_compute_network/member_client_credentials.py",
+    "src/research_compute_network/member_client_lifecycle.py",
+    "src/research_compute_network/member_compute_dialog.py",
+    "src/research_compute_network/member_comsol_discovery.py",
+    "src/research_compute_network/member_contribution_operations.py",
+    "src/research_compute_network/member_enrollment.py",
+    "src/research_compute_network/member_enrollment_api.py",
+    "src/research_compute_network/member_execution_identity.py",
+    "src/research_compute_network/member_invitation_operations.py",
+    "src/research_compute_network/member_openssh_prerequisite.py",
+    "src/research_compute_network/member_probe_transport.py",
+    "src/research_compute_network/member_registration.py",
+    "src/research_compute_network/member_relay.py",
+    "src/research_compute_network/member_relay_cli.py",
+    "src/research_compute_network/member_relay_client.py",
+    "src/research_compute_network/member_relay_keys.py",
+    "src/research_compute_network/member_relay_policy.py",
+    "src/research_compute_network/member_retirement.py",
+    "src/research_compute_network/member_setup.py",
+    "src/research_compute_network/member_ssh_access.py",
+    "src/research_compute_network/member_ssh_bootstrap.py",
+    "src/research_compute_network/member_ssh_client.py",
+    "src/research_compute_network/member_ssh_service.py",
+    "src/research_compute_network/member_supervisor_startup.py",
+    "src/research_compute_network/member_transport.py",
+    "src/research_compute_network/member_transport_client.py",
+    "src/research_compute_network/member_tunnel_identity.py",
+    "src/research_compute_network/member_tunnel_install.py",
+    "src/research_compute_network/member_worker_root.py",
+    "src/research_compute_network/member_worker_root_contract.py",
+    "web/src/MemberClient.jsx",
+    "web/src/MemberAgentSetup.jsx",
+    "web/src/MemberAdmissionFields.jsx",
+    "web/src/HelpSystem.jsx",
+    "web/src/memberAgentConfig.js",
+    "web/src/memberClientModel.js",
+    "web/src/memberClient.css",
+    "web/src/memberContributionCheckpoint.js",
+    "web/src/styles.css"
+  ],
+  "required_files": [
+    "docs/member-task-package-guide.zh.md",
+    "src/research_compute_network/help_content/public/member-task-package.md"
+  ],
+  "intentional_differences": [
+    {
+      "paths": ["pyproject.toml", "src/research_compute_network/__init__.py", "src/research_compute_network/build_identity.json"],
+      "reason": "Internal stability and public preview releases have separate versions, distribution metadata and source identities."
+    },
+    {
+      "paths": ["README.md", "AGENTS.md", "config/", "docs/", "src/research_compute_network/help_content/public/getting-started.md"],
+      "reason": "Deployment configuration, entry documentation and onboarding differ. Internal connection policy uses managed SSH; public onboarding defaults to HTTPS. Internal operational records are not exported."
+    },
+    {
+      "paths": ["docs/member-task-package-guide.zh.md", "src/research_compute_network/help_content/public/member-task-package.md"],
+      "reason": "Both distributions require the task-package guide and packaged help. Their navigation and origin-adapter links differ to keep private filesystem and operational references out of the public edition. Verify packaged help against each edition's source instead of copying it."
+    },
+    {
+      "paths": ["src/research_compute_network/member_client_connection.py"],
+      "reason": "Connection behavior is maintained in both trees; the public legacy migration uses generic identifiers instead of private deployment path names. Review changes in both trees without copying this file wholesale."
+    },
+    {
+      "paths": ["src/research_compute_network/member_client_installer.py", "src/research_compute_network/member_installer.py", "src/research_compute_network/member_client_compute.py", "src/research_compute_network/member_release_catalog.py", "src/research_compute_network/member_runtime.py", "src/research_compute_network/member_runtime_verification.py", "src/research_compute_network/runtime_policy.py"],
+      "reason": "Internal scientific runtime approvals, pins and offline scientific dependencies are private. Public releases require operator supplied approvals and sanitize portable installer inputs."
+    },
+    {
+      "paths": ["src/research_compute_network/service.py", "src/research_compute_network/api.py", "src/research_compute_network/remote_agent/", "web/src/App.jsx", "web/src/main.jsx", "web/package.json", "web/package-lock.json", "web/vite.config.js", "src/research_compute_network/web_dist/"],
+      "reason": "The platform and surrounding console have independently reviewed public sanitization and build metadata. They are outside the common copy allowlist. Each distribution's built UI must match its own wheel and member runtime."
+    }
+  ],
+  "excluded_public": [
+    "release-assets.json",
+    "runtime-lock.json",
+    "src/research_compute_network/*.zip",
+    "src/research_compute_network/**/*.zip",
+    "src/research_compute_network/help_content/protected/*",
+    "config/production*",
+    "docs/audit/*",
+    ".local/*",
+    ".scratch/*",
+    "*.mph",
+    "**/*.mph"
+  ]
+}

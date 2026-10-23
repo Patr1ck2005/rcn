@@ -6,6 +6,7 @@ import hashlib
 import json
 import os
 import subprocess
+import sys
 import threading
 import time
 import uuid
@@ -260,6 +261,9 @@ class Dispatcher:
         )
         self._held_lease = False
         self._lease_lost = False
+        self._lease_lock = threading.Lock()
+        self._lease_deadline: float | None = None
+        self._lease_expires_at: datetime | None = None
         self._collection_pool = ThreadPoolExecutor(
             max_workers=max_concurrent_collections,
             thread_name_prefix="rcn-collect",
@@ -290,30 +294,123 @@ class Dispatcher:
         """Request an immediate reconciliation on the next dispatcher loop."""
         self._wake_event.set()
 
-    def _accept_dispatcher_lease(self, lease: DispatcherLease | None) -> bool:
+    def _accept_dispatcher_lease(self, lease: DispatcherLease | None, *, source: str = "receipt") -> bool:
         """Apply every lease receipt without reviving an already fenced process."""
-        if lease is None:
-            if self._held_lease:
-                self._lease_lost = True
-                self.io_stop_event.set()
-                self.status.accepting_assignments = False
-            return False
-        if self._lease_lost:
-            return False
-        # Sample monotonic first so receipt processing cannot extend the
-        # database expiry by the time spent obtaining the wall-clock sample.
-        received_at = time.monotonic()
-        remaining = (lease.expires_at - _utc_now()).total_seconds()
-        self._held_lease = True
-        self._lease_deadline = received_at + max(0.0, remaining)
-        return self._lease_valid()
+        reason = None
+        event = None
+        accepted = False
+        expires_at = None
+        new_remaining = None
+        previous_wall_remaining = None
+        with self._lease_lock:
+            if self._lease_lost:
+                return False
+            checked_at = time.monotonic()
+            deadline = self._lease_deadline
+            if lease is None:
+                if self._held_lease:
+                    reason = "renewal_not_owned"
+            elif lease.owner_id != self.owner_id:
+                reason = "receipt_owner_mismatch"
+            else:
+                # The two clock reads bracket the wall-clock conversion. A
+                # delayed conversion must not revive a gap in the old lease.
+                received_at = time.monotonic()
+                expires_at = _aware(lease.expires_at)
+                wall_now = _utc_now()
+                candidate_deadline = received_at + (expires_at - wall_now).total_seconds()
+                checked_at = time.monotonic()
+                new_remaining = candidate_deadline - checked_at
+                previous_wall_remaining = (self._lease_expires_at - wall_now).total_seconds() if self._lease_expires_at is not None else None
+                if deadline is not None and checked_at >= deadline:
+                    reason = "previous_deadline_expired"
+                elif previous_wall_remaining is not None and previous_wall_remaining <= 0:
+                    reason = "previous_wall_expiry_elapsed"
+                elif self._lease_expires_at is not None and expires_at <= self._lease_expires_at:
+                    # Ignore an old receipt only while the newer confirmed
+                    # lease remains valid on both clocks. Never reproject it.
+                    accepted, event, reason = True, "lease_receipt_ignored", "receipt_expiry_not_newer"
+                elif candidate_deadline <= checked_at:
+                    reason = "initial_receipt_expired" if deadline is None else "new_receipt_expired"
+                else:
+                    self._held_lease = True
+                    self._lease_expires_at = expires_at
+                    # A genuinely newer grant may project earlier after a
+                    # forward wall-clock adjustment. Keep the shorter bound.
+                    self._lease_deadline = candidate_deadline
+                    accepted = True
+            previous_remaining = None if deadline is None else deadline - checked_at
+            if reason is not None and not accepted:
+                self._fence_dispatcher_lease_locked()
+                event = "lease_fenced"
+        if event is not None:
+            self._lease_diagnostic(event, source=source, reason=reason,
+                observed_monotonic=checked_at, previous_remaining_s=previous_remaining,
+                previous_wall_remaining_s=previous_wall_remaining, new_remaining_s=new_remaining,
+                receipt_expires_at=expires_at.isoformat() if expires_at is not None else None)
+        return accepted
+
+    def _fence_dispatcher_lease_locked(self) -> None:
+        """Caller owns the memory-only lease lock; this fence is terminal."""
+        self._lease_lost = True
+        self.io_stop_event.set()
+        self.status.accepting_assignments = False
+
+    def _lease_diagnostic(self, event: str, **safe_values) -> None:
+        """Independent process log, outside the lease lock and metadata DB."""
+        try:
+            sys.stderr.write(json.dumps({"event": event, "utc": datetime.now(timezone.utc).isoformat(),
+                "monotonic": time.monotonic(), "thread": threading.current_thread().name,
+                **safe_values}, sort_keys=True) + "\n")
+            sys.stderr.flush()
+        except Exception:
+            # A log failure cannot undo a fence or replace the original error.
+            pass
+
+    def _acquire_dispatcher_lease(self, source: str) -> DispatcherLease | None:
+        started = time.monotonic()
+        error_type = None
+        sqlite_errorcode = None
+        sqlite_errorname = None
+        lease = None
+        with self._lease_lock:
+            previous_remaining = None if self._lease_deadline is None else self._lease_deadline - started
+        if source == "heartbeat":
+            self._lease_diagnostic("lease_acquire_start", source=source,
+                observed_monotonic=started, previous_remaining_s=previous_remaining)
+        try:
+            lease = self.repository.acquire_dispatcher_lease(self.owner_id, ttl_s=self.lease_ttl_s)
+            return lease
+        except Exception as exc:
+            error_type = type(exc).__name__
+            try:
+                original = getattr(exc, "orig", exc)
+                code = getattr(original, "sqlite_errorcode", None)
+                name = getattr(original, "sqlite_errorname", None)
+                if type(code) is int and 0 <= code <= 2147483647:
+                    sqlite_errorcode = code
+                if (isinstance(name, str) and name.startswith("SQLITE_") and len(name) <= 64
+                        and all(character in "ABCDEFGHIJKLMNOPQRSTUVWXYZ_0123456789" for character in name)):
+                    sqlite_errorname = name
+            except Exception:
+                pass
+            raise
+        finally:
+            finished = time.monotonic()
+            elapsed = max(0.0, finished - started)
+            with self._lease_lock:
+                previous_remaining = None if self._lease_deadline is None else self._lease_deadline - finished
+            if source == "heartbeat" or error_type is not None or elapsed >= self.lease_ttl_s / 3:
+                self._lease_diagnostic("lease_acquire_end", source=source,
+                    observed_monotonic=finished, previous_remaining_s=previous_remaining,
+                    elapsed_s=round(elapsed, 6), error_type=error_type, granted=lease is not None,
+                    sqlite_errorcode=sqlite_errorcode, sqlite_errorname=sqlite_errorname,
+                    receipt_expires_at=lease.expires_at.isoformat() if lease is not None else None,
+                    receipt_remaining_wall_s=(_aware(lease.expires_at) - _utc_now()).total_seconds() if lease is not None else None)
 
     def run_cycle(self) -> bool:
-        lease = self.repository.acquire_dispatcher_lease(
-            self.owner_id,
-            ttl_s=self.lease_ttl_s,
-        )
-        if not self._accept_dispatcher_lease(lease):
+        lease = self._acquire_dispatcher_lease("cycle_start")
+        if not self._accept_dispatcher_lease(lease, source="cycle_start"):
             self.status.phase = DispatcherPhase.STANDBY
             self.status.heartbeat_at = _utc_now()
             return False
@@ -324,15 +421,12 @@ class Dispatcher:
             interval = max(1.0, self.lease_ttl_s / 3)
             while not heartbeat_stop.wait(interval):
                 try:
-                    renewed = self.repository.acquire_dispatcher_lease(
-                        self.owner_id,
-                        ttl_s=self.lease_ttl_s,
-                    )
+                    renewed = self._acquire_dispatcher_lease("heartbeat")
                 except Exception:
                     if not self._lease_valid():
                         return
                     continue
-                if not self._accept_dispatcher_lease(renewed):
+                if not self._accept_dispatcher_lease(renewed, source="heartbeat"):
                     return
                 self.status.heartbeat_at = _utc_now()
 
@@ -423,8 +517,8 @@ class Dispatcher:
                     prepared += int(bool(future.result()))
             self.status.assignments += assignments
             self.status.cycle_count += 1
-            renewed = self.repository.acquire_dispatcher_lease(self.owner_id, ttl_s=self.lease_ttl_s)
-            if not self._accept_dispatcher_lease(renewed):
+            renewed = self._acquire_dispatcher_lease("cycle_end")
+            if not self._accept_dispatcher_lease(renewed, source="cycle_end"):
                 raise RuntimeError("dispatcher lease was lost during final renewal")
             self.status.last_successful_cycle_at = _utc_now()
             self.status.last_error = None
@@ -549,13 +643,24 @@ class Dispatcher:
             raise _SubmissionAborted("dispatcher lease expired before remote publication")
 
     def _lease_valid(self) -> bool:
-        deadline = getattr(self, "_lease_deadline", None)
-        if deadline is not None and time.monotonic() >= deadline:
-            self._lease_lost = True
-            self.io_stop_event.set()
-            self.status.accepting_assignments = False
-            return False
-        return not self._lease_lost
+        fenced = False
+        with self._lease_lock:
+            if self._lease_lost:
+                return False
+            deadline = self._lease_deadline
+            wall_remaining = (self._lease_expires_at - _utc_now()).total_seconds() if self._lease_expires_at is not None else None
+            checked_at = time.monotonic()
+            reason = "monotonic_deadline_expired" if deadline is not None and checked_at >= deadline else (
+                "wall_expiry_elapsed" if wall_remaining is not None and wall_remaining <= 0 else None)
+            if reason is not None:
+                self._fence_dispatcher_lease_locked()
+                fenced = True
+        if fenced:
+            self._lease_diagnostic("lease_fenced", source="lease_valid", reason=reason,
+                observed_monotonic=checked_at, previous_remaining_s=deadline - checked_at,
+                previous_wall_remaining_s=wall_remaining, new_remaining_s=None,
+                receipt_expires_at=self._lease_expires_at.isoformat() if self._lease_expires_at is not None else None)
+        return not fenced
 
     def _scan_allowed(self) -> bool:
         """Check control requests inside a large queue scan, not only between cycles."""

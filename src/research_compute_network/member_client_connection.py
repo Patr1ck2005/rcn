@@ -216,8 +216,11 @@ def _powershell(script):
 
 
 def _task_snapshot():
-    return _powershell("$ErrorActionPreference='Stop';$t=Get-ScheduledTask -TaskName '" + LEGACY_TASK
-        + "' -TaskPath '\\' -ErrorAction SilentlyContinue;if($t){[pscustomobject]@{xml=(Export-ScheduledTask -TaskName $t.TaskName -TaskPath $t.TaskPath);owner=$t.Principal.UserId;actions=@($t.Actions|Select-Object Execute,Arguments);enabled=[bool]$t.Settings.Enabled}|ConvertTo-Json -Depth 6 -Compress}")
+    # Named queries report a nonterminating error for normal absence. Enumerate
+    # the fixed root instead, while preserving real scheduler/export failures.
+    return _powershell("$ErrorActionPreference='Stop';$t=Get-ScheduledTask -TaskPath '\\' -ErrorAction Stop"
+        "|Where-Object {$_.TaskName -ieq '" + LEGACY_TASK
+        + "'};if($t){[pscustomobject]@{xml=(Export-ScheduledTask -TaskName $t.TaskName -TaskPath $t.TaskPath);owner=$t.Principal.UserId;actions=@($t.Actions|Select-Object Execute,Arguments);enabled=[bool]$t.Settings.Enabled}|ConvertTo-Json -Depth 6 -Compress};exit 0")
 
 
 def _task_definition(task):
@@ -363,6 +366,8 @@ def prepare_handoff(root):
     spec, digest = loaded
     if spec.mode == "unselected":
         _fail("mode_unselected")
+    if not spec.legacy:
+        return {"handoff": "not-required"}
     lock_root = Path(root) / "console-handoff-lock"
     storage._private_directory(lock_root)
     with storage._exclusive(lock_root):
@@ -470,17 +475,24 @@ def public_connection(root):
     return {"mode": spec.mode, "center_reference": reference(spec, digest)}
 
 
-def resolve_center(root, value, *, start=True):
+def _resolve_center(root, value, *, start=True):
+    """Return this resolution's endpoint and validated public descriptor.
+
+    The descriptor belongs to this operation only; callers must resolve again
+    on their next request so changed private metadata or keys are checked.
+    """
     loaded = load_spec(root)
     if not value.startswith("rcn-managed://"):
         center = https_center(value)
+        descriptor = None
         if loaded:
-            spec, _ = loaded
+            spec, digest = loaded
             if spec.mode == "unselected":
                 _fail("mode_unselected")
             if spec.mode != "https" or center != https_center(spec.https_url):
                 _fail("reference_required")
-        return center
+            descriptor = {"mode": spec.mode, "center_reference": reference(spec, digest)}
+        return center, descriptor
     if not loaded:
         _fail("spec_required")
     spec, digest = loaded
@@ -488,9 +500,17 @@ def resolve_center(root, value, *, start=True):
         _fail("reference_changed")
     if spec.mode == "unselected":
         _fail("mode_unselected")
+    descriptor = {"mode": spec.mode, "center_reference": reference(spec, digest)}
     if spec.mode == "https":
-        return https_center(spec.https_url)
-    _ssh_command(spec.ssh)
+        return https_center(spec.https_url), descriptor
     if start:
+        # The locked path reloads the spec and verifies the pinned SSH files.
+        # Avoid performing that same key validation before acquiring the lock.
         _ensure_ssh(root, spec, digest)
-    return f"http://127.0.0.1:{spec.ssh.upstream_port}"
+    else:
+        _ssh_command(spec.ssh)
+    return f"http://127.0.0.1:{spec.ssh.upstream_port}", descriptor
+
+
+def resolve_center(root, value, *, start=True):
+    return _resolve_center(root, value, start=start)[0]

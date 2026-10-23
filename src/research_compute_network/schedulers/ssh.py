@@ -67,6 +67,18 @@ class CollectionCapacityUnavailable(RuntimeError):
 
 
 _COLLECTION_RESERVE_BYTES = 10 * 1024**3
+
+
+def _collection_timeout_s(required_bytes: int) -> int:
+    """Bound a completed-output copy by its measured size, at 1 MiB/s.
+
+    The 600-second floor retains the existing small-output deadline. Large
+    immutable outputs receive their byte budget plus two minutes of setup;
+    the owned runner still supports cooperative release cancellation.
+    """
+    if type(required_bytes) is not int or required_bytes < 0:
+        raise ValueError("completed output byte count must be a nonnegative integer")
+    return max(600, 120 + (required_bytes + 1024**2 - 1) // 1024**2)
 _COLLECTION_CAPACITY_LOCK = threading.Lock()
 _COLLECTION_CAPACITY_RESERVATIONS: dict[int, dict[str, int]] = {}
 
@@ -1397,7 +1409,7 @@ Remove-Item -LiteralPath $stdout,$stderr -Force -ErrorAction SilentlyContinue
             self._guard_collection_storage(destination, required_bytes)
             writer_stopped = False
             try:
-                completed = self.runner(command, timeout=600)
+                completed = self.runner(command, timeout=_collection_timeout_s(required_bytes))
             except BaseException as exc:
                 # subprocess.run kills/waits its own timed-out child. The
                 # cooperative runner attaches proof only after its exact tree

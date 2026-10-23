@@ -155,7 +155,8 @@ foreach($rule in $acl.Access){
     script = script.replace('__MEMBER_ACL__', _managed_worker_acl(root))
     script = script.replace('__CREATE__', '$true' if created else '$false')
     result = subprocess.run(['powershell.exe', '-NoProfile', '-NonInteractive', '-Command', script],
-                            capture_output=True, timeout=20, check=False)
+                            capture_output=True, timeout=20, check=False,
+                            creationflags=subprocess.CREATE_NO_WINDOW)
     if result.returncode != 0:
         raise MemberRegistrationError('registration_root_permissions')
 
@@ -179,7 +180,8 @@ foreach($rule in $acl.Access){if($rule.AccessControlType -eq 'Allow' -and $rule.
 """.replace('__PATH__', "'" + str(path).replace("'", "''") + "'")
     script = script.replace('__MEMBER_ACL__', _managed_worker_acl(path))
     result = subprocess.run(['powershell.exe', '-NoProfile', '-NonInteractive', '-Command', script],
-                            capture_output=True, timeout=20, check=False)
+                            capture_output=True, timeout=20, check=False,
+                            creationflags=subprocess.CREATE_NO_WINDOW)
     if result.returncode != 0:
         raise MemberRegistrationError('registration_file_permissions')
 

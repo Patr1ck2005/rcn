@@ -9,6 +9,25 @@ import re
 import subprocess
 
 RECEIPT = '.rcn-source-export.json'
+ASSET_MANIFEST = 'release-assets.json'
+
+
+def _asset_inputs(root):
+    """Immutable package data stays outside Git; its exact hashes stay in Git."""
+    path = Path(root) / ASSET_MANIFEST
+    if not path.exists():
+        return {}
+    value = json.loads(path.read_text(encoding='utf-8'))
+    if value.get('schema') != 'rcn-release-assets-v1' or not isinstance(value.get('files'), dict):
+        raise ValueError('invalid release asset manifest')
+    for name, digest in value['files'].items():
+        # External inputs are data archives only. Never allow this mechanism
+        # to replace committed source, configuration or generated Web assets.
+        if (not isinstance(name, str)
+                or not re.fullmatch(r'src/research_compute_network/acceptance_fixtures/[A-Za-z0-9_.-]+\.zip', name)
+                or not isinstance(digest, str) or not re.fullmatch('[0-9a-f]{64}', digest)):
+            raise ValueError('invalid release asset path or digest')
+    return value['files']
 
 
 def _git(root, *args):
@@ -52,9 +71,19 @@ def verify_source_export(project_root):
         path = root / relative
         if path.is_symlink() or not path.is_file() or hashlib.sha256(path.read_bytes()).hexdigest() != digest:
             raise ValueError('source export changed: ' + name)
-    # Generated web_dist is expected. Additional Python/ZIP inputs are not.
+    assets = _asset_inputs(root)
+    if (root / ASSET_MANIFEST).exists() and ASSET_MANIFEST not in value['files']:
+        raise ValueError('release assets require a committed manifest')
+    if value.get('assets', {}) != assets:
+        raise ValueError('export assets differ from the committed manifest')
+    for name, digest in assets.items():
+        path = root / name
+        if (path.is_symlink() or not path.is_file()
+                or hashlib.sha256(path.read_bytes()).hexdigest() != digest):
+            raise ValueError('release asset missing or changed: ' + name)
+    # Generated web_dist and explicitly pinned data archives are expected.
     package = root / 'src/research_compute_network'
-    declared = {name for name in value['files'] if name.startswith('src/research_compute_network/')}
+    declared = {name for name in value['files'] if name.startswith('src/research_compute_network/')} | set(assets)
     for path in package.rglob('*'):
         if path.is_symlink():
             raise ValueError('source export contains linked package content')
@@ -84,7 +113,7 @@ def verify_source_export(project_root):
             'source_tree': value['source_tree']}
 
 
-def export_release_source(project_root, destination, *, commit=None):
+def export_release_source(project_root, destination, *, commit=None, asset_root=None):
     root, destination = Path(project_root).resolve(), Path(destination).absolute()
     metadata = git_source_metadata(root)
     if metadata['source_dirty'] is not False or metadata['source_commit'] is None:
@@ -155,6 +184,22 @@ def export_release_source(project_root, destination, *, commit=None):
         batch.stderr.close()
     if set(files) != set(tree_files):
         raise ValueError('export omitted committed source inputs')
+    assets = _asset_inputs(destination)
+    if assets and ASSET_MANIFEST not in files:
+        raise ValueError('release assets require a committed manifest')
+    source = Path(asset_root).resolve() if asset_root is not None else root
+    for name, expected_sha in assets.items():
+        path = source / name
+        if path.is_symlink() or not path.is_file() or not path.resolve().is_relative_to(source):
+            raise ValueError('release asset unavailable: ' + name)
+        raw = path.read_bytes()
+        if hashlib.sha256(raw).hexdigest() != expected_sha:
+            raise ValueError('release asset hash mismatch: ' + name)
+        target = destination / name
+        if target.exists() and target.read_bytes() != raw:
+            raise ValueError('release asset conflicts with committed content: ' + name)
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_bytes(raw)
     (destination / RECEIPT).write_text(json.dumps({'schema': 'rcn-clean-source-export-v1',
-        'source_commit': commit, 'source_tree': tree, 'files': files}, sort_keys=True, indent=2) + '\n', encoding='utf-8')
+        'source_commit': commit, 'source_tree': tree, 'files': files, 'assets': assets}, sort_keys=True, indent=2) + '\n', encoding='utf-8')
     return verify_source_export(destination)

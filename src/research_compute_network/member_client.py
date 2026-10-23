@@ -47,9 +47,15 @@ RESERVE_BYTES = 10 * 1024**3
 MAX_METADATA_BYTES = 64 * 1024**2
 
 
-def member_api_client(base_url, token=None):
+def member_api_client(base_url, token=None, *, connection_root=None):
+    from .member_client_connection import resolve_center
+    endpoint = resolve_center(connection_root or default_client_root(), base_url)
+    return _member_api_for_endpoint(endpoint, token)
+
+
+def _member_api_for_endpoint(endpoint, token):
     from .origin_transfer_client import _NoRedirect
-    return RcnClient(base_url, token=token, opener=build_opener(ProxyHandler({}), _NoRedirect()))
+    return RcnClient(endpoint, token=token, opener=build_opener(ProxyHandler({}), _NoRedirect()))
 
 
 def default_client_root() -> Path:
@@ -158,14 +164,37 @@ class MemberBroker:
     def client(self):
         if not self.login:
             raise HTTPException(401, "请先登录个人账号")
-        return self.api_factory(self.login["center_url"], token=self.login["token"])
+        return self._api(self.login["center_url"], self.login["token"])
+
+    def _api(self, center, token):
+        return self._api_with_connection(center, token)[0]
+
+    def _api_with_connection(self, center, token):
+        try:
+            from .member_client_connection import _resolve_center
+            from .member_agent_config import member_connection_root
+            endpoint, descriptor = _resolve_center(member_connection_root(self), center)
+            if self.api_factory is member_api_client:
+                api = _member_api_for_endpoint(endpoint, token)
+            else:
+                api = self.api_factory(endpoint, token=token)
+            return api, descriptor
+        except (RuntimeError, ValueError, OSError) as exc:
+            if isinstance(exc, RcnApiError):
+                raise
+            raise RcnApiError(0, "member connection is unavailable", reason_code="member_connection_unavailable") from None
 
     def session(self, *, refresh=False):
+        from .member_client_connection import public_connection
         with self.lock:
             login, generation, actor = self.login, self.auth_generation, self.actor
+        configured_connection = None
         if login and (refresh or not actor):
             try:
-                found = self.api_factory(login["center_url"], token=login["token"]).current_actor()
+                # Reuse only the descriptor validated while resolving this
+                # request. Keep it even if the subsequent center call fails.
+                api, configured_connection = self._api_with_connection(login["center_url"], login["token"])
+                found = api.current_actor()
                 if not isinstance(found, dict) or not found.get("actor_id"):
                     raise RcnApiError(502, "invalid member identity")
                 error = None
@@ -180,16 +209,26 @@ class MemberBroker:
                     self.actor = found
                     self.online = error is None
                     self.connection_error = error
+        else:
+            try:
+                from .member_agent_config import member_connection_root
+                configured_connection = public_connection(member_connection_root(self))
+            except (RuntimeError, ValueError, OSError):
+                configured_connection = None
+        return self._session_payload(configured_connection)
+
+    def _session_payload(self, configured_connection):
         with self.lock:
             return {"connected": bool(self.login and self.actor),
-                    "center_url": self.login["center_url"] if self.login else "", "actor": self.actor,
+                    "center_url": self.login["center_url"] if self.login else (configured_connection or {}).get("center_reference", ""),
+                    "configured_connection": configured_connection, "actor": self.actor,
                     "online": self.online, "remote_actions_available": bool(self.online and self.login),
                     "connection_error": self.connection_error}
 
     def sign_in(self, payload: Login):
-        center = _center(payload.center_url)
+        center = payload.center_url if payload.center_url.startswith("rcn-managed://") else _center(payload.center_url)
         token = payload.token.strip()
-        client = self.api_factory(center, token=token)
+        client, configured_connection = self._api_with_connection(center, token)
         actor = client.current_actor()
         # Verify the endpoint identity before saving any personal credential.
         if not isinstance(actor, dict) or not actor.get("actor_id"):
@@ -204,7 +243,7 @@ class MemberBroker:
             self.online = True
             self.connection_error = None
         self.recover_collections()
-        return self.session()
+        return self._session_payload(configured_connection)
 
     def sign_out(self):
         with self.lock:
@@ -678,7 +717,9 @@ def create_member_app(*, state_root: Path | None = None, credential_store=None,
     broker = MemberBroker(state_root or default_client_root(), credential_store=credential_store,
                           api_factory=api_factory, transfer_factory=transfer_factory)
     from .member_client_compute import ContributionManager
+    from .help import HelpCatalog
     contribution = ContributionManager(broker.root)
+    help_catalog = HelpCatalog()
 
     @asynccontextmanager
     async def lifespan(app):
@@ -939,6 +980,31 @@ def create_member_app(*, state_root: Path | None = None, credential_store=None,
         options = {key: item for key, item in previous["plan_options"].items()
                    if key in {"requested_unit_count", "estimated_seconds_per_item"}}
         return broker.plan(payload.operation_id, PlanOptions(package_id=previous["package_id"], **options))
+
+    @app.get("/v1/help/public")
+    def public_help_index():
+        return help_catalog.list_public()
+
+    @app.get("/v1/help/public/{slug}")
+    def public_help_article(slug: str):
+        article = help_catalog.public(slug)
+        if article is None:
+            raise HTTPException(404, "help article not found")
+        return article
+
+    @app.get("/v1/help/catalog")
+    def member_help_catalog():
+        # Public guidance follows the installed client, including when its
+        # center is older or unavailable. Only the center authorizes protected
+        # entries; never derive those from packaged content or cached roles.
+        protected = []
+        if broker.login:
+            try:
+                remote = broker.client()._request("GET", "/v1/help/catalog")
+                protected = remote.get("protected", [])
+            except RcnApiError:
+                pass
+        return {"public": help_catalog.list_public(), "protected": protected}
 
     # Only public, read-only observation calls and explicit owner/project actions.
     # Submission is exclusively the data-package operation protocol above.

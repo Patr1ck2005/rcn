@@ -52,6 +52,28 @@ def _read_profile(path):
     return profile
 
 
+def member_connection_root(broker):
+    """Reuse the parent transport only for this exact isolated Agent login.
+
+    The command keeps its own DPAPI credentials and journals. Resolve the
+    parent's pinned transport afresh; never copy keys or cache its validation.
+    """
+    root = broker.root
+    path = root / "agent-profile.json"
+    if not path.exists() or not broker.login:
+        return root
+    storage._check_private_file(path)
+    profile = _read_profile(path)
+    actor = (broker.login.get("actor") or {}).get("actor_id")
+    fingerprint = hashlib.sha256(broker.login["token"].encode("utf-8")).hexdigest()
+    if (root.parent.name != "agents" or profile["agent_id"] != root.name
+            or profile.get("actor_id") != actor
+            or profile.get("center_url") != broker.login.get("center_url")
+            or not secrets.compare_digest(profile["credential_fingerprint"], fingerprint)):
+        raise PermissionError("member_agent_connection_binding_changed")
+    return root.parent.parent
+
+
 def _present_profile(profile, root):
     return {key: profile[key] for key in ("agent_id", "actor_id", "center_url", "target", "label")} | {
         "credential_id": profile.get("credential_id"),
@@ -122,7 +144,7 @@ def _agent_view(broker, session, target, agent_id, label, token):
                     and known["center_url"] == session["center_url"]
                     and known["credential_fingerprint"] == fingerprint):
                 raise HTTPException(409, "这份 token 已绑定本机另一 Agent，请选择原实例重新导出")
-        actor = broker.api_factory(session["center_url"], token=token).current_actor()
+        actor = broker._api(session["center_url"], token=token).current_actor()
         if actor.get("actor_id") != session["actor"]["actor_id"]:
             raise HTTPException(403, "Agent token 必须属于当前个人身份")
         if "agent" not in actor.get("scopes", []) or set(actor.get("roles", [])) != {"member"}:
@@ -148,7 +170,7 @@ def _agent_view(broker, session, target, agent_id, label, token):
         if (existing.get("center_url") != session["center_url"]
                 or hashlib.sha256(existing["token"].encode("utf-8")).hexdigest() != profile["credential_fingerprint"]):
             raise HTTPException(409, "此 Agent 的本机凭据与原始绑定不一致")
-        actor = broker.api_factory(session["center_url"], token=existing["token"]).current_actor()
+        actor = broker._api(session["center_url"], token=existing["token"]).current_actor()
         if (actor.get("actor_id") != session["actor"]["actor_id"]
                 or "agent" not in actor.get("scopes", []) or set(actor.get("roles", [])) != {"member"}):
             raise HTTPException(403, "此 Agent 的受限凭据或个人身份已失效")

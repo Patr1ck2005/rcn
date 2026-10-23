@@ -279,11 +279,24 @@ def install_entry(root, *, desktop=True, startup=True):
     if os.name != "nt":
         raise RuntimeError("member_client_entry_requires_windows")
     import winreg
-    # Updating the software cannot leave an old local API serving new assets.
-    stop(root)
     python = _pythonw()
     if not python.is_file():
         raise RuntimeError("member_client_pythonw_missing")
+    from .member_client_connection import prepare_handoff
+    # Drain the original API and its supervisor before switching the entry.
+    # A first migration may still have the pinned legacy gateway on this port;
+    # stop refuses that foreign API. Only the exact handoff may retire it.
+    try:
+        stop(root)
+    except RuntimeError as exc:
+        if (str(exc) != "member_client_port_in_use_by_another_service"
+                or (Path(root).absolute() / "service.json").exists()):
+            raise
+        _wait_supervisor(root, 35)
+        prepare_handoff(root)
+        stop(root)
+    else:
+        prepare_handoff(root)
     arguments = subprocess.list2cmdline(["-B", "-m", MODULE, "launch", "--state-root", str(Path(root).absolute())])
     command = _startup_command(root)
     if startup:
@@ -294,7 +307,8 @@ def install_entry(root, *, desktop=True, startup=True):
         def literal(value):
             return "'" + str(value).replace("'", "''") + "'"
         script = "$w=New-Object -ComObject WScript.Shell;$s=$w.CreateShortcut((Join-Path ([Environment]::GetFolderPath('Desktop')) 'Research Compute Network.lnk'));$s.TargetPath=" + literal(python) + ";$s.Arguments=" + literal(arguments) + ";$s.WindowStyle=7;$s.Save()"
-        result = subprocess.run([_powershell(), "-NoProfile", "-NonInteractive", "-Command", script], capture_output=True, timeout=15)
+        result = subprocess.run([_powershell(), "-NoProfile", "-NonInteractive", "-Command", script], capture_output=True, timeout=15,
+                                creationflags=subprocess.CREATE_NO_WINDOW)
         if result.returncode:
             raise RuntimeError("member_client_shortcut_failed")
     _write_json(Path(root).absolute() / "active-version.json", {
@@ -323,7 +337,8 @@ def uninstall(root):
         from .member_ssh_service import _powershell
         expected_python = "'" + str(_pythonw()).replace("'", "''") + "'"
         script = "$p=Join-Path ([Environment]::GetFolderPath('Desktop')) 'Research Compute Network.lnk';if(Test-Path -LiteralPath $p){$w=New-Object -ComObject WScript.Shell;$s=$w.CreateShortcut($p);if(($s.Arguments -like '*research_compute_network.member_client_lifecycle*') -and ($s.TargetPath -ieq " + expected_python + ")){Remove-Item -LiteralPath $p}}"
-        subprocess.run([_powershell(), "-NoProfile", "-NonInteractive", "-Command", script], capture_output=True, timeout=15, check=True)
+        subprocess.run([_powershell(), "-NoProfile", "-NonInteractive", "-Command", script], capture_output=True, timeout=15, check=True,
+                       creationflags=subprocess.CREATE_NO_WINDOW)
     marker = Path(root).absolute() / "active-version.json"
     if marker.exists() and _same_executable(_read_json(marker)["pythonw_path"], _pythonw()):
         marker.unlink()

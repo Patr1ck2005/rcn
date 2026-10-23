@@ -4283,6 +4283,49 @@ class MetadataRepository:
         return bool(alert.subject_type == "attempt" and stamp is not None
                     and _aware_datetime(alert.last_seen_at) <= stamp <= now)
 
+    @staticmethod
+    def _collection_recovery_generation(session):
+        """Trust the existing raw-write-aware epoch only with complete coverage."""
+        from .reconciliation_read_projection import _HEADER, _PARAMS, ReconciliationReadProjection
+        try:
+            header = session.execute(text(_HEADER), _PARAMS).one_or_none()
+        except OperationalError as exc:
+            if "no such table" not in str(exc.orig):
+                raise
+            return None
+        if header is None or not ReconciliationReadProjection._compatible(header):
+            return None
+        return (header.epoch, header.installation_id, header.schema_version)
+
+    def _collection_recovery_read_proof(self, attempt_id=None, *, circuit=False):
+        """Scan Job evidence before taking SQLite's single writer lock.
+
+        Job triggers cover normal and raw SQL writes. An unchanged generation
+        before/after the scan and again behind BEGIN IMMEDIATE proves that the
+        evidence is still current. A concurrent change defers recovery; it never
+        causes a full scan or an optimistic recovery inside the writer gate.
+        Nested callers already hold that gate and defer until a later cycle.
+        """
+        if self._transaction_session() is not None:
+            return None
+        with self._session() as session:
+            if circuit:
+                row = session.get(DispatcherStatusRow, "dispatcher")
+                if row is None or row.payload.get("blocked_reason") != "collection_circuit_breaker":
+                    return None
+            rows = [row for row in self._collection_alert_rows(session)
+                    if (circuit or row.status != "resolved")
+                    and (attempt_id is None or row.subject_id == attempt_id)]
+            if not rows:
+                return None
+            generation = self._collection_recovery_generation(session)
+            if generation is None:
+                return None
+            collected = self._collected_for_recovery(session, {row.subject_id for row in rows})
+            if self._collection_recovery_generation(session) != generation:
+                return None
+            return generation, collected
+
     def latch_collection_circuit(self, alert_id: str) -> None:
         """Bind a global block to its exact persisted causes, preserving other controls."""
         def write() -> None:
@@ -4309,14 +4352,20 @@ class MetadataRepository:
 
     def resolve_proven_collection_alerts(self, attempt_id: str | None = None) -> dict[str, list[str]]:
         """Resolve only failures followed by an actual persisted collection."""
+        sqlite = self.engine.dialect.name == "sqlite"
+        proof = self._collection_recovery_read_proof(attempt_id) if sqlite else None
+        if sqlite and proof is None:
+            return {}
         def write() -> dict[str, list[str]]:
             with self._session() as session, session.begin():
                 self._lock_collection_recovery(session)
+                if sqlite and self._collection_recovery_generation(session) != proof[0]:
+                    return {}
                 rows = [row for row in self._collection_alert_rows(session)
                         if row.status != "resolved" and (attempt_id is None or row.subject_id == attempt_id)]
                 if not rows:
                     return {}
-                collected = self._collected_for_recovery(session, {row.subject_id for row in rows})
+                collected = proof[1] if sqlite else self._collected_for_recovery(session, {row.subject_id for row in rows})
                 now = datetime.now(timezone.utc)
                 resolved: dict[str, list[str]] = {}
                 for row in rows:
@@ -4338,9 +4387,15 @@ class MetadataRepository:
         Legacy blocks without cause IDs need a recorded global circuit alert.
         Missing records are unknown, never a vacuous proof of successful recovery.
         """
+        sqlite = self.engine.dialect.name == "sqlite"
+        proof = self._collection_recovery_read_proof(circuit=True) if sqlite else None
+        if sqlite and proof is None:
+            return None
         def write() -> DispatcherStatus | None:
             with self._session() as session, session.begin():
                 self._lock_collection_recovery(session)
+                if sqlite and self._collection_recovery_generation(session) != proof[0]:
+                    return None
                 row = session.get(DispatcherStatusRow, "dispatcher")
                 if row is None:
                     return None
@@ -4362,7 +4417,7 @@ class MetadataRepository:
                 relevant = [a for a in alerts if a.alert_id in causes or a.status != "resolved"
                             or _aware_datetime(a.last_seen_at) >= episode_start]
                 now = datetime.now(timezone.utc)
-                collected = self._collected_for_recovery(session, {a.subject_id for a in relevant})
+                collected = proof[1] if sqlite else self._collected_for_recovery(session, {a.subject_id for a in relevant})
                 if any(a.status != "resolved" or not self._collection_proven(a, collected, now) for a in relevant):
                     return None
                 count = status.collection_circuit_auto_resume_count
