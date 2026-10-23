@@ -17,7 +17,7 @@ def main():
     parser.add_argument("--skip-web", action="store_true", help="Use already-built public assets")
     args = parser.parse_args()
     sys.path.insert(0, str(ROOT / "src"))
-    from research_compute_network.release_identity import source_metadata, stamp
+    from research_compute_network.release_identity import source_metadata, stamp, verify_wheel_version
     import tomllib
     identity = source_metadata(ROOT)
     if identity.get("source_commit") is None or identity.get("source_dirty") is not False:
@@ -42,8 +42,10 @@ def main():
     import setuptools.build_meta
     output = ROOT / "dist"
     output.mkdir(exist_ok=True)
-    print(json.dumps({"wheel": setuptools.build_meta.build_wheel(str(output)),
-                      "sdist": setuptools.build_meta.build_sdist(str(output))}))
+    wheel = setuptools.build_meta.build_wheel(str(output))
+    version = tomllib.loads((ROOT / "pyproject.toml").read_text(encoding="utf-8"))["project"]["version"]
+    verify_wheel_version(output / wheel, expected_version=version)
+    print(json.dumps({"wheel": wheel, "sdist": setuptools.build_meta.build_sdist(str(output))}))
 
 
 if __name__ == "__main__":

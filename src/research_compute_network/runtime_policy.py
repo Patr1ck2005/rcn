@@ -6,9 +6,10 @@ from dataclasses import dataclass, field
 import os
 import re
 
+from .release_identity import resolve_package_version
 
 PROTOCOL_VERSION = "1"
-PACKAGE_VERSION = "0.15.0a1"
+PACKAGE_VERSION = resolve_package_version()
 # A public, non-executable identity marker, never a bundled scientific runtime.
 UNCONFIGURED_RUNTIME_VERSION = "f2a0851b1fcdf782e5c5c063"
 STABLE_RUNTIME_VERSION = UNCONFIGURED_RUNTIME_VERSION

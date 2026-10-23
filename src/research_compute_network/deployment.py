@@ -477,11 +477,18 @@ def _validate_candidate_package_origin(
             "from pathlib import Path\n"
             "import research_compute_network as package\n"
             "from importlib.resources import files\n"
+            "from importlib.metadata import distribution\n"
+            "from research_compute_network.release_identity import read_identity\n"
             "from research_compute_network.runtime_policy import PACKAGE_VERSION\n"
+            "dist = distribution('research-compute-network')\n"
+            "build = read_identity()\n"
             "fixture = files('research_compute_network.acceptance_fixtures').joinpath('project_worker_smoke.py')\n"
             "print(json.dumps({"
             "'module_path': str(Path(package.__file__).resolve()), "
             "'package_version': PACKAGE_VERSION, "
+            "'distribution_package_version': dist.version, "
+            "'distribution_package_root': str(Path(str(dist.locate_file('research_compute_network'))).resolve()), "
+            "'build_package_version': build['package_version'], "
             "'project_worker_fixture_path': str(Path(str(fixture)).resolve()), "
             "'project_worker_fixture_available': fixture.is_file()"
             "}))"
@@ -505,6 +512,9 @@ def _validate_candidate_package_origin(
         evidence = json.loads(lines[-1])
         module_path = Path(evidence["module_path"]).resolve()
         package_version = str(evidence["package_version"])
+        distribution_version = str(evidence["distribution_package_version"])
+        distribution_root = Path(evidence["distribution_package_root"]).resolve()
+        build_version = str(evidence["build_package_version"])
         fixture_path = Path(evidence["project_worker_fixture_path"]).resolve()
         fixture_available = bool(evidence["project_worker_fixture_available"])
     except (IndexError, KeyError, TypeError, ValueError, json.JSONDecodeError) as exc:
@@ -514,6 +524,10 @@ def _validate_candidate_package_origin(
         raise ValueError(
             "candidate research_compute_network package resolves outside the managed runtime"
         )
+    if distribution_root != module_path.parent:
+        raise ValueError("candidate distribution metadata belongs to another package origin")
+    if package_version != distribution_version or package_version != build_version:
+        raise ValueError("candidate runtime, distribution and build identity versions do not match")
     if package_version != PACKAGE_VERSION:
         raise ValueError(
             "candidate research_compute_network package version does not match the release tool"
@@ -526,6 +540,9 @@ def _validate_candidate_package_origin(
         "verified": True,
         "module_path": str(module_path),
         "package_version": package_version,
+        "distribution_package_version": distribution_version,
+        "distribution_package_root": str(distribution_root),
+        "build_package_version": build_version,
         "project_worker_fixture_path": str(fixture_path),
         "project_worker_fixture_available": True,
     }

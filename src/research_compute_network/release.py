@@ -79,7 +79,7 @@ def build_wheel(project_root: Path, wheel_root: Path, *, require_clean_source: b
     The caller's unrelated setuptools cache is neither reused nor deleted.
     Build identity is placed only in the snapshot, not the live working tree.
     """
-    from .release_identity import source_metadata, stamp, package_hashes
+    from .release_identity import source_metadata, stamp, package_hashes, verify_wheel_version
     import tomllib
     project_root = Path(project_root).resolve()
     wheel_root = Path(wheel_root).resolve()
@@ -117,6 +117,7 @@ def build_wheel(project_root: Path, wheel_root: Path, *, require_clean_source: b
     wheels = list(wheel_root.glob("research_compute_network-*.whl"))
     if len(wheels) != 1:
         raise RuntimeError("release build must produce exactly one Research Compute Network wheel")
+    verify_wheel_version(wheels[0], expected_version=version)
     return wheels[0]
 
 
