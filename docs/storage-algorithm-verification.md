@@ -19,8 +19,9 @@ Interface and adapter contracts are in [storage-algorithm-interfaces.md](storage
   Forecast uses confirmed normal file-event buckets, not whole-volume free-space
   changes. Baseline/backfill/registered migration copies are excluded; estimates
   explicitly describe managed logical growth, with no estimate when events are absent.
-- Actual occupancy uses exact registered paths, a persistent cursor, 32-file and
-  25 ms limits. Windows native allocation/file identity deduplicates registered
+- Actual occupancy uses exact registered paths and a persistent cursor. The final
+  maintenance call uses 8 files and 10 ms; the initial checkpoint used 32 files and
+  25 ms (the dated measurements below retain that history). Windows native allocation/file identity deduplicates registered
   hardlinks. Missing, stale, compressed/sparse or unregistered allocations remain
   unknown. No recursive scanner, payload hashing, remote probing or volume probe
   occurs on the dashboard GET. A single OS call cannot be forcibly time-bounded.
@@ -63,7 +64,7 @@ limits, no data-path/history-table access from snapshot, and capacity wait leavi
 GC eligible. All three supplied hotfix files are preserved, with projection hooks
 added only to repository manifest writes.
 
-## Paired measurements and unresolved performance gate
+## Historical paired measurements before the final performance decision
 
 Raw samples, including failures, are committed in
 [evidence/storage-algorithms-20261024](evidence/storage-algorithms-20261024).
@@ -191,7 +192,7 @@ unfavorable statistics as well. We cannot attribute all tail changes to the nati
 boundary improvement or promise a production <=10% bound from these samples.
 Natural-load/installed validation belongs to the parent release gate.
 
-Release interpretation remains unresolved: the raw `background_target_passed`
+At the pre-decision checkpoint, release interpretation remained unresolved: the raw `background_target_passed`
 field describes its declared P95 point-estimate predicate, not a blanket <=10%
 dispatch cost claim. The extra median ~1.9 ms is real in this experiment. The
 enabled branch wakes another thread inside the measured interval; the alone
@@ -200,7 +201,7 @@ separated by a null-work control, so assigning all overhead to the benchmark wou
 be unsupported. The removed FFI setup is much smaller than this residual; OS and
 thread scheduling are plausible contributors, not established causes.
 
-A concrete user tradeoff, **not approved or applied**, is to retain the simple
+The proposed user tradeoff, **not yet approved or applied at that checkpoint**, was to retain the simple
 cooperative implementation and permit up to about 2 ms additional median latency
 per 256-Job scan, while retaining the existing foreground byte-throughput and
 dispatch P95 10% limits and checking natural-load evidence later. If a blanket
