@@ -41,16 +41,18 @@ _SLOTS = threading.BoundedSemaphore(2)
 def _bootstrap_config_shape(value):
     """Accept only the original disabled config's serialized field shape.
 
-    The two optional operational deadlines intentionally disappear when None.
-    Do not require those absent keys, invent values, normalize the signed bytes,
-    accept a new timeout, or relax any other identity/resource field.
+    Optional deadlines disappear when None; model retirement disappears when
+    False. Accept only those neutral values, without normalizing signed bytes
+    or enabling retirement as a side effect of member bootstrap.
     """
     if not isinstance(value, dict):
         return False
-    optional = {'ssh_connect_timeout_s', 'ssh_status_timeout_s'}
+    deadlines = {'ssh_connect_timeout_s', 'ssh_status_timeout_s'}
+    optional = deadlines | {'scientific_model_retirement_enabled'}
     fields = set(MachineExecutionConfig.model_fields)
     return (fields - optional <= set(value) <= fields
-            and all(value.get(name) is None for name in optional))
+            and all(value.get(name) is None for name in deadlines)
+            and value.get('scientific_model_retirement_enabled', False) is False)
 
 
 class SshBootstrapRequest(WorkerRootRequest):
