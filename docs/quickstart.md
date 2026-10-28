@@ -6,6 +6,12 @@ This path runs the real control-plane API and console with a synthetic fleet. It
 
 ## Install from source
 
+Joining an existing group does not require this development setup. Use the
+[member onboarding guide](member-onboarding-guide.md) to install the Windows
+Setup and request HTTPS membership. Operators configure their own center;
+the research-group endpoint and alpha.6 acceptance status are recorded in the
+[release notes](releases/0.15.0a6.md).
+
 Use Python 3.11+ and Node.js 20.19+ or 22.12+. The frontend uses the dependency versions recorded in `web/package-lock.json`.
 
 ```shell

@@ -8,6 +8,7 @@ import { PersonPolicyEditor } from "./PersonalAccess";
 import { useMutationGuard } from "./useMutationGuard";
 import { markTokenIssuance, pendingTokenIssuance } from "./tokenIssuance";
 import MemberInvitations from "./MemberInvitations.jsx";
+import AdminMemberPairing from "./AdminMemberPairing.jsx";
 import { clearSolverApproval, loadSolverApproval, recoverSolverApproval, saveSolverApproval, solverApprovalCheckpoint, validateSolverApproval } from "./solverApprovalCheckpoint";
 import { DataLoadState, initialRequestState, RefreshStatus, settleResourceRequests } from "./AsyncState";
 import { RuntimeControlDialog } from "./ControlDialogs";
@@ -333,6 +334,7 @@ export default function AdminConsole({ overview = {}, actorId = "", onGlobalRefr
     <section className="admin-tab-guide" aria-label={`${tabHelpCopy[tab][0]}说明`}><div><span>CURRENT SECTION</span><b>{tabHelpCopy[tab][0]}</b><small>{tabHelpCopy[tab][1]}</small></div>{tabHelpTopics[tab] && <HelpLink topic={tabHelpTopics[tab]}>本页说明</HelpLink>}</section>
     <fieldset disabled={mutating} style={{ border: 0, padding: 0, margin: 0, minWidth: 0 }}>
     {tab === "users" && Object.keys(pendingTokens).length > 0 && <section className="detail-section" aria-label="待核对的 Token 签发"><h2>Token 签发结果待核对</h2><p>请求可能已被接受，明文响应无法重新读取。先查看并撤销无法交付的 Token；本页和重新加载页面都不会自动重签。原请求是否已送达，需要管理员核对服务端审计后处理检查点。</p>{Object.entries(pendingTokens).filter(([id]) => id !== "unreadable").map(([id, marker]) => <p key={id}><b>{id}</b> · {time(marker.started_at)} <button className="button small" onClick={() => inspectTokens(id)}>核对现有 Token</button></p>)}</section>}
+    {tab === "users" && <AdminMemberPairing key={actorId} actorId={actorId} users={data.users} ready={["ready", "refreshing"].includes(requests.users?.status)} onRefresh={() => load(["users"], true)} />}
     {tab === "users" && !initialLoading && <PersonPolicyEditor users={data.users} profiles={data.profiles} />}
     {tab === "projects" && !initialLoading && (!loadError || hasCachedTab) && <ProjectRegistrationReview registrations={data.projectRegistrations} onReview={reviewProject} />}
     {tab === "projects" && !initialLoading && (!loadError || hasCachedTab) && <ProjectPriorityControls projects={data.projects} onSave={savePriorityCeiling} />}

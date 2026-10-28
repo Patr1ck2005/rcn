@@ -12,6 +12,7 @@ from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
 
 from .models import JobEnvelope, OriginImportReceipt, PartitionRequest, UnitDiskEstimate
+from .transport_diagnostics import gateway_failure_code, network_failure_code
 
 
 MINIMUM_CONTROL_PLANE_VERSION = "0.12.3"
@@ -154,6 +155,7 @@ class RcnClient:
                     and future_evidence_only(error_payload.get("detail")))
                 if future:
                     reason_code = "scientific_evidence_clock_skew"
+                reason_code = reason_code or gateway_failure_code(exc.code, exc.headers, raw)
                 failure = RcnApiError(exc.code, detail, reason_code=reason_code, restriction=restriction)
                 if future and attempt < 2:
                     if deadline is None:
@@ -166,7 +168,7 @@ class RcnClient:
                             continue
                 raise failure from exc
             except URLError as exc:
-                raise RcnApiError(0, str(exc.reason)) from exc
+                raise RcnApiError(0, "center connection failed", reason_code=network_failure_code(exc)) from exc
 
     def submit(self, job: JobEnvelope | dict) -> dict:
         runtime = self.require_minimum_version()
@@ -429,7 +431,7 @@ class RcnClient:
                 restriction=restriction,
             ) from exc
         except URLError as exc:
-            raise RcnApiError(0, str(exc.reason)) from exc
+            raise RcnApiError(0, "center connection failed", reason_code=network_failure_code(exc)) from exc
         event_type = ""
         data_lines: list[str] = []
         with response:

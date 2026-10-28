@@ -1,4 +1,31 @@
 .member-loading { display: grid; min-height: 50vh; place-items: center; color: var(--muted); }
+.member-pairing { border-top: 3px solid var(--green); }
+.member-pairing h2, .member-pairing-admin h2 { display: flex; align-items: center; gap: .5rem; }
+.member-pairing-fields { display: grid; gap: 1rem; border: 0; padding: 0; margin: 0; min-width: 0; }
+.member-pairing-fields > label:not(.member-consent), .member-pairing-form-row > label { display: grid; gap: .4rem; min-width: 0; }
+.member-pairing-fields input, .member-pairing-fields select { width: 100%; min-width: 0; }
+.member-pairing-fields > .member-consent input { width: 18px; }
+.member-pairing-fields > button { justify-self: start; }
+.member-pairing-form-row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
+.member-pairing-code-box { display: flex; flex-wrap: wrap; align-items: center; gap: 1.2rem; padding: 1.2rem; border: 1px solid var(--green); background: var(--green-soft); border-radius: 8px; }
+.member-pairing-code-box span { color: var(--muted); }
+.member-pairing-code-box strong { font: 700 clamp(1.6rem, 5vw, 2.3rem) ui-monospace, Consolas, monospace; letter-spacing: .16em; color: var(--green); overflow-wrap: anywhere; }
+.member-pairing-review { padding: 1rem; margin-top: 1rem; border: 1px solid var(--line); border-radius: 8px; min-width: 0; }
+.member-pairing-review > header { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
+.member-pairing-review h3 { margin: 0; }
+.member-pairing-review p { color: var(--muted); overflow-wrap: anywhere; }
+.member-pairing-review code { overflow-wrap: anywhere; }
+.member-pairing-code { font-size: 1.2rem; letter-spacing: .08em; }
+.member-pairing-unknown { padding: 1rem; background: var(--amber-soft); border-radius: 6px; }
+.member-advanced > section { margin-top: 1.1rem; }
+.member-connection-management { margin-bottom: 1.2rem; }
+.member-connection-management > summary { cursor: pointer; padding: 1rem; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; font-weight: 650; margin-bottom: 1rem; }
+@media (max-width: 600px) {
+  .member-pairing-form-row { grid-template-columns: minmax(0, 1fr); }
+  .member-pairing-admin > header { flex-wrap: wrap; }
+  .member-pairing-review { padding: .8rem; }
+  .member-pairing-review .member-metadata { grid-template-columns: minmax(0, 1fr); }
+}
 .member-client { font-size: .82rem; }
 .member-client h2 { font-size: 1rem; }
 .member-center { display: flex; gap: .5rem; align-items: center; min-width: 0; flex: 1; color: var(--green); }

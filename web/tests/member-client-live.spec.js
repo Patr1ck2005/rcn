@@ -7,6 +7,7 @@ test("real local broker imports and recovers one original Job with hash-verified
   const failures = [];
   page.on("pageerror", (error) => failures.push(error.message));
   await page.goto("/connect");
+  await page.getByText("高级恢复：使用已有个人登录信息", { exact: true }).click();
   await page.getByLabel("中心 HTTPS 地址").fill("https://center.example");
   await page.getByLabel("个人访问 token").fill("personal-a");
   await page.getByRole("button", { name: "连接并进入" }).click();

@@ -69,7 +69,7 @@ def test_local_journal_read_keeps_identity_checks_without_resolving_transport(tm
 
 
 def application(tmp_path, service, *, transfer_factory=OriginTransferClient, static_root=None,
-                ensure_running_callback=None):
+                ensure_running_callback=None, public_https=False):
     service.register_project(approved_grant(), actor_id="admin")
     class API:
         def __init__(self, url, token):
@@ -102,7 +102,9 @@ def application(tmp_path, service, *, transfer_factory=OriginTransferClient, sta
             return [item.model_dump(mode="json") for item in service.repository.list_artifact_manifests(job_id)]
         @property
         def base_url(self):
-            return "https://center.example"
+            # The legacy transfer fixture represents an existing managed
+            # loopback channel. New public HTTPS must not use its whole PUT.
+            return "https://center.example" if public_https else "http://127.0.0.1:28765"
         token = None
         timeout = 3
     fail_after_confirm = []
@@ -505,6 +507,21 @@ def complete_fixture(service, job_id, server):
     service.repository.put_job(job)
     server.result_index = {"job_id": job_id, "units": index}
     return job
+
+
+def test_public_https_upload_rejects_legacy_capabilities_without_sending_file(service, tmp_path):
+    package(tmp_path)
+    server=TransferServer()
+    app, _, _=application(tmp_path, service, transfer_factory=server.factory, public_https=True)
+    with TestClient(app) as browser:
+        login(browser)
+        operation_id, job_id=imported_operation(browser,tmp_path,count=2)
+        assert browser.post(f'/local/v1/operations/{operation_id}/upload').status_code==200
+        result=wait_for_transfer(app.state.broker,operation_id)
+        assert result['phase']=='upload-interrupted'
+        assert result['error']['reason_code']=='resumable_uploads_required'
+        assert result['job_id']==job_id and not server.puts
+        assert len(service.repository.list_jobs())==1
 
 
 def test_transfer_interruption_resumes_same_job_and_confirmed_bundle_bytes(service, tmp_path, monkeypatch):

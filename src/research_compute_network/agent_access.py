@@ -58,6 +58,16 @@ def parser():
     commands = result.add_subparsers(dest="action", required=True)
     commands.add_parser("status")
     commands.add_parser("capabilities")
+    join = commands.add_parser("join", help="Request online member admission or resume the original pairing")
+    join.add_argument("--center", dest="center_url")
+    join.add_argument("--name")
+    join.add_argument("--device-name")
+    join.add_argument("--agent", choices=["codex", "claude", "dsh", "generic"], default="generic")
+    join.add_argument("--label", default="RCN Agent")
+    join.add_argument("--status", action="store_true")
+    join.add_argument("--pairing-id")
+    join.add_argument("--wait", type=float, nargs="?", const=300, default=0,
+                      help="Wait at most this many seconds (default when supplied: 300; maximum: 3600)")
     doctor = commands.add_parser("doctor", help="Check connection without submitting or starting compute")
     doctor.add_argument("--repair", action="store_true", help="Explicitly restore only this owner's managed connection")
     commands.add_parser("context", help="Current installation, help index and original operation references")
@@ -105,7 +115,7 @@ def instruction_artifacts(broker, directory: Path) -> dict:
               "command_prefix": prefix, "launcher_kind": launcher_kind,
               "center_url": session.get("center_url", ""), "credential_storage": "windows-current-user-dpapi",
               "token_argv_supported": False, "submission_format": "rcn-data-package-v1",
-              "commands": ["status", "capabilities", "doctor", "context", "help", "configure", "plan", "submit", "watch", "cancel", "collect", "diagnostics", "pool"]}
+              "commands": ["join", "status", "capabilities", "doctor", "context", "help", "configure", "plan", "submit", "watch", "cancel", "collect", "diagnostics", "pool"]}
     (directory / "rcn-agent-access.json").write_text(json.dumps(config, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
     text = """# RCN personal Agent access
 
@@ -160,7 +170,37 @@ execution types or already running work.
 
 
 def execute(args, broker):
-    if args.action == "doctor":
+    if args.action == "join":
+        import math
+        import platform
+        from .member_pairing_client import LocalPairingRequest, pairing_status, start_pairing
+        if not math.isfinite(args.wait) or not 0 <= args.wait <= 3600:
+            raise AgentAccessError("member_pairing_wait_bounds_invalid")
+        if args.status:
+            value = pairing_status(broker, args.pairing_id, retry_doctor=True, resume=True)
+        else:
+            if not args.center_url or not args.name:
+                raise AgentAccessError("member_pairing_center_and_name_required")
+            value = start_pairing(broker, LocalPairingRequest(center_url=args.center_url, name=args.name,
+                device_name=args.device_name or platform.node(), agent=args.agent, label=args.label,
+                pairing_id=args.pairing_id))
+        _emit(value)
+        deadline = time.monotonic() + args.wait
+        previous = json.dumps(value, sort_keys=True)
+        while args.wait and value.get("state") == "pending":
+            remaining = deadline - time.monotonic()
+            if remaining <= 0:
+                _emit({"pairing_id": value["pairing_id"], "reason_code": "member_pairing_wait_timeout",
+                    "resume_same_pairing": True, "retry_arguments": ["join", "--status"]})
+                return 3
+            time.sleep(min(5, remaining))
+            value = pairing_status(broker, value["pairing_id"])
+            signature = json.dumps(value, sort_keys=True)
+            if signature != previous:
+                _emit(value)
+                previous = signature
+        return 2 if value.get("state") in {"rejected", "expired", "revoked"} else 0
+    elif args.action == "doctor":
         from .member_doctor import diagnose
         value = diagnose(broker, repair=args.repair)
         _emit(value)
@@ -193,7 +233,7 @@ def execute(args, broker):
         _emit(instruction_artifacts(broker, args.output))
     elif args.action == "capabilities":
         value = {"schema_version": 1, "kind": "rcn-agent-access", "credential_storage": "windows-current-user-dpapi",
-                 "token_argv_supported": False, "commands": ["status", "capabilities", "doctor", "context", "help", "configure", "plan", "submit", "watch", "cancel", "collect", "diagnostics", "pool"],
+                 "token_argv_supported": False, "commands": ["join", "status", "capabilities", "doctor", "context", "help", "configure", "plan", "submit", "watch", "cancel", "collect", "diagnostics", "pool"],
                  "session": broker.session(refresh=bool(broker.login))}
         if broker.login and value["session"].get("online"):
             for key, path in [("submission_policy", "/v1/me/submission-policy"), ("credits", "/v1/me/credits"), ("profiles", "/v1/profiles")]:
@@ -313,6 +353,10 @@ def main(argv=None):
         broker = MemberBroker(args.state_root or default_client_root())
         return execute(args, broker)
     except KeyboardInterrupt:
+        if args.action == "join":
+            _emit({"reason_code": "member_pairing_wait_interrupted", "resume_same_pairing": True,
+                "retry_arguments": ["join", "--status"]})
+            return 130
         _emit({"reason_code": "agent_action_interrupted", "resume_same_operation": True})
         return 130
     except (RcnApiError, HTTPException, CredentialUnavailable, ValueError, OSError, RuntimeError) as exc:
@@ -324,6 +368,20 @@ def main(argv=None):
         code = exc.reason_code if isinstance(exc, AgentAccessError) else detail["reason_code"]
         resumable = args.action in {"plan", "submit", "watch", "cancel", "collect", "diagnostics"}
         report = {**detail, "reason_code": code, "resume_same_operation": resumable}
+        if args.action == "join":
+            import re
+            original_code = (exc.detail.get("reason_code") if isinstance(exc, HTTPException)
+                and isinstance(exc.detail, dict) else getattr(exc, "reason_code", None))
+            if isinstance(original_code, str) and re.fullmatch(r"(?:invalid_)?member_pairing_[a-z_]{1,80}", original_code):
+                report["reason_code"] = original_code
+            report.update(resume_same_pairing=True, retry_arguments=["join", "--status"])
+            if broker is not None:
+                try:
+                    from .member_client import _read_json
+                    identifier = _read_json(broker.root / "member-pairings" / "current.json")["pairing_id"]
+                    report["pairing_id"] = str(UUID(identifier))
+                except (ValueError, OSError, KeyError, TypeError):
+                    pass
         operation_id = getattr(args, "operation_id", None)
         try:
             operation_id = str(UUID(operation_id)) if operation_id else None

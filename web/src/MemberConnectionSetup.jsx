@@ -1,9 +1,10 @@
 import { useEffect, useRef, useState } from "react";
 import { BookOpen, CheckCircle2, Copy, Download, KeyRound, RefreshCw, Upload } from "lucide-react";
-import { Link, useLocation } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { api } from "./api";
 import { useMutationGuard } from "./useMutationGuard";
 import MemberAgentSetup from "./MemberAgentSetup";
+import MemberPairing from "./MemberPairing";
 import { memberIdentityVerified } from "./memberAgentConfig";
 import {
   connectionError, connectionStages, downloadDoctorReport, importComplete, importPreview, importRunning,
@@ -19,7 +20,6 @@ function ManualConnection({ session, onSession }) {
   const [personalToken, setPersonalToken] = useState("");
   const [error, setError] = useState("");
   const mutation = useMutationGuard();
-  const location = useLocation();
   const submit = (event) => mutation.run(async () => {
     setError("");
     try {
@@ -28,8 +28,8 @@ function ManualConnection({ session, onSession }) {
     } catch (failure) { setError(connectionError(failure)); }
     finally { setPersonalToken(""); }
   }, event);
-  return <details className="member-panel member-advanced" open={location.pathname === "/connect" || Boolean(configured) || undefined}>
-    <summary>高级：使用已有个人登录信息</summary><p>已有管理员提供的个人访问凭据时，可手动登录 HTTPS 中心；组内受管连接请优先导入私密连接包。</p>
+  return <details className="member-panel member-advanced">
+    <summary>高级恢复：使用已有个人登录信息</summary><p>已有个人访问凭据时，可手动登录 HTTPS 中心；新成员请使用上方“加入课题组”。</p>
     <form className="member-manual-form" onSubmit={submit}>{configured
       ? <label>管理员预配置的中心连接<input value="课题组计算中心" readOnly /></label>
       : <label>中心 HTTPS 地址<input type="url" name="center_url" value={center} onChange={(event) => setCenter(event.target.value)} placeholder="https://compute.example.org" pattern="https://.*" required autoComplete="url" /></label>}
@@ -50,6 +50,7 @@ export default function MemberConnectionSetup({ session, onSession, onRetry, err
   const [action, setAction] = useState("");
   const [repairConfirmed, setRepairConfirmed] = useState(false);
   const [importConfirmed, setImportConfirmed] = useState(false);
+  const [pairingReady, setPairingReady] = useState(false);
   const mutation = useMutationGuard();
   const doctorMutation = useMutationGuard();
   const mounted = useRef(true);
@@ -115,9 +116,11 @@ export default function MemberConnectionSetup({ session, onSession, onRetry, err
   const canRepair = doctor?.checks?.some((check) => ["member_openssh_missing", "member_connection_unavailable"].includes(check.reason_code));
   const currentPreview = record?.preview;
   const canReplace = !mutation.busy && !importRunning(record) && !["unknown", "recovery_required"].includes(record?.state);
-  return <main className="app-page member-page member-setup"><div className="page-title"><div><span>MEMBER / SETUP</span><h1>连接与 Agent 配置</h1><p>安装客户端后，导入管理员为你签发的私密连接包，再选择使用的 Agent。</p></div><Link className="button" to="/app/help"><BookOpen size={16} />帮助与文档</Link></div>
-    <ol className="member-steps member-setup-steps" aria-label="成员接入流程"><li className="done">安装客户端</li><li className={online ? "done" : "current"}>导入个人连接包</li><li className={online ? "current" : ""}>一键配置 Agent</li></ol>
-    <section className="member-panel"><header><h2><KeyRound size={18} /> 1 · 导入个人连接包</h2><span className="member-badge">{online ? "个人身份已连接" : "等待个人连接"}</span></header>
+  return <main className="app-page member-page member-setup"><div className="page-title"><div><span>MEMBER / SETUP</span><h1>连接与 Agent 配置</h1><p>{session?.connected ? "管理当前个人连接与 Agent，或运行自检恢复连接。" : "填写姓名与设备，申请加入课题组，批准后自动连接。"}</p></div><Link className="button" to="/app/help"><BookOpen size={16} />帮助与文档</Link></div>
+    {!session?.connected && <ol className="member-steps member-setup-steps" aria-label="成员接入流程"><li className="current">申请加入</li><li>管理员核对与批准</li><li>自动连接与配置 Agent</li></ol>}
+    <MemberPairing session={session} onSession={onSession} onReadyChange={setPairingReady} />
+    <details className="member-panel member-advanced" open={Boolean(record || recoverId) || undefined}><summary>高级恢复：导入已有个人连接包</summary>
+    <section><header><h2><KeyRound size={18} /> 导入个人连接包</h2><span className="member-badge">{online ? "个人身份已连接" : "等待个人连接"}</span></header>
       <p>组内受管 SSH 与 HTTPS 连接均从同一入口接入。连接包仅供你本人使用，由本机客户端安全保存；无需另行复制 Agent token。</p>
       <div className="member-actions"><label className={`button button-primary member-file-button${canReplace ? "" : " disabled"}`}><Upload size={16} />{action === "upload" ? "正在校验连接包…" : "选择私密连接包"}<input aria-label="选择私密连接包" type="file" accept=".zip,.rcn,application/zip" onChange={importFile} disabled={!canReplace} /></label>
         {recoverId && <button className="button" disabled={mutation.busy} onClick={recover}><RefreshCw size={16} />{action === "recover" ? "正在读取原导入…" : "恢复同一导入"}</button>}
@@ -134,7 +137,8 @@ export default function MemberConnectionSetup({ session, onSession, onRetry, err
       </div>}
       {(error || externalError) && <div className="form-error" role="alert">{error || externalError}</div>}
       {externalError && <button className="button small" onClick={onRetry}>恢复本机连接</button>}
-    </section>
+    </section></details>
+    <details className="member-connection-management" open={!pairingReady || undefined}><summary>连接自检与更多 Agent 配置</summary>
     <section className="member-panel"><header><h2><CheckCircle2 size={18} /> 连接自检与恢复</h2><span>未登录、离线或配置损坏时均可使用</span></header><p>点击后检查本机配置、连接通道和个人身份。报告仅保留脱敏检查结果，可直接交给 Agent。</p>
       <div className="member-actions"><button className="button" disabled={doctorMutation.busy || mutation.busy} onClick={() => runDoctor(false)}><RefreshCw size={16} />{doctorMutation.busy ? "正在自检…" : "重新自检"}</button>
         {doctor && <><button className="button" onClick={copyReport}><Copy size={16} />复制诊断给 Agent</button><button className="button" onClick={() => downloadDoctorReport(doctor)}><Download size={16} />下载诊断 JSON</button></>}</div>
@@ -146,8 +150,9 @@ export default function MemberConnectionSetup({ session, onSession, onRetry, err
       {doctorError && <div className="form-error" role="alert">{doctorError}</div>}
     </section>
     {session?.connected && <MemberAgentSetup session={session} onSession={onSession} doctor={doctor} onCheck={() => runDoctor(false)} checking={doctorMutation.busy} embedded />}
+    </details>
     {!session?.connected && <ManualConnection session={session} onSession={(value) => { setDoctor(null); onSession(value); }} />}
     {notice && <p className="member-notice" role="status">{notice}</p>}
-    {session?.connected && <div className="member-actions"><Link className="button" to="/app/submit">继续提交任务</Link><Link className="button" to="/app/contribution">可选：贡献我的电脑</Link></div>}
+    {session?.connected && !pairingReady && <div className="member-actions"><Link className="button" to="/app/submit">继续提交任务</Link><Link className="button" to="/app/contribution">可选：贡献我的电脑</Link></div>}
   </main>;
 }

@@ -15,6 +15,13 @@ from .client import RcnApiError
 
 
 ERRORS = {
+    "resumable_uploads_required": ("transfer", "中心版本尚不支持公网分段上传", "请管理员升级中心后继续原上传；不重新创建 Job，也不退回整文件上传。"),
+    "center_dns_unavailable": ("domain", "暂时无法解析中心域名", "核对课题组链接和本机网络；域名恢复后继续原申请，无需重装。"),
+    "center_certificate_invalid": ("certificate", "中心 HTTPS 证书未通过验证", "核对电脑日期和课题组链接；若仍失败，请管理员检查证书，不要关闭证书验证。"),
+    "center_tls_failed": ("certificate", "无法建立 HTTPS 加密连接", "检查本机网络或代理设置，再继续原申请；不要改为 HTTP 或关闭验证。"),
+    "center_tunnel_unavailable": ("tunnel", "公网入口暂时没有连接到课题组中心", "请管理员检查 WKR 的 Tunnel 服务；本机身份和传输进度保留，无需重装。"),
+    "center_origin_unavailable": ("center", "公网入口已响应，但中心暂不可达或超时", "请管理员检查中心服务和 Tunnel 回源；稍后继续原操作，无需重新申请。"),
+    "center_gateway_tls_failed": ("certificate", "公网入口与中心的证书连接失败", "请管理员检查网关的证书配置；保留本机记录，无需重装。"),
     "member_client_port_in_use_by_another_service": ("port", "客户端端口被其他程序占用", "关闭占用该端口的程序后重新打开客户端；不会自动终止其他进程。"),
     "member_credentials_dpapi_failed": ("identity", "当前 Windows 用户无法解密原登录", "使用原 Windows 用户登录，或导入本人的接入包重新连接；原任务保留。"),
     "member_credentials_invalid": ("identity", "本机登录记录无法读取", "重新导入本人的接入包；不要删除任务和结果目录。"),

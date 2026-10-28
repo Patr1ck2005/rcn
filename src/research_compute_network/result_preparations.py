@@ -179,9 +179,13 @@ class PreparationIndex:
 
 class ResultPreparations:
     def __init__(self, control_root: Path | None, *, gate=None, idle_seconds=IDLE_SECONDS,
-                 terminal_cache_limit=TERMINAL_CACHE_LIMIT, drain_ready_grace_seconds=DRAIN_READY_GRACE_SECONDS):
+                 terminal_cache_limit=TERMINAL_CACHE_LIMIT, drain_ready_grace_seconds=DRAIN_READY_GRACE_SECONDS,
+                 max_active=8, max_actor_active=2):
         if type(terminal_cache_limit) is not int or terminal_cache_limit < 1:
             raise ValueError("terminal ticket cache must retain at least one entry")
+        if any(type(value) is not int or value < 1 for value in (max_active, max_actor_active)):
+            raise ValueError("preparation limits must be positive integers")
+        self.max_active, self.max_actor_active = max_active, max_actor_active
         self.directory = Path(control_root) / "result-preparations" if control_root is not None else None
         self.gate = gate
         self.idle_seconds = idle_seconds
@@ -290,7 +294,7 @@ class ResultPreparations:
                 self.draining = False
             active = [item for item in self.tickets.values() if not self._deferred(item) and (item.admission is not None or
                       item.document["state"] in {"queued", "verifying", "restore_pending", "ready", "cancelling"})]
-            if len(active) >= 8 or sum(item.document["actor_id"] == actor_id for item in active) >= 2:
+            if len(active) >= self.max_active or sum(item.document["actor_id"] == actor_id for item in active) >= self.max_actor_active:
                 if admission is not None:
                     admission.release()
                 raise HTTPException(429, {"reason_code": "preparation_capacity"}, headers={"Retry-After": "5"})

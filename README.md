@@ -6,11 +6,13 @@
 
 RCN coordinates research jobs across a group of contributed machines. It provides a Python control plane, resource-aware scheduler, dispatcher, browser console, Windows member client, and a CLI for personal Agent access. Projects submit structured jobs through registered execution profiles; RCN tracks placement, attempts, recovery, result manifests, and audit events.
 
-This checkout contains the **0.15.0a5 public preview**, extracted from a system used in a private research group. The source includes real scheduling and operations code. Public examples and the local demo use synthetic data. Internal use does not establish unattended deployment or acceptance in another lab.
+This checkout contains the **0.15.0a6 public preview candidate**, extracted from a system used in a private research group. The source includes real scheduling and operations code. Public examples and the local demo use synthetic data. Internal use does not establish unattended deployment or acceptance in another lab.
 
 ![Synthetic RCN overview; no production data](https://github.com/Patr1ck2005/rcn/releases/download/v0.15.0-alpha.1/rcn-overview-demo.png)
 
-[Download alpha.5](https://github.com/Patr1ck2005/rcn/releases/tag/v0.15.0-alpha.5). Windows members install **RCN-Member-Setup.exe** and import the personal connection bundle supplied privately by their operator. The installer includes Python and client dependencies; members do not need a separate runtime ZIP or developer environment. Release wheels include the built console.
+Windows members start at [GitHub Releases](https://github.com/Patr1ck2005/rcn/releases): install **RCN-Member-Setup.exe**, request HTTPS membership, and obtain one approval from their group's private administrator console. The client then configures the selected Agent and runs diagnostics automatically. Python and dependencies are included. See the single [member onboarding guide](docs/member-onboarding-guide.md); ZIP and SSH are advanced recovery paths.
+
+Operators configure their own HTTPS endpoint using the [generic ingress example](config/member-ingress.example.json). This research group's intended endpoint is **https://rcn.my1ab.fyi**; its alpha.6 HTTPS acceptance and release publication are **pending**, as tracked in the [release notes](docs/releases/0.15.0a6.md). It is not a default service for other deployments.
 
 ## What it does
 
@@ -67,7 +69,7 @@ npm --prefix web test
 npm --prefix web run build
 ```
 
-The frontend build writes generated assets into the Python package for local use and wheel assembly. Keep generated assets, screenshots, runtime archives, credentials, and local state out of source commits. See [contributing](docs/contributing.md), [security](docs/security.md), and the [preview release notes](docs/releases/0.15.0a5.md).
+The frontend build writes generated assets into the Python package for local use and wheel assembly. Keep generated assets, screenshots, runtime archives, credentials, and local state out of source commits. See [contributing](docs/contributing.md), [security](docs/security.md), and the [preview release notes](docs/releases/0.15.0a6.md).
 
 ## License
 

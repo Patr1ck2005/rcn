@@ -25,6 +25,7 @@ CAPABILITIES={
     'person_submission_policy':1,'compute_credits':1,'control_operation_replay':1,
     'canonical_job_contract':1,'durable_collection':1,'resumable_result_transfer':1,
     'personal_agent_credentials':1,'member_connection_bundle':1,'member_agent_stable_entry':1,
+    'member_online_pairing':1,'member_https_ingress':1,'resumable_origin_upload':1,
 }
 
 

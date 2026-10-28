@@ -16,7 +16,7 @@ test("archive retrieval stays visible and browsing never starts another transfer
   });
   await page.goto("/app/runs");
   await expect(page.locator(".member-badge")).toHaveText("等待归档取回");
-  await expect(page.getByText("原下载记录和已核验文件会保留。", { exact: false })).toBeVisible();
+  await expect(page.getByText("保留原下载记录和已核验文件。", { exact: false })).toBeVisible();
   await expect(page.getByRole("button", { name: "暂停结果下载" })).toBeVisible();
   expect(fixture.calls.filter((call) => call.method !== "GET")).toEqual([]);
   expect(fixture.jobsCreated()).toBe(0);
@@ -40,6 +40,7 @@ for (const mode of ["https", "managed-ssh"]) {
       return route.fulfill({ json: session });
     });
     await page.goto("/connect");
+    await page.getByText("高级恢复：使用已有个人登录信息", { exact: true }).click();
     await expect(page.getByLabel("管理员预配置的中心连接")).toHaveValue("课题组计算中心");
     await expect(page.getByLabel("中心 HTTPS 地址")).toHaveCount(0);
     await expect(page.locator("body")).not.toContainText(reference);
@@ -60,13 +61,14 @@ for (const mode of ["https", "managed-ssh"]) {
     expect(fixture.jobsCreated()).toBe(1);
     if (await page.getByRole("button", { name: "打开导航", exact: true }).isVisible()) await page.getByRole("button", { name: "打开导航", exact: true }).click();
     await page.getByRole("button", { name: "退出个人登录" }).click();
+    await page.getByText("高级恢复：使用已有个人登录信息", { exact: true }).click();
     await expect(page.getByLabel("管理员预配置的中心连接")).toBeVisible();
     await expect(page.getByLabel("个人访问 token")).toHaveValue("");
     await expectNoOverflow(page);
   });
 }
 
-test("unselected connection keeps the ordinary HTTPS entry and performs no automatic login", async ({ page }) => {
+test("unselected connection keeps HTTPS in advanced recovery and performs no automatic login", async ({ page }) => {
   await memberApiFixture(page, { connected: false });
   const logins = [];
   await page.route("**/local/v1/session", async (route) => {
@@ -74,6 +76,7 @@ test("unselected connection keeps the ordinary HTTPS entry and performs no autom
     return route.fulfill({ json: { connected: false, center_url: "", configured_connection: null } });
   });
   await page.goto("/connect");
+  await page.getByText("高级恢复：使用已有个人登录信息", { exact: true }).click();
   await expect(page.getByLabel("中心 HTTPS 地址")).toHaveValue("");
   await expect(page.getByLabel("管理员预配置的中心连接")).toHaveCount(0);
   expect(logins).toEqual([]);
@@ -91,6 +94,7 @@ test("member connection uses the local session and never persists a personal tok
   const fixture = await memberApiFixture(page, { connected: false });
   await page.addInitScript(() => sessionStorage.setItem("rcn-pilot-token", "old-central-test-token"));
   await page.goto("/connect");
+  await page.getByText("高级恢复：使用已有个人登录信息", { exact: true }).click();
   await page.getByLabel("中心 HTTPS 地址").fill("https://compute.example.org");
   await page.getByLabel("个人访问 token").fill("private-member-test-token");
   await page.getByRole("button", { name: "连接并进入" }).click();

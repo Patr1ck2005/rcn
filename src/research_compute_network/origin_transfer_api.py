@@ -33,6 +33,7 @@ from .origin import MAX_BUNDLE_BYTES, OriginSpool
 from .origin_transfer import CHUNK_BYTES, TRANSFER_PROTOCOL, identifier, managed_path, publish_new_file, verify_file
 from .origin_assets import TransferAssetValidationCache, asset_path, declared_asset, verify_asset
 from .origin_transfer_diagnostics import OriginTransferDiagnostics
+from .origin_upload_sessions import UploadSessions, UploadSessionRequest, UPLOAD_CHUNK_BYTES
 from .spool_relocation import SpoolRelocationRegistry
 from .storage_roots import StorageRootError
 from .storage_lifecycle import StorageMetadataBusy
@@ -479,11 +480,14 @@ class OriginTransferStore:
                 self._claims.pop(key, None)
             self._reservations.pop(key, None)
 
-    def publish(self, job, unit, temporary):
+    def publish(self, job, unit, temporary, *, before_publish=None):
         self.check_write()
         spool = self.spool()
         descriptor = spool._validate_archive(job, unit, temporary)
         target = self.outgoing(job, unit)
+        if before_publish is not None:
+            before_publish()
+        self.check_write()
         try:
             publish_new_file(temporary, target)
             repeated = False
@@ -517,11 +521,14 @@ def build_origin_transfer_router(*, repository, auth, root, require_owner, enabl
         transfer_gate = get_transfer_gate(control_root)
     preparations = ResultPreparations(control_root, gate=transfer_gate)
     router.result_preparations = preparations
+    uploads = UploadSessions(store, control_root, repository=repository, gate=transfer_gate)
+    router.upload_sessions = uploads
     if restore_sources is None and lifecycle is not None:
         from .restore_sources import RegisteredResultSources
         restore_sources = RegisteredResultSources(lifecycle)
     router.restore_sources = restore_sources
     router.add_event_handler("shutdown", preparations.close)
+    router.add_event_handler("shutdown", uploads.close)
 
     def admitted_transfer(function):
         @wraps(function)
@@ -591,11 +598,141 @@ def build_origin_transfer_router(*, repository, auth, root, require_owner, enabl
                 "max_bundle_bytes": store.max_bytes, "artifact_ownership": "origin_submitter",
                 "bundle_status": True, "bundle_source_receipts": True, "max_parallel_uploads": 4,
                 "content_addressed_inputs": 1, "asset_encoding": "gzip",
+                "resumable_uploads": 1, "upload_chunk_bytes": UPLOAD_CHUNK_BYTES,
+                "resumable_upload_encodings": ["identity"],
                 "result_preparations": True, "result_range_resume": True,
                 "registered_archive_restore": restore_sources is not None,
                 "result_preparation_idle_seconds": 120, "max_ready_result_tickets": 8,
                 "max_actor_ready_result_tickets": 2, "max_result_verifications": 2,
                 "max_volume_result_verifications": 1}
+
+    def upload_binding(job_id, context, kind, target_id):
+        job = owned_job(job_id, context, target_id if kind == "bundle" else None)
+        if kind == "bundle":
+            unit = unit_for(job, target_id)
+            target = store.outgoing(job, unit)
+            holder = job_id + "/" + target_id
+        else:
+            try:
+                declared_asset(job, target_id)
+                target = asset_path(store.root, job, target_id)
+            except ValueError as exc:
+                raise HTTPException(409, {"reason_code": "upload_asset_binding_invalid"}) from exc
+            holder = f"asset/{job.origin_submitter_id}/{job.project_id}/{target_id}"
+        binding = sha256_value(dict(job_id=job.job_id, origin_submitter_id=job.origin_submitter_id,
+            project_id=job.project_id, user_id=job.user_id, request_hash=job.request_hash,
+            kind=kind, target_id=target_id))
+        return job, target, holder, binding
+
+    def upload_validator(job_id, context, authorization):
+        def validate(document):
+            # No bearer is persisted in a session or a preparation ticket.
+            current = auth.actor(authorization)
+            if current.actor_id != context.actor_id:
+                raise HTTPException(403, {"reason_code": "upload_actor_changed"})
+            job, _, _, binding = upload_binding(job_id, current, document["kind"], document["target_id"])
+            if binding != document["binding"]:
+                raise HTTPException(409, {"reason_code": "upload_job_binding_changed"})
+            if document["kind"] == "asset":
+                record = declared_asset(job, document["target_id"])
+                if (record.size_bytes, record.sha256) != (document["size_bytes"], document["sha256"]):
+                    raise HTTPException(409, {"reason_code": "upload_asset_binding_changed"})
+            store.check_write()
+            return job
+        return validate
+
+    @router.post("/v1/jobs/{job_id}/origin-upload-sessions")
+    @admitted_transfer
+    async def initialize_upload(job_id: str, body: UploadSessionRequest, request: Request, context: AuthContext = Depends(auth.actor)):
+        job, target, holder, binding = await joined_io(upload_binding, job_id, context, body.kind, body.target_id)
+        if body.size_bytes > store.max_bytes or (body.kind == "bundle" and body.size_bytes == 0):
+            raise HTTPException(413, {"reason_code": "upload_size_invalid"})
+        if body.kind == "asset":
+            record = declared_asset(job, body.target_id)
+            if (record.size_bytes, record.sha256) != (body.size_bytes, body.sha256):
+                raise HTTPException(409, {"reason_code": "upload_asset_binding_changed"})
+        result = await joined_io(uploads.initialize, context.actor_id, job_id, body,
+                                 target=target, holder_key=holder, binding=binding)
+        if result["ready"] or result["verification_required"]:
+            return await finalize_upload(job_id, result["session_id"], request, context)
+        return result
+
+    @router.get("/v1/jobs/{job_id}/origin-upload-sessions/{session_id}")
+    async def upload_session_status(job_id: str, session_id: str, context: AuthContext = Depends(auth.actor)):
+        await joined_io(owned_job, job_id, context)
+        return await joined_io(uploads.status, session_id, context.actor_id, job_id)
+
+    @router.put("/v1/jobs/{job_id}/origin-upload-sessions/{session_id}/chunk")
+    @admitted_transfer
+    async def upload_chunk(job_id: str, session_id: str, request: Request, context: AuthContext = Depends(auth.actor)):
+        await joined_io(owned_job, job_id, context)
+        offset, length = request.headers.get("upload-offset", ""), request.headers.get("content-length", "")
+        digest = request.headers.get("x-rcn-sha256", "")
+        if (not re.fullmatch(r"[0-9]{1,12}", offset) or not re.fullmatch(r"[0-9]{1,12}", length)
+            or not re.fullmatch(r"[0-9a-f]{64}", digest) or request.headers.get("content-encoding", "identity") != "identity"):
+            raise HTTPException(400, {"reason_code": "upload_chunk_headers_invalid"})
+        offset, length = int(offset), int(length)
+        if not 0 < length <= UPLOAD_CHUNK_BYTES:
+            raise HTTPException(413, {"reason_code": "upload_chunk_size_invalid"})
+        writer = await joined_io(uploads.begin_chunk, session_id, context.actor_id, job_id, offset, length,
+                                 on_cancelled_result=lambda writer: writer.close())
+        try:
+            content = bytearray()
+            async for chunk in request.stream():
+                if len(content) + len(chunk) > length:
+                    raise HTTPException(413, {"reason_code": "upload_chunk_size_invalid"})
+                content.extend(chunk)
+            if len(content) != length:
+                raise HTTPException(422, {"reason_code": "upload_chunk_truncated"})
+            validate = upload_validator(job_id, context, request.headers.get("authorization"))
+            return await joined_io(uploads.append, writer, offset, content, digest, validate)
+        except ClientDisconnect as exc:
+            raise HTTPException(400, {"reason_code": "upload_chunk_interrupted"}) from exc
+        except OSError as exc:
+            raise HTTPException(507, {"reason_code": "upload_io_failed"}) from exc
+        finally:
+            await joined_io(writer.close)
+
+    @router.post("/v1/jobs/{job_id}/origin-upload-sessions/{session_id}/finalize", status_code=202)
+    async def finalize_upload(job_id: str, session_id: str, request: Request, context: AuthContext = Depends(auth.actor)):
+        await joined_io(owned_job, job_id, context)
+        validate = upload_validator(job_id, context, request.headers.get("authorization"))
+        def verify_existing(document):
+            if document["kind"] == "asset":
+                receipt = asset_status(job_id, document["target_id"], context)
+                accepted = (receipt.get("size_bytes"), receipt.get("sha256")) == (document["size_bytes"], document["sha256"])
+            else:
+                receipt = bundle_status(job_id, document["target_id"], document["sha256"], document["size_bytes"], context)
+                accepted = ((receipt.get("size_bytes"), receipt.get("sha256")) == (document["size_bytes"], document["sha256"])
+                    or (receipt.get("accepted_source_size_bytes"), receipt.get("accepted_source_sha256")) == (document["size_bytes"], document["sha256"]))
+            if not receipt.get("ready") or not accepted:
+                raise HTTPException(409, {"reason_code": "upload_published_content_changed"})
+            return dict(receipt, already_present=True)
+        def publish(document, partial, recheck):
+            job = validate(document)
+            if document["kind"] == "bundle":
+                receipt = store.publish(job, unit_for(job, document["target_id"]), partial, before_publish=recheck)
+                event_type = "origin_transfer.bundle_published"
+            else:
+                target = asset_path(store.root, job, document["target_id"])
+                recheck()
+                try:
+                    publish_new_file(partial, target)
+                except FileExistsError:
+                    verify_file(target, document["size_bytes"], document["sha256"])
+                receipt = dict(job_id=job_id, sha256=document["sha256"], size_bytes=document["size_bytes"], ready=True)
+                event_type = "origin_transfer.asset_published"
+            repository.append_event(AuditEvent(event_type=event_type, actor_id=context.actor_id,
+                subject_type="job", subject_id=job_id, details=dict(receipt, upload_session_id=session_id)))
+            return receipt
+        return await joined_io(uploads.finalize, session_id, context.actor_id, job_id, validate, publish,
+                               verify_existing=verify_existing)
+
+    @router.delete("/v1/jobs/{job_id}/origin-upload-sessions/{session_id}")
+    @admitted_transfer
+    async def cancel_upload(job_id: str, session_id: str, context: AuthContext = Depends(auth.actor)):
+        await joined_io(owned_job, job_id, context)
+        return await joined_io(uploads.cancel, session_id, context.actor_id, job_id)
 
     @router.get("/v1/jobs/{job_id}/origin-assets/{digest}")
     def asset_status(job_id: str, digest: str, context: AuthContext = Depends(auth.actor)):

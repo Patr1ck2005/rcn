@@ -6,6 +6,7 @@ import { Link, Navigate, NavLink, Route, Routes, useLocation, useNavigate } from
 import { api } from "./api";
 import { MyPersonalAccess } from "./PersonalAccess";
 import MemberConnectionSetup from "./MemberConnectionSetup";
+import { pausePairingResume } from "./MemberPairing";
 import { connectionError } from "./memberConnectionModel";
 import { usePageRefresh } from "./usePageRefresh";
 import { DATA_REFRESH_EVENT, watchPageReturn } from "./freshness";
@@ -46,7 +47,7 @@ export default function MemberClient({ capabilities }) {
   }, { initial: true, intervalMs: 15000, listen: false });
   useEffect(() => watchPageReturn(() => { void refreshSession(); window.dispatchEvent(new Event(DATA_REFRESH_EVENT)); }), [refreshSession]);
   const logout = () => mutation.run(async () => {
-    try { await api("/local/v1/session", { method: "DELETE" }); sessionRevision.current += 1; setSession((previous) => ({ ...previous, connected: false, actor: null })); navigate("/connect"); }
+    try { await api("/local/v1/session", { method: "DELETE" }); pausePairingResume(); sessionRevision.current += 1; setSession((previous) => ({ ...previous, connected: false, actor: null })); setNavOpen(false); navigate("/connect"); }
     catch (failure) { setError(errorMessage(failure)); }
   });
   const actor = sessionActor(session);
@@ -67,7 +68,7 @@ export default function MemberClient({ capabilities }) {
     </nav><div className="nav-account"><div><span>{actor.actor_id || actor.user_id || "尚未连接个人身份"}</span><small>个人身份 · {capabilities?.client_version || "成员客户端"}</small></div>{connected && <button title="退出个人登录" aria-label="退出个人登录" disabled={mutation.busy} onClick={logout}><LogOut size={17} /></button>}</div>
   </aside><section className="app-workspace"><header className="workspace-header">
     <button className="nav-toggle" aria-label="打开导航" aria-expanded={navOpen} onClick={() => setNavOpen(!navOpen)}><Menu size={19} /></button>
-    <div className={`member-center${online ? "" : " offline"}`}><CheckCircle2 size={16} /><span>{loading ? "正在读取本机状态" : online ? "中心已连接" : connected ? "中心连接未确认" : "等待导入个人连接"}</span><small>{session?.configured_connection ? "管理员预配置的中心连接" : session?.center_url}</small></div>
+    <div className={`member-center${online ? "" : " offline"}`}><CheckCircle2 size={16} /><span>{loading ? "正在读取本机状态" : online ? "中心已连接" : connected ? "中心连接未确认" : "加入课题组以连接中心"}</span><small>{session?.configured_connection ? "管理员预配置的中心连接" : session?.center_url}</small></div>
     <button className="icon-button" aria-label="刷新连接" onClick={() => { void refreshSession(); window.dispatchEvent(new Event(DATA_REFRESH_EVENT)); }}><RefreshCw size={17} /></button>
   </header>{error && <div className="inline-error" role="alert">{error}</div>}
     {connected && !online && <div className="member-offline" role="status"><b>当前离线，保留本机身份与提交记录。</b><p>{session.connection_error?.message || "可以查看本机记录或暂停自己的计算。提交、上传、下载与恢复接活需要重新连接中心。"}</p><Link to="/app/setup">连接自检与恢复</Link> · <Link to="/app/contribution">管理本机计算与暂停</Link></div>}

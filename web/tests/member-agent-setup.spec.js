@@ -30,6 +30,7 @@ test("HTTPS login enters identity/self-check/Agent export and requires explicit 
     return route.fulfill({ json: bundle(body.target, "member-alice", body.agent_id) });
   });
   await page.goto("/connect");
+  await page.getByText("高级恢复：使用已有个人登录信息", { exact: true }).click();
   await page.getByLabel("中心 HTTPS 地址").fill("https://compute.example.org");
   await page.getByLabel("个人访问 token").fill("synthetic-HTTPS-wizard-token");
   await page.getByRole("button", { name: "连接并进入", exact: true }).click();

@@ -267,6 +267,8 @@ class MemberBroker:
         with self.lock:
             if self.busy:
                 raise HTTPException(409, "传输仍在进行，请先等待或关闭客户端后重开")
+            from .member_pairing_client import pause_pairing_resume
+            pause_pairing_resume(self)
             self.credentials.clear()
             self.login = None
             self.actor = None
@@ -533,6 +535,10 @@ class MemberBroker:
             value = self.read_operation(operation_id)
             client = self.client()
             transfer = self.transfer_factory(client)
+            if not collect and urlsplit(client.base_url).scheme == "https":
+                # Public proxies cannot safely accept the legacy whole-file
+                # fallback. The same broker serves the UI and Agent entry.
+                transfer.require_resumable_uploads = True
             if collect:
                 from .collection import CollectionRunner
                 frozen = value.get("collection_request")
@@ -795,6 +801,8 @@ def create_member_app(*, state_root: Path | None = None, credential_store=None,
     app = FastAPI(title="RCN member client", lifespan=lifespan)
     app.state.broker = broker
     app.state.contribution = contribution
+    from .member_pairing_client import build_local_pairing_router
+    app.include_router(build_local_pairing_router(broker))
     local_session = secrets.token_urlsafe(32)
     hosts = ["127.0.0.1", "localhost"]
     if api_factory is not member_api_client:
@@ -854,6 +862,7 @@ def create_member_app(*, state_root: Path | None = None, credential_store=None,
     def capabilities():
         return {"mode": "member-client", "schema_version": 1, "contribution_supported": True,
                 "connection_bundle_import": 1, "member_diagnostics": 1, "self_service_agent_credentials": 1,
+                "online_member_pairing": 1,
                 "submission_operation_schema": 1, "instance_id": getattr(app.state, "instance_id", None)}
 
     @app.post("/local/v1/doctor")

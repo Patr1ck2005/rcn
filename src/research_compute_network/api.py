@@ -474,8 +474,12 @@ def create_app(
             )
             payload["restriction"] = restriction.model_dump(mode="json")
         return JSONResponse(status_code=exc.status_code, content=payload, headers=exc.headers)
+    from .public_member_ingress import INGRESS_HOST, PublicMemberIngress
     if trusted_hosts:
-        app.add_middleware(TrustedHostMiddleware, allowed_hosts=trusted_hosts)
+        # The managed ingress fixes this origin Host; its outer guard limits
+        # the public route surface and requires explicit member identity.
+        app.add_middleware(TrustedHostMiddleware, allowed_hosts=[*trusted_hosts, INGRESS_HOST])
+    app.add_middleware(PublicMemberIngress, state_root=state.root)
     app.state.repository = repository
     app.state.service = service
     app.state.dataset_mode = dataset_mode
@@ -503,6 +507,8 @@ def create_app(
     app.include_router(build_personal_access_router(repository=repository, auth=auth))
     from .agent_credentials import build_agent_credentials_router
     app.include_router(build_agent_credentials_router(repository=repository, auth=auth))
+    from .member_pairing import build_member_pairing_router
+    app.include_router(build_member_pairing_router(repository=repository, auth=auth, state_root=state.root))
 
     def job_visibility(context):
         if UserRole.ADMIN in context.roles:

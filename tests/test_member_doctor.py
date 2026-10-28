@@ -21,7 +21,7 @@ def test_offline_help_does_not_create_broker_or_touch_credentials(monkeypatch, c
         raise AssertionError("offline help must not initialize credentials")
     monkeypatch.setattr(agent_access, "MemberBroker", forbidden)
     assert agent_access.main(["help", "read", "member-getting-started"]) == 0
-    assert "接入包" in capsys.readouterr().out
+    assert "join --status" in capsys.readouterr().out
     assert agent_access.main(["help", "list", "--format", "json"]) == 0
     assert json.loads(capsys.readouterr().out)["offline_available"]
 

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import hashlib
+import io
 import gzip
 import ipaddress
 import json
@@ -13,6 +14,7 @@ import tempfile
 import time
 import zipfile
 from concurrent.futures import ThreadPoolExecutor
+from http.client import HTTPException as HTTPTransportError
 from pathlib import Path
 from urllib.error import HTTPError, URLError
 from urllib.parse import urlencode, urlsplit
@@ -48,8 +50,9 @@ class ResultCapacityError(OriginTransferCapacityError):
 
 
 class OriginTransferClient:
-    def __init__(self, client):
+    def __init__(self, client, *, require_resumable_uploads=False):
         self.client = client
+        self.require_resumable_uploads = require_resumable_uploads
         parsed = urlsplit(client.base_url)
         try:
             loopback = parsed.hostname == "localhost" or ipaddress.ip_address(parsed.hostname or "").is_loopback
@@ -128,7 +131,82 @@ class OriginTransferClient:
             capabilities = self._read_json(response)
         if capabilities.get("protocol") != TRANSFER_PROTOCOL or capabilities.get("enabled") is not True:
             raise RcnApiError(503, "origin transfer is unavailable; no local fallback")
+        if self.require_resumable_uploads and capabilities.get("resumable_uploads") != 1:
+            raise RcnApiError(409, "coordinator lacks required resumable uploads; no downgrade",
+                              reason_code="resumable_uploads_required")
         return capabilities
+
+    def _upload_resumable(self, job_id, kind, target_id, source, size, digest, capabilities):
+        # A public ingress must never receive one multi-GiB HTTP request.
+        chunk_bytes = 8 * 1024**2
+        if (capabilities.get("upload_chunk_bytes") != chunk_bytes
+            or "identity" not in capabilities.get("resumable_upload_encodings", [])):
+            raise RcnApiError(409, "unsupported resumable upload contract; no downgrade",
+                              reason_code="resumable_uploads_required")
+        base = f"/v1/jobs/{identifier(job_id)}/origin-upload-sessions"
+        identity = dict(kind=kind, target_id=target_id, size_bytes=size, sha256=digest, encoding="identity")
+        def request(path, *, body=None, method="GET", headers=None):
+            selected = dict(headers or {})
+            if body is not None:
+                selected["Content-Length"] = str(len(body))
+            with self._open(path, method=method, data=io.BytesIO(body) if body is not None else None, headers=selected) as response:
+                return self._read_json(response)
+        status = request(base, body=json.dumps(identity).encode(), method="POST", headers={"Content-Type": "application/json"})
+        session_id = identifier(status.get("session_id", ""))
+        url = base + "/" + session_id
+        uploaded, failures = 0, 0
+        deadline = time.monotonic() + 3600
+        with source.open("rb") as incoming:
+            while True:
+                if (status.get("job_id") != job_id or status.get("session_id") != session_id
+                    or any(status.get(k) != v for k, v in identity.items())
+                    or type(status.get("offset")) is not int or not 0 <= status["offset"] <= size
+                    or (status["offset"] != size and status["offset"] % chunk_bytes)):
+                    raise ValueError("invalid resumable upload acknowledgement")
+                state, offset = status.get("state"), status["offset"]
+                if state == "completed":
+                    receipt = status.get("receipt", {})
+                    if receipt.get("job_id") != job_id or receipt.get("ready") is not True:
+                        raise ValueError("invalid resumable publication acknowledgement")
+                    if kind == "bundle" and receipt.get("work_unit_id") != target_id:
+                        raise ValueError("invalid resumable bundle acknowledgement")
+                    accepted = ((receipt.get("size_bytes"), receipt.get("sha256")) == (size, digest)
+                        or (kind == "bundle" and (receipt.get("accepted_source_size_bytes"), receipt.get("accepted_source_sha256")) == (size, digest)))
+                    if not accepted:
+                        raise ValueError("resumable acknowledgement differs from source bytes")
+                    return receipt, uploaded, max(0, size - uploaded)
+                if state in {"failed", "cancelled"}:
+                    raise RcnApiError(409, "resumable upload verification failed; retain the original Job",
+                                      reason_code=status.get("reason_code"))
+                if time.monotonic() >= deadline:
+                    raise RcnApiError(0, "upload remains resumable; retry the same Job")
+                try:
+                    if state == "uploading" and offset < size:
+                        incoming.seek(offset)
+                        content = incoming.read(min(chunk_bytes, size - offset))
+                        if len(content) != min(chunk_bytes, size - offset):
+                            raise ValueError("upload source changed size")
+                        status = request(url + "/chunk", method="PUT", body=content, headers={
+                            "Content-Type": "application/octet-stream", "Content-Length": str(len(content)),
+                            "Upload-Offset": str(offset), "X-RCN-SHA256": hashlib.sha256(content).hexdigest()})
+                        uploaded += len(content)
+                    elif state == "uploading":
+                        status = request(url + "/finalize", method="POST", body=b"")
+                    elif state == "verifying":
+                        time.sleep(1)
+                        status = request(url)
+                    else:
+                        raise ValueError("unknown resumable upload state")
+                    failures = 0
+                except (RcnApiError, OSError, HTTPTransportError) as exc:
+                    code = getattr(exc, "status", 0)
+                    if code not in {0, 409, 429, 503} or failures >= 2:
+                        raise
+                    failures += 1
+                    time.sleep(1)
+                    # Lost responses are reconciled by durable offset before
+                    # sending bytes again; an unknown acknowledgement is not 0.
+                    status = request(url)
 
     def upload_bundles(self, job: JobEnvelope, spool_root: str | Path, *,
                        max_workers: int = 1, unit_ids=None, progress=None):
@@ -171,6 +249,9 @@ class OriginTransferClient:
                 raise ValueError("sealed bundle exceeds coordinator transfer limit")
             digest = sha256_file(source)
             url = f"/v1/jobs/{identifier(job.job_id)}/origin-bundles/{identifier(unit.work_unit_id)}"
+            if capabilities.get("resumable_uploads") == 1:
+                return self._upload_resumable(job.job_id, "bundle", unit.work_unit_id,
+                                              source, size, digest, capabilities)
             if capabilities.get("bundle_status") is True:
                 status_url = url
                 if capabilities.get("bundle_source_receipts") is True:
@@ -221,6 +302,15 @@ class OriginTransferClient:
                     if record.size_bytes > capabilities["max_bundle_bytes"]:
                         raise ValueError("asset exceeds coordinator transfer limit")
                     source = verify_asset(spool.root, job, record)
+                    if capabilities.get("resumable_uploads") == 1:
+                        receipt, uploaded, skipped = self._upload_resumable(job.job_id, "asset", record.sha256,
+                            source, record.size_bytes, record.sha256, capabilities)
+                        if receipt.get("sha256") != record.sha256 or receipt.get("size_bytes") != record.size_bytes:
+                            raise ValueError("invalid resumable asset acknowledgement")
+                        counters["uploaded_asset_bytes"] += uploaded
+                        counters["skipped_asset_bytes"] += skipped
+                        notify("assets")
+                        continue
                     url = f"/v1/jobs/{identifier(job.job_id)}/origin-assets/{record.sha256}"
                     with self._open(url) as response:
                         status = self._read_json(response)

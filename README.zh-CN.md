@@ -6,9 +6,11 @@
 
 RCN 负责把结构化科研任务分配到研究组贡献的机器上，提供 Python 控制面、资源调度、Dispatcher、网页控制台、Windows 成员客户端，以及个人 Agent CLI。任务按登记的执行 Profile 运行，系统记录放置条件、运行尝试、恢复过程、结果清单与审计事件。
 
-本工作树为 **0.15.0a5 公开预览版源码**，从研究组实际使用的系统中提取通用源码。调度与运维代码来自真实使用；公开示例和本地 demo 全部使用合成数据。组内使用经历不等于陌生实验室已完成部署验收。
+本工作树为 **0.15.0a6 公开预览候选源码**，从研究组实际使用的系统中提取通用源码。调度与运维代码来自真实使用；公开示例和本地 demo 全部使用合成数据。组内使用经历不等于陌生实验室已完成部署验收。
 
-[alpha.5 下载入口](https://github.com/Patr1ck2005/rcn/releases/tag/v0.15.0-alpha.5)。普通 Windows 成员安装 **RCN-Member-Setup.exe**，再导入管理员私发给本人的个人连接包。安装包已包含 Python 和客户端依赖，无需另下 runtime ZIP 或配置开发环境。
+普通 Windows 成员从 [GitHub Releases](https://github.com/Patr1ck2005/rcn/releases) 下载 **RCN-Member-Setup.exe**，经 **HTTPS join → 私有管理入口批准一次 → 自动 Agent 配置与自检** 接入。安装包自带 Python 和依赖，无需克隆源码或配置开发环境。精确命令和原编号恢复只在[唯一成员指南](docs/member-onboarding-guide.md)维护；ZIP 与 SSH 用于高级恢复。
+
+部署者按[通用配置示例](config/member-ingress.example.json)设置自己的 HTTPS 中心。本组拟用入口为 **https://rcn.my1ab.fyi**，alpha.6 的公网 HTTPS 验收和发行发布当前均为 **pending**，见[版本说明](docs/releases/0.15.0a6.md)；这不是其他部署的默认公共服务。
 
 ## 可以做什么
 
@@ -65,7 +67,7 @@ npm --prefix web test
 npm --prefix web run build
 ```
 
-网页构建产物用于本机运行和 wheel 打包，不提交到源码历史。生成截图、runtime 档案、凭据与本地状态同样不入库。参见[贡献指南](docs/contributing.md)、[安全说明](docs/security.md)和[版本说明](docs/releases/0.15.0a5.md)。
+网页构建产物用于本机运行和 wheel 打包，不提交到源码历史。生成截图、runtime 档案、凭据与本地状态同样不入库。参见[贡献指南](docs/contributing.md)、[安全说明](docs/security.md)和[版本说明](docs/releases/0.15.0a6.md)。
 
 RCN 源码采用 [MIT](LICENSE)，版权归 2026 Patr1ck2005。依赖保留各自许可证；MIT 不覆盖第三方组件、外部 runtime 或商业求解器，详见[第三方说明](docs/third-party-notices.md)。
 

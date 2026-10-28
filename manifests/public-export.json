@@ -114,7 +114,25 @@
     "web/src/memberConnectionModel.test.jsx",
     "web/src/memberAgentConfig.test.jsx",
     "web/tests/member-agent-setup.spec.js",
-    "web/tests/member-connection-setup.spec.js"
+    "web/tests/member-connection-setup.spec.js",
+    "src/research_compute_network/client.py",
+    "src/research_compute_network/member_pairing.py",
+    "src/research_compute_network/member_pairing_client.py",
+    "src/research_compute_network/origin_upload_sessions.py",
+    "src/research_compute_network/public_member_ingress.py",
+    "src/research_compute_network/transport_diagnostics.py",
+    "tests/test_member_pairing.py",
+    "tests/test_member_pairing_client.py",
+    "tests/test_origin_upload_sessions.py",
+    "tests/test_public_member_ingress.py",
+    "tests/test_transport_diagnostics.py",
+    "tests/test_member_doctor.py",
+    "web/src/AdminMemberPairing.jsx",
+    "web/src/MemberPairing.jsx",
+    "web/src/MemberPairing.test.jsx",
+    "web/tests/member-pairing.spec.js",
+    "web/tests/member-client-live.spec.js",
+    "tests/test_member_client.py"
   ],
   "required_files": [
     "docs/member-task-package-guide.zh.md",
@@ -137,7 +155,7 @@
         "docs/",
         "src/research_compute_network/help_content/public/getting-started.md"
       ],
-      "reason": "Deployment configuration, entry documentation and onboarding differ. Internal connection policy uses managed SSH; public onboarding defaults to HTTPS. Internal operational records are not exported."
+      "reason": "Deployment configuration, entry documentation and operational records differ. New member pairing uses operator-configured HTTPS; existing managed SSH remains an advanced recovery option. Private operational records are not exported."
     },
     {
       "paths": [
