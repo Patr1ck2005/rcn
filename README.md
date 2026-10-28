@@ -6,11 +6,11 @@
 
 RCN coordinates research jobs across a group of contributed machines. It provides a Python control plane, resource-aware scheduler, dispatcher, browser console, Windows member client, and a CLI for personal Agent access. Projects submit structured jobs through registered execution profiles; RCN tracks placement, attempts, recovery, result manifests, and audit events.
 
-This checkout contains the **0.15.0a5 public-preview candidate**, extracted from a system used in a private research group. The source includes real scheduling and operations code. Public examples and the local demo use synthetic data. Internal use does not establish unattended deployment or acceptance in another lab.
+This checkout contains the **0.15.0a5 public preview**, extracted from a system used in a private research group. The source includes real scheduling and operations code. Public examples and the local demo use synthetic data. Internal use does not establish unattended deployment or acceptance in another lab.
 
 ![Synthetic RCN overview; no production data](https://github.com/Patr1ck2005/rcn/releases/download/v0.15.0-alpha.1/rcn-overview-demo.png)
 
-[Forthcoming alpha.5 downloads](https://github.com/Patr1ck2005/rcn/releases/tag/v0.15.0-alpha.5). This is candidate source; alpha.5 downloads will become available after the release is published. Release wheels include the built console, and the Windows client installer includes Python and client dependencies.
+[Download alpha.5](https://github.com/Patr1ck2005/rcn/releases/tag/v0.15.0-alpha.5). Windows members install **RCN-Member-Setup.exe** and import the personal connection bundle supplied privately by their operator. The installer includes Python and client dependencies; members do not need a separate runtime ZIP or developer environment. Release wheels include the built console.
 
 ## What it does
 
