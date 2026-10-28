@@ -40,6 +40,34 @@ class Credentials:
         self.value = None
 
 
+def test_local_journal_read_keeps_identity_checks_without_resolving_transport(tmp_path, monkeypatch):
+    from research_compute_network import member_client
+    broker = MemberBroker(tmp_path / "local-journal", credential_store=Credentials())
+    operation_id = str(uuid4())
+    try:
+        broker.actor = {"actor_id": "user-a"}
+        broker.login = {"center_url": "https://original.example", "token": "synthetic"}
+        member_client._write_json(broker.journal_path(operation_id), {
+            "operation_id": operation_id, "actor_id": "user-a", "center_url": "https://original.example"})
+        monkeypatch.setattr(broker, "session", lambda **kw: pytest.fail("local journal resolved transport"))
+        assert broker.read_operation(operation_id)["operation_id"] == operation_id
+        broker.actor = {"actor_id": "user-b"}
+        with pytest.raises(HTTPException) as denied:
+            broker.read_operation(operation_id)
+        assert denied.value.status_code == 403
+        broker.actor = {"actor_id": "user-a"}
+        broker.login["center_url"] = "https://other.example"
+        with pytest.raises(HTTPException) as changed:
+            broker.read_operation(operation_id)
+        assert changed.value.status_code == 409
+        broker.login = None
+        with pytest.raises(HTTPException) as absent:
+            broker.read_operation(operation_id)
+        assert absent.value.status_code == 403
+    finally:
+        broker.close()
+
+
 def application(tmp_path, service, *, transfer_factory=OriginTransferClient, static_root=None,
                 ensure_running_callback=None):
     service.register_project(approved_grant(), actor_id="admin")

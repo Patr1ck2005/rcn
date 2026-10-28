@@ -366,16 +366,21 @@ class MemberBroker:
         return self.root / "operations" / (_uuid(operation_id) + ".json")
 
     def read_operation(self, operation_id):
-        path = self.journal_path(operation_id)
-        if not path.exists():
-            raise HTTPException(404, "提交记录不存在")
-        value = _read_json(path)
-        actor = self.session()["actor"]
-        if not actor or value["actor_id"] != actor["actor_id"]:
-            raise HTTPException(403, "该提交属于另一位成员")
-        if value.get("center_url") != self.login["center_url"]:
-            raise HTTPException(409, "请连接这次提交原来的中心")
-        return value
+        # A private journal read checks its current login, owner and center. It
+        # does not use the transport, so do not repeatedly parse connection.json
+        # (and spawn native ACL checks) for every local transfer state update.
+        # Actual network requests still resolve and validate the current channel.
+        with self.lock:
+            path = self.journal_path(operation_id)
+            if not path.exists():
+                raise HTTPException(404, "提交记录不存在")
+            value = _read_json(path)
+            actor, login = self.actor, self.login
+            if not login or not actor or value["actor_id"] != actor["actor_id"]:
+                raise HTTPException(403, "该提交属于另一位成员")
+            if value.get("center_url") != login["center_url"]:
+                raise HTTPException(409, "请连接这次提交原来的中心")
+            return value
 
     def update(self, operation_id, **fields):
         with self.lock:

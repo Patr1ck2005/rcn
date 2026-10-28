@@ -178,3 +178,34 @@ def test_custom_opener_carries_json_and_sse_without_global_urlopen(monkeypatch):
     assert client._request("GET", "/v1/me") == {"ok": True}
     assert list(client.iter_events()) == [{"sequence": 1}]
     assert all(r.get_header("Authorization") == "Bearer synthetic-token" for r in opener.requests)
+
+
+@pytest.mark.parametrize("status", [0, 503])
+def test_unknown_operation_reply_gives_original_retry_and_never_echoes_remote_code(tmp_path, monkeypatch, capsys, status):
+    broker = Broker(tmp_path)
+    operation_id = broker.receipt["operation_id"]
+    def fail(_):
+        from research_compute_network.client import RcnApiError
+        raise RcnApiError(status, "synthetic-secret", reason_code="synthetic-secret")
+    broker.confirm = fail
+    monkeypatch.setattr(agent_access, "MemberBroker", lambda root: broker)
+    assert agent_access.main(["submit", "--operation-id", operation_id]) == 2
+    output = capsys.readouterr().out
+    value = json.loads(output)
+    assert "synthetic-secret" not in output
+    assert value["reason_code"] == "operation_response_unconfirmed"
+    assert value["operation_id"] == operation_id and value["resume_same_operation"]
+    assert value["retry_arguments"] == ["submit", "--operation-id", operation_id]
+    assert operation_id in value["next_action"]
+
+
+def test_revoked_login_does_not_suggest_blind_operation_retry(tmp_path, monkeypatch, capsys):
+    broker = Broker(tmp_path)
+    def fail(_):
+        from research_compute_network.client import RcnApiError
+        raise RcnApiError(401, "revoked")
+    broker.confirm = fail
+    monkeypatch.setattr(agent_access, "MemberBroker", lambda root: broker)
+    assert agent_access.main(["submit", "--operation-id", broker.receipt["operation_id"]]) == 2
+    value = json.loads(capsys.readouterr().out)
+    assert value["reason_code"] == "center_login_required" and "retry_arguments" not in value

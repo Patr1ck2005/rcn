@@ -157,11 +157,12 @@ def test_lost_probe_response_is_same_import_no_remote_mutation(local):
             return actual.current_actor()
         return SimpleNamespace(current_actor=current)
     broker.api_factory = unreliable
-    identifier = preview(broker)
+    raw = package()
+    identifier = preview(broker, raw)
     with pytest.raises(bundles.ConnectionImportError, match="center_unavailable") as found:
         bundles.confirm_import(broker, identifier)
     assert TOKEN not in str(found.value) and broker.login is None
-    assert bundles.preview_bundle(broker, package())["import_id"] == identifier
+    assert bundles.preview_bundle(broker, raw)["import_id"] == identifier
     assert bundles.confirm_import(broker, identifier)["state"] == "completed"
     assert len(calls) == 1
 

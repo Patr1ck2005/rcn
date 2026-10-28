@@ -2,9 +2,13 @@
 from __future__ import annotations
 
 from datetime import datetime, timezone
+import errno
+import hashlib
 from pathlib import Path
+import secrets
 import sys
-from uuid import uuid4
+import threading
+from uuid import UUID, uuid4
 
 from . import member_registration as storage
 from .client import RcnApiError
@@ -30,6 +34,9 @@ ERRORS = {
     "member_connection_unavailable": ("connection", "受管连接尚未建立", "重新检查连接，或重新导入本人的接入包。"),
     "member_agent_launcher_unavailable": ("agent", "Agent 稳定入口尚未就绪", "使用同一 Setup 修复安装，再在客户端重新导出 Agent 配置。"),
     "member_installation_integrity_failed": ("installation", "安装文件未通过完整性核验", "从管理员给出的同一发行版本重新安装；身份与结果保留。"),
+    "member_installation_verification_unavailable": ("installation", "暂时无法完成安装完整性核验", "稍后重新检查；仍失败时将诊断交给本机 Agent，保留原身份与结果。"),
+    "member_agent_registration_unconfirmed": ("agent", "此 Agent 的登记尚未确认", "在成员客户端继续原 Agent 实例并重新检查，保留原编号与任务。"),
+    "member_agent_connection_binding_changed": ("agent", "此 Agent 的登记与当前身份不一致", "使用原成员客户端检查此 Agent，保留原编号与任务；不要复制他人的配置。"),
     "agent_submission_not_eligible": ("submission", "个人提交准入尚未启用或已暂停", "请管理员核对本人的提交策略与获授权 Profile，再继续原 Agent 实例。"),
     "submission_person_not_active_member": ("submission", "当前账号不是可提交任务的有效成员", "请管理员核对本人的成员身份；无需再索取第二份 token。"),
     "personal_login_required": ("login", "此操作需要个人登录", "在成员客户端导入本人的个人接入包，再配置 Agent；Agent 凭据不能创建其他凭据。"),
@@ -99,21 +106,98 @@ def _check(stage, status, message, *, code=None, action=None):
             "message": message, "next_action": action, "help_slug": "member-getting-started"}
 
 
+# A full snapshot pins every file until the inventory has been verified. Two
+# concurrent UI requests can exceed the Windows CRT descriptor limit even when
+# each snapshot is valid. Serialize verification, without caching its result.
+_installation_check_lock = threading.Lock()
+
+
 def installed_integrity():
     from .member_client_installer import verify_snapshot
     release = Path(sys.executable).absolute().parents[2]
     if not (release / "member-software-release.json").is_file():
         return _check("installation", "skipped", "当前为开发或旧版命令环境，未宣称安装包完整性已验证。")
     try:
-        verify_snapshot(release)
-    except (ValueError, RuntimeError, OSError):
-        return error_detail(RuntimeError("member_installation_integrity_failed"))
+        with _installation_check_lock:
+            verify_snapshot(release, expected_payload_id=release.name)
+    except (ValueError, RuntimeError, KeyError, TypeError) as exc:
+        result = error_detail(RuntimeError("member_installation_integrity_failed"))
+        reason = str(exc)
+        result["verification_reason"] = reason if reason in {
+            "member_software_linked_directory", "member_software_files_changed",
+            "member_software_manifest_invalid", "member_software_directory_identity_changed",
+            "member_software_identity_changed", "member_software_runtime_catalog_changed",
+        } else "invalid_snapshot"
+        return result
+    except OSError as exc:
+        missing = isinstance(exc, FileNotFoundError)
+        result = error_detail(RuntimeError("member_installation_integrity_failed" if missing else
+                                         "member_installation_verification_unavailable"))
+        result["verification_reason"] = ("snapshot_file_missing" if missing else
+            "resource_exhausted" if exc.errno in {errno.EMFILE, errno.ENFILE, errno.ENOMEM} else
+            "sharing_violation" if getattr(exc, "winerror", None) in {32, 33} else
+            "permission_denied" if isinstance(exc, PermissionError) else "snapshot_io_unavailable")
+        return result
     return _check("installation", "passed", "已安装文件与发行清单一致。")
+
+
+def _agent_check(broker, current_actor):
+    """Distinguish this isolated Agent from the desktop's Agent manager."""
+    login = broker.login
+    cached_actor = login.get("actor") or {}
+    registration = cached_actor.get("agent_registration")
+    path = broker.root / "agent-profile.json"
+    own_root = (broker.root.parent.name == "agents" or registration is not None
+                or "agent" in cached_actor.get("scopes", []) or path.exists())
+    if own_root:
+        if current_actor is None:
+            return _check("agent", "skipped", "中心身份确认后检查此 Agent 的原登记。",
+                          action="重新检查连接后继续原 Agent 实例。")
+        # The resolver has already checked the public profile against this login.
+        # Reuse its sealed registration rather than decrypting/revalidating again.
+        # Legacy pre-issued Agent logins have no sealed registration attachment.
+        from .member_agent_config import AGENT_TARGETS, _read_profile
+        if not isinstance(registration, dict):
+            from fastapi import HTTPException
+            try:
+                storage._check_private_file(path)
+                registration = _read_profile(path)
+            except (RuntimeError, ValueError, OSError, HTTPException):
+                return error_detail(RuntimeError("member_agent_connection_binding_changed"))
+        try:
+            if (broker.root.parent.name != "agents" or str(UUID(broker.root.name)) != broker.root.name
+                    or registration.get("schema_version") != 1
+                    or registration.get("target") not in AGENT_TARGETS
+                    or registration.get("agent_id") != broker.root.name
+                    or registration.get("actor_id") != cached_actor.get("actor_id")
+                    or registration.get("actor_id") != current_actor.get("actor_id")
+                    or registration.get("center_url") != login.get("center_url")
+                    or "agent" not in current_actor.get("scopes", [])
+                    or set(current_actor.get("roles", [])) != {"member"}
+                    or not secrets.compare_digest(registration.get("credential_fingerprint", ""),
+                        hashlib.sha256(login["token"].encode("utf-8")).hexdigest())
+                    or (registration.get("credential_id") is not None
+                        and registration["credential_id"] != current_actor.get("credential_id"))
+                    or (registration.get("credential_origin") == "self_service"
+                        and (not registration.get("credential_id")
+                             or registration["credential_id"] != cached_actor.get("credential_id")))):
+                raise ValueError("binding_changed")
+        except (ValueError, TypeError, KeyError):
+            return error_detail(RuntimeError("member_agent_connection_binding_changed"))
+        if registration.get("registration_state", "confirmed") != "confirmed":
+            return error_detail(RuntimeError("member_agent_registration_unconfirmed"))
+        return _check("agent", "passed", "已确认此 Agent 的独立登记与当前凭据。")
+    directory = broker.root / "agents"
+    count = len(list(directory.glob("*/agent-profile.json"))) if directory.is_dir() else 0
+    return _check("agent", "passed" if count else "warning",
+        f"本机已有 {count} 个 Agent 配置。" if count else "尚未配置 Agent。",
+        action=None if count else "在连接与 Agent 配置页选择 Agent，点击一键配置。")
 
 
 def diagnose(broker, *, repair=False, verify_install=True):
     """One call, one channel resolution. Never submits work or grants compute."""
     checks = [installed_integrity()] if verify_install else []
+    current_actor = None
     try:
         storage._private_directory(broker.root, create=False)
         checks.append(_check("local_identity", "passed", "本机客户端目录属于当前用户。"))
@@ -154,7 +238,9 @@ def diagnose(broker, *, repair=False, verify_install=True):
         actor = api.current_actor()
         if actor.get("actor_id") != (broker.login.get("actor") or {}).get("actor_id"):
             raise RuntimeError("member_connection_owner_or_root_changed")
-        checks.append(_check("login", "passed", "中心已确认当前个人身份。"))
+        current_actor = actor
+        checks.append(_check("login", "passed", "中心已确认当前 Agent 身份。" if
+                             "agent" in actor.get("scopes", []) else "中心已确认当前个人身份。"))
         view = api._request("GET", "/v1/me/submission-policy")
         policy = view.get("policy") if isinstance(view, dict) else None
         enabled = bool(isinstance(policy, dict) and policy.get("approved") and not policy.get("paused")
@@ -168,11 +254,7 @@ def diagnose(broker, *, repair=False, verify_install=True):
     except (RcnApiError, RuntimeError, ValueError, OSError) as exc:
         checks.append(error_detail(exc, stage="center"))
     # Do not refresh authentication a second time just to enumerate local profiles.
-    directory = broker.root / "agents"
-    count = len(list(directory.glob("*/agent-profile.json"))) if directory.is_dir() else 0
-    checks.append(_check("agent", "passed" if count else "warning",
-        f"本机已有 {count} 个 Agent 配置。" if count else "尚未配置 Agent。",
-        action=None if count else "在连接与 Agent 配置页选择 Agent，点击一键配置。"))
+    checks.append(_agent_check(broker, current_actor))
     return _result(checks)
 
 

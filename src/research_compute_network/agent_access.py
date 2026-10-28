@@ -12,7 +12,7 @@ import os
 from pathlib import Path
 import sys
 import time
-from uuid import uuid4
+from uuid import UUID, uuid4
 from urllib.parse import quote
 
 from fastapi import HTTPException
@@ -319,8 +319,26 @@ def main(argv=None):
         # Network/native exception text can contain response bodies or secrets.
         from .member_doctor import error_detail
         detail = error_detail(exc)
-        code = getattr(exc, "reason_code", None) or detail["reason_code"]
-        _emit({**detail, "reason_code": code, "resume_same_operation": args.action in {"plan", "submit", "watch", "cancel", "collect", "diagnostics"}})
+        # Remote reason text is not a trusted diagnostic code. Local CLI errors
+        # have fixed literals; all other errors use the doctor's allowlist.
+        code = exc.reason_code if isinstance(exc, AgentAccessError) else detail["reason_code"]
+        resumable = args.action in {"plan", "submit", "watch", "cancel", "collect", "diagnostics"}
+        report = {**detail, "reason_code": code, "resume_same_operation": resumable}
+        operation_id = getattr(args, "operation_id", None)
+        try:
+            operation_id = str(UUID(operation_id)) if operation_id else None
+        except (TypeError, ValueError, AttributeError):
+            operation_id = None
+        if resumable and operation_id:
+            report["operation_id"] = operation_id
+            if isinstance(exc, RcnApiError) and exc.status in {0, 408, 425, 429, 500, 502, 503, 504}:
+                report.update(stage="operation", reason_code="operation_response_unconfirmed",
+                    message="本次操作回执未确认，原任务编号已保留。",
+                    next_action=f"保留原操作编号 {operation_id}；网络恢复后继续原 {args.action} 命令。不要生成新编号、重新配置 Agent 或重新导入接入包。",
+                    help_slug="member-task-package")
+                if args.action != "plan":
+                    report["retry_arguments"] = [args.action, "--operation-id", operation_id]
+        _emit(report)
         return 2
     finally:
         if broker is not None and not broker.closed:
