@@ -6,13 +6,15 @@
 
 RCN coordinates research jobs across a group of contributed machines. It provides a Python control plane, resource-aware scheduler, dispatcher, browser console, Windows member client, and a CLI for personal Agent access. Projects submit structured jobs through registered execution profiles; RCN tracks placement, attempts, recovery, result manifests, and audit events.
 
-This checkout contains the **0.15.0a6 public preview candidate**, extracted from a system used in a private research group. The source includes real scheduling and operations code. Public examples and the local demo use synthetic data. Internal use does not establish unattended deployment or acceptance in another lab.
+This checkout contains the **0.15.0a6 public preview**, extracted from a system used in a private research group. The source includes real scheduling and operations code. Public examples and the local demo use synthetic data. Internal use does not establish unattended deployment or acceptance in another lab.
 
 ![Synthetic RCN overview; no production data](https://github.com/Patr1ck2005/rcn/releases/download/v0.15.0-alpha.1/rcn-overview-demo.png)
 
-Windows members start at [GitHub Releases](https://github.com/Patr1ck2005/rcn/releases): install **RCN-Member-Setup.exe**, request HTTPS membership, and obtain one approval from their group's private administrator console. The client then configures the selected Agent and runs diagnostics automatically. Python and dependencies are included. See the single [member onboarding guide](docs/member-onboarding-guide.md); ZIP and SSH are advanced recovery paths.
+Windows members: [download Setup](https://github.com/Patr1ck2005/rcn/releases/download/v0.15.0-alpha.6/RCN-Member-Setup.exe) and [verify its hash](https://github.com/Patr1ck2005/rcn/releases/download/v0.15.0-alpha.6/SHA256SUMS.txt), install it, request HTTPS membership, and obtain one approval from their group's private administrator console. The client then configures the selected Agent and runs diagnostics automatically. Python and dependencies are included. See the single [member onboarding guide](docs/member-onboarding-guide.md); ZIP and SSH are advanced recovery paths.
 
-Operators configure their own HTTPS endpoint using the [generic ingress example](config/member-ingress.example.json). This research group's intended endpoint is **https://rcn.my1ab.fyi**; its alpha.6 HTTPS acceptance and release publication are **pending**, as tracked in the [release notes](docs/releases/0.15.0a6.md). It is not a default service for other deployments.
+Operators configure their own HTTPS endpoint using the [generic ingress example](config/member-ingress.example.json). This research group's **https://rcn.my1ab.fyi** endpoint is live; alpha.6 passed actual HTTPS pairing, a 112 MiB synthetic upload and verified result collection before the endpoint switched to the production center. See the [release notes and remaining acceptance boundaries](docs/releases/0.15.0a6.md). It is not a default service for other deployments.
+
+Give your local Agent this repository link and ask it to follow the member onboarding guide, verify and install the published Setup, request membership using your name and device, then continue the original pairing after administrator approval. Scientific task preparation still follows your project's own rules.
 
 ## What it does
 

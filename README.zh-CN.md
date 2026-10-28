@@ -6,11 +6,13 @@
 
 RCN 负责把结构化科研任务分配到研究组贡献的机器上，提供 Python 控制面、资源调度、Dispatcher、网页控制台、Windows 成员客户端，以及个人 Agent CLI。任务按登记的执行 Profile 运行，系统记录放置条件、运行尝试、恢复过程、结果清单与审计事件。
 
-本工作树为 **0.15.0a6 公开预览候选源码**，从研究组实际使用的系统中提取通用源码。调度与运维代码来自真实使用；公开示例和本地 demo 全部使用合成数据。组内使用经历不等于陌生实验室已完成部署验收。
+本工作树为 **0.15.0a6 公开预览源码**，从研究组实际使用的系统中提取通用源码。调度与运维代码来自真实使用；公开示例和本地 demo 全部使用合成数据。组内使用经历不等于陌生实验室已完成部署验收。
 
-普通 Windows 成员从 [GitHub Releases](https://github.com/Patr1ck2005/rcn/releases) 下载 **RCN-Member-Setup.exe**，经 **HTTPS join → 私有管理入口批准一次 → 自动 Agent 配置与自检** 接入。安装包自带 Python 和依赖，无需克隆源码或配置开发环境。精确命令和原编号恢复只在[唯一成员指南](docs/member-onboarding-guide.md)维护；ZIP 与 SSH 用于高级恢复。
+普通 Windows 成员[下载 Setup](https://github.com/Patr1ck2005/rcn/releases/download/v0.15.0-alpha.6/RCN-Member-Setup.exe)、[核对哈希](https://github.com/Patr1ck2005/rcn/releases/download/v0.15.0-alpha.6/SHA256SUMS.txt)后安装，经 **HTTPS join → 私有管理入口批准一次 → 自动 Agent 配置与自检** 接入。安装包自带 Python 和依赖，无需克隆源码或配置开发环境。精确命令和原编号恢复只在[唯一成员指南](docs/member-onboarding-guide.md)维护；ZIP 与 SSH 用于高级恢复。
 
-部署者按[通用配置示例](config/member-ingress.example.json)设置自己的 HTTPS 中心。本组拟用入口为 **https://rcn.my1ab.fyi**，alpha.6 的公网 HTTPS 验收和发行发布当前均为 **pending**，见[版本说明](docs/releases/0.15.0a6.md)；这不是其他部署的默认公共服务。
+部署者按[通用配置示例](config/member-ingress.example.json)设置自己的 HTTPS 中心。本组入口 **https://rcn.my1ab.fyi** 已上线；真实公网配对、112 MiB 合成数据上传和结果校验通过后，入口已切到正式中心。通过范围与延期项见[版本说明](docs/releases/0.15.0a6.md)；这不是其他部署的默认公共服务。
+
+把本仓库链接交给自己的 Agent，并说明：“请按成员指南核对并安装已发布的 Setup，用我的姓名和设备申请入组；管理员批准后继续原申请，完成自检和 Agent 配置。科研任务沿用我的项目规则。”
 
 ## 可以做什么
 

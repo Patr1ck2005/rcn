@@ -6,7 +6,7 @@ This guide applies to a group whose operator has configured a center, submission
 
 ## Install, connect and configure an Agent
 
-Follow the single [onboarding guide](member-onboarding-guide.md#三步开始): **GitHub Releases → Setup → HTTPS join → one private administrator approval → automatic Agent configuration and diagnostics**. Operators provide their own center URL; this research group's intended `https://rcn.my1ab.fyi` endpoint is still pending alpha.6 acceptance. See the [release status](releases/0.15.0a6.md).
+Follow the single [onboarding guide](member-onboarding-guide.md#三步开始): **GitHub Releases → Setup → HTTPS join → one private administrator approval → automatic Agent configuration and diagnostics**. Operators provide their own center URL; this research group's `https://rcn.my1ab.fyi` endpoint is live following alpha.6 HTTPS acceptance. See the [release status and boundaries](releases/0.15.0a6.md).
 
 The software installer contains no personal credential. The client generates and protects the personal secret locally before sending its digest for approval. Pairing codes help the administrator check a person and device; they are not login credentials. Private bundles and SSH remain advanced recovery paths. Keep credentials and machine invitations out of Git, screenshots, issues and Agent conversations. Personal policies and project/runtime gates still apply after connection.
 
