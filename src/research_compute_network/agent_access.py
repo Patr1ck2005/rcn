@@ -331,7 +331,8 @@ def main(argv=None):
             operation_id = None
         if resumable and operation_id:
             report["operation_id"] = operation_id
-            if isinstance(exc, RcnApiError) and exc.status in {0, 408, 425, 429, 500, 502, 503, 504}:
+            if (isinstance(exc, RcnApiError) and exc.status in {0, 408, 425, 429, 500, 502, 503, 504}
+                    and detail["reason_code"] in {"center_unavailable", "member_connection_unavailable"}):
                 report.update(stage="operation", reason_code="operation_response_unconfirmed",
                     message="本次操作回执未确认，原任务编号已保留。",
                     next_action=f"保留原操作编号 {operation_id}；网络恢复后继续原 {args.action} 命令。不要生成新编号、重新配置 Agent 或重新导入接入包。",

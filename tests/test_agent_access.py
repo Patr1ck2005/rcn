@@ -209,3 +209,16 @@ def test_revoked_login_does_not_suggest_blind_operation_retry(tmp_path, monkeypa
     assert agent_access.main(["submit", "--operation-id", broker.receipt["operation_id"]]) == 2
     value = json.loads(capsys.readouterr().out)
     assert value["reason_code"] == "center_login_required" and "retry_arguments" not in value
+
+
+def test_local_binding_failure_is_not_reported_as_an_unknown_network_reply(tmp_path, monkeypatch, capsys):
+    broker = Broker(tmp_path)
+    def fail(_):
+        from research_compute_network.client import RcnApiError
+        raise RcnApiError(0, "local identity rejected", reason_code="member_agent_connection_binding_changed")
+    broker.confirm = fail
+    monkeypatch.setattr(agent_access, "MemberBroker", lambda root: broker)
+    assert agent_access.main(["submit", "--operation-id", broker.receipt["operation_id"]]) == 2
+    value = json.loads(capsys.readouterr().out)
+    assert value["reason_code"] == "member_agent_connection_binding_changed"
+    assert "retry_arguments" not in value and value["operation_id"] == broker.receipt["operation_id"]
