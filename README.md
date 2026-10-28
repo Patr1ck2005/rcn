@@ -6,11 +6,11 @@
 
 RCN coordinates research jobs across a group of contributed machines. It provides a Python control plane, resource-aware scheduler, dispatcher, browser console, Windows member client, and a CLI for personal Agent access. Projects submit structured jobs through registered execution profiles; RCN tracks placement, attempts, recovery, result manifests, and audit events.
 
-This is **0.15.0a4, a public preview** extracted from a system used in a private research group. The source includes real scheduling and operations code. Public examples and the local demo use synthetic data. Internal use does not establish unattended deployment or acceptance in another lab.
+This checkout contains the **0.15.0a5 public-preview candidate**, extracted from a system used in a private research group. The source includes real scheduling and operations code. Public examples and the local demo use synthetic data. Internal use does not establish unattended deployment or acceptance in another lab.
 
 ![Synthetic RCN overview; no production data](https://github.com/Patr1ck2005/rcn/releases/download/v0.15.0-alpha.1/rcn-overview-demo.png)
 
-[Download the public preview](https://github.com/Patr1ck2005/rcn/releases/tag/v0.15.0-alpha.4). Python wheels include the built console; the Windows client installer includes Python and client dependencies.
+[Forthcoming alpha.5 downloads](https://github.com/Patr1ck2005/rcn/releases/tag/v0.15.0-alpha.5). This is candidate source; alpha.5 downloads will become available after the release is published. Release wheels include the built console, and the Windows client installer includes Python and client dependencies.
 
 ## What it does
 
@@ -67,7 +67,7 @@ npm --prefix web test
 npm --prefix web run build
 ```
 
-The frontend build writes generated assets into the Python package for local use and wheel assembly. Keep generated assets, screenshots, runtime archives, credentials, and local state out of source commits. See [contributing](docs/contributing.md), [security](docs/security.md), and the [preview release notes](docs/releases/0.15.0a4.md).
+The frontend build writes generated assets into the Python package for local use and wheel assembly. Keep generated assets, screenshots, runtime archives, credentials, and local state out of source commits. See [contributing](docs/contributing.md), [security](docs/security.md), and the [preview release notes](docs/releases/0.15.0a5.md).
 
 ## License
 

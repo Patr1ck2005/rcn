@@ -33,7 +33,7 @@ from starlette.middleware.trustedhost import TrustedHostMiddleware
 
 from . import member_registration as storage
 from .client import RcnClient, RcnApiError
-from .member_client_credentials import PersonalCredentialStore
+from .member_client_credentials import PersonalCredentialStore, CredentialUnavailable
 from .member_agent_config import (
     MemberAgentExportRequest, clear_member_agent_login, export_member_agent_config,
     list_member_agent_configs,
@@ -145,14 +145,25 @@ class MemberBroker:
         storage._private_directory(self.root)
         for name in ("packages", "operations", "transfers", "results"):
             storage._private_directory(self.root / name)
-        self.credentials = credential_store or PersonalCredentialStore(self.root / "credentials")
         self.api_factory = api_factory
         self.transfer_factory = transfer_factory
         self.lock = threading.RLock()
         self.executor = ThreadPoolExecutor(max_workers=2, thread_name_prefix="rcn-member")
         self.busy: set[str] = set()
         self.closed = False
-        self.login = self.credentials.load()
+        self.credential_error = None
+        try:
+            self.credentials = credential_store or PersonalCredentialStore(self.root / "credentials")
+            self.login = self.credentials.load()
+        except (CredentialUnavailable, ValueError, OSError, storage.MemberRegistrationError) as exc:
+            # Keep the original bytes. Public help and a new connection import
+            # must remain reachable when a login record cannot be decoded.
+            from .member_doctor import error_detail
+            self.credential_error = error_detail(exc, stage="identity")["reason_code"]
+            if not hasattr(self, "credentials"):
+                from .member_client_credentials import UnavailableCredentialStore
+                self.credentials = UnavailableCredentialStore(self.credential_error)
+            self.login = None
         self.actor = self.login.get("actor") if self.login else None
         self.auth_generation = 0
         self.online = False
@@ -185,7 +196,9 @@ class MemberBroker:
         except (RuntimeError, ValueError, OSError) as exc:
             if isinstance(exc, RcnApiError):
                 raise
-            raise RcnApiError(0, "member connection is unavailable", reason_code="member_connection_unavailable") from None
+            from .member_doctor import error_detail
+            detail = error_detail(exc)
+            raise RcnApiError(0, detail["message"], reason_code=detail["reason_code"]) from None
 
     def session(self, *, refresh=False):
         from .member_client_connection import public_connection
@@ -226,7 +239,8 @@ class MemberBroker:
                     "center_url": self.login["center_url"] if self.login else (configured_connection or {}).get("center_reference", ""),
                     "configured_connection": configured_connection, "actor": self.actor,
                     "online": self.online, "remote_actions_available": bool(self.online and self.login),
-                    "connection_error": self.connection_error}
+                    "connection_error": self.connection_error,
+                    "credential_error": self.credential_error}
 
     def sign_in(self, payload: Login):
         center = payload.center_url if payload.center_url.startswith("rcn-managed://") else _center(payload.center_url)
@@ -245,6 +259,7 @@ class MemberBroker:
             self.auth_generation += 1
             self.online = True
             self.connection_error = None
+            self.credential_error = None
         self.recover_collections()
         return self._session_payload(configured_connection)
 
@@ -692,15 +707,16 @@ class MemberBroker:
         if shutil.disk_usage(self.root).free < RESERVE_BYTES + needed:
             raise MemberStorageError("member_input_disk_reserve")
 
-    def close(self):
+    def close(self, *, cancel_active=True):
         with self.lock:
             self.closed = True
             self.collection_queue.close()
             for timer in self.collection_timers.values():
                 timer.cancel()
             self.collection_timers.clear()
-            for event in self.collection_cancels.values():
-                event.set()
+            if cancel_active:
+                for event in self.collection_cancels.values():
+                    event.set()
         self.executor.shutdown(wait=True, cancel_futures=False)
 
 
@@ -806,9 +822,18 @@ def create_member_app(*, state_root: Path | None = None, credential_store=None,
 
     @app.exception_handler(RcnApiError)
     async def api_error(request, exc):
-        return JSONResponse({"detail": {"message": "中心拒绝或暂时无法完成请求，请保留原提交恢复",
-                             "reason_code": exc.reason_code or "center_request_failed"}},
+        from .member_doctor import error_detail
+        detail = error_detail(exc, stage="center")
+        # Preserve a bounded server reason code for existing operation recovery.
+        if exc.reason_code and re.fullmatch(r"[a-z][a-z0-9_]{0,100}", exc.reason_code):
+            detail["reason_code"] = exc.reason_code
+        return JSONResponse({"detail": detail},
                             status_code=exc.status if 400 <= exc.status <= 599 else 503)
+
+    @app.exception_handler(RuntimeError)
+    async def member_runtime_error(request, exc):
+        from .member_doctor import error_detail
+        return JSONResponse({"detail": error_detail(exc)}, status_code=409)
 
     @app.exception_handler(ValueError)
     async def validation_error(request, exc):
@@ -823,7 +848,38 @@ def create_member_app(*, state_root: Path | None = None, credential_store=None,
     @app.get("/local/v1/capabilities")
     def capabilities():
         return {"mode": "member-client", "schema_version": 1, "contribution_supported": True,
+                "connection_bundle_import": 1, "member_diagnostics": 1, "self_service_agent_credentials": 1,
                 "submission_operation_schema": 1, "instance_id": getattr(app.state, "instance_id", None)}
+
+    @app.post("/local/v1/doctor")
+    def doctor(payload: dict = None):
+        from .member_doctor import diagnose
+        value = payload or {}
+        if set(value) - {"repair"} or type(value.get("repair", False)) is not bool:
+            raise HTTPException(422, "invalid_diagnostic_options")
+        return diagnose(broker, repair=value.get("repair", False))
+
+    @app.post("/local/v1/connection-imports")
+    async def connection_import(request: Request):
+        from .member_connection_bundle import preview_bundle, MAX_BUNDLE_BYTES
+        if request.headers.get("content-type", "").split(";")[0] not in {"application/zip", "application/octet-stream"}:
+            raise HTTPException(415, "请选择管理员提供的个人接入 ZIP")
+        raw = bytearray()
+        async for chunk in request.stream():
+            if len(raw) + len(chunk) > MAX_BUNDLE_BYTES:
+                raise HTTPException(413, "个人接入包超过大小上限")
+            raw.extend(chunk)
+        return preview_bundle(broker, bytes(raw))
+
+    @app.get("/local/v1/connection-imports/{import_id}")
+    def connection_import_status(import_id: str):
+        from .member_connection_bundle import read_import
+        return read_import(broker, import_id)
+
+    @app.post("/local/v1/connection-imports/{import_id}/confirm")
+    def connection_import_confirm(import_id: str):
+        from .member_connection_bundle import confirm_import
+        return confirm_import(broker, import_id)
 
     @app.post("/local/v1/shutdown")
     def shutdown(request: Request):
@@ -857,6 +913,11 @@ def create_member_app(*, state_root: Path | None = None, credential_store=None,
     @app.delete("/local/v1/agent-configurations/{agent_id}")
     def clear_agent_login(agent_id: UUID):
         return clear_member_agent_login(broker, agent_id)
+
+    @app.post("/local/v1/agent-configurations/{agent_id}/revoke")
+    def revoke_agent(agent_id: UUID):
+        from .member_agent_config import revoke_member_agent
+        return revoke_member_agent(broker, agent_id)
 
     def contribution_identity(*, offline=False):
         # Revalidate credentials before exposing or changing this original scope.
@@ -1030,8 +1091,8 @@ def create_member_app(*, state_root: Path | None = None, credential_store=None,
         return help_catalog.list_public()
 
     @app.get("/v1/help/public/{slug}")
-    def public_help_article(slug: str):
-        article = help_catalog.public(slug)
+    def public_help_article(slug: str, format: str = "html"):
+        article = help_catalog.public_markdown(slug) if format == "markdown" else help_catalog.public(slug)
         if article is None:
             raise HTTPException(404, "help article not found")
         return article

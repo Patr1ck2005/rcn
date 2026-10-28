@@ -24,6 +24,7 @@ CAPABILITIES={
     'evidence_failure_advice':1,'member_distribution_preflight':1,
     'person_submission_policy':1,'compute_credits':1,'control_operation_replay':1,
     'canonical_job_contract':1,'durable_collection':1,'resumable_result_transfer':1,
+    'personal_agent_credentials':1,'member_connection_bundle':1,'member_agent_stable_entry':1,
 }
 
 

@@ -297,6 +297,10 @@ def install_entry(root, *, desktop=True, startup=True):
         stop(root)
     else:
         prepare_handoff(root)
+    # Verify/publish the stable entry before changing shortcuts or startup.
+    # A compatible existing entry is retained even while a long CLI is active.
+    from .member_agent_launcher import install_launcher
+    launcher = install_launcher(Path(root).absolute())
     arguments = subprocess.list2cmdline(["-B", "-m", MODULE, "launch", "--state-root", str(Path(root).absolute())])
     command = _startup_command(root)
     if startup:
@@ -313,6 +317,7 @@ def install_entry(root, *, desktop=True, startup=True):
             raise RuntimeError("member_client_shortcut_failed")
     _write_json(Path(root).absolute() / "active-version.json", {
         "schema_version": 1, "pythonw_path": str(python),
+        **launcher,
     })
     return {"entry_installed": True, "startup": startup, "desktop": desktop}
 

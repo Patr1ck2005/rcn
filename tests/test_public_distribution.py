@@ -29,7 +29,7 @@ def test_installer_has_no_scientific_equivalence_dependency():
 
 def test_public_metadata():
     metadata = tomllib.loads((ROOT / "pyproject.toml").read_text(encoding="utf-8"))
-    assert metadata["project"]["version"] == "0.15.0a1"
+    assert metadata["project"]["version"] == "0.15.0a5"
     assert metadata["project"]["license"]["text"] == "MIT"
     assert "MIT License" in (ROOT / "LICENSE").read_text(encoding="utf-8")
 

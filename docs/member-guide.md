@@ -2,56 +2,46 @@
 
 [Home](../README.md) · [Quickstart](quickstart.md) · [Security](security.md)
 
-This guide applies to a group whose operator has already configured a center, grants, transport, and approved scientific runtime. The public demo is useful for exploring the console, but it does not enroll compute machines. Ask the group operator for the center address and your personal access route.
+This guide applies to a group whose operator has configured a center, submission grants, transport and approved execution profiles. The public demo does not enroll compute machines or provide scientific runtimes. See the detailed [installation, connection and Agent guide](member-onboarding-guide.md). The installed client includes offline public help for the same workflow.
+
+## Install, connect and configure an Agent
+
+1. Install the operator-supplied Setup under your own Windows user. The Windows client includes Python, dependencies and offline help.
+2. Open **Connection and Agent setup**, import your private connection bundle, review the member and center, and confirm the original import. HTTPS and explicitly managed SSH connections use the same flow.
+3. Select Codex, Claude Code, DSH or a generic Agent and choose a recognizable name. The client creates an independent restricted credential automatically. Copy the instructions or download the credential-free configuration ZIP for this computer's Agent.
+
+The software installer contains no personal credential. Keep the private connection bundle, tokens and machine invitations out of Git, screenshots, issues and Agent conversations. Connection success does not grant submission rights or imply that a scientific profile is executable.
+
+A lost response must resume the same import or Agent instance. Removing the Agent's local encrypted login and revoking its center credential are separate actions. Revoking one Agent preserves the desktop login and other Agents.
 
 ## Submit and collect work
 
-The Windows member client provides a local interface to a configured center. To inspect its supported lifecycle commands:
-
-```shell
-python -m research_compute_network.member_client_lifecycle --help
-```
-
-On a supported Windows installation, launch it with a dedicated local state root:
-
-```powershell
-python -m research_compute_network.member_client_lifecycle launch --state-root (Join-Path $env:LOCALAPPDATA 'RCN-PublicMember')
-```
-
-Launching the client does not install a scientific runtime or issue a group identity. It opens the local interface; connect to your operator's HTTPS center and use your own token. The Windows personal-access route stores local credentials using DPAPI.
-
-For an authorized task:
-
 1. Obtain a sealed task package from the project's origin adapter.
-2. Import it in the member client and inspect the project, profile, resources, and output contract.
-3. Create and review the partition plan, then confirm submission.
-4. Track the original operation and job. If the center becomes unavailable, recover that operation rather than creating another submission.
-5. Collect the result and check the client's integrity status. Formal project import and scientific analysis still belong to the origin adapter.
+2. Import it in the member client and inspect the project, profile, resources and output contract.
+3. Review the partition plan, then confirm submission.
+4. Track the original operation and job; recover that operation after a disconnect.
+5. Collect the result and verify the integrity receipt. Formal project import and scientific analysis remain with the origin adapter.
 
-Keep tokens and machine invitations private. Do not put them in a task package, issue, screenshot, or command-line argument.
+See the [task-package guide](member-task-package-guide.zh.md) for the data-only preparation contract. A model file alone does not specify a complete scientific task.
 
 ## Personal Agent access
 
-The Agent CLI uses the same personal scope and structured operations. Its configure command accepts a token through a hidden prompt or an explicitly named environment variable, not a `--token` value.
+Read the exported `AGENT_ACCESS.md` and `rcn-agent-access.json`. Use that JSON's complete `command_prefix`, including the Agent's own state root. Add these arguments to the prefix:
 
-```shell
-rcn-agent --help
-rcn-agent configure --center-url https://compute.example.org
-rcn-agent status
-rcn-agent capabilities
-rcn-agent plan --package task.zip
+```text
+help list --format json
+help read member-getting-started --format markdown
+context
+doctor
+capabilities
+plan --package task.zip
 ```
 
-Replace the example center with your group's address. `plan` returns an operation ID. Review the plan and retain that ID before continuing:
+Public help is available offline. Protected help still requires the current center identity and role. `doctor` produces a sanitized staged report; reuse that report when asking for help. The installed stable entry follows the verified active version after upgrades.
 
-```shell
-rcn-agent submit --operation-id YOUR_OPERATION_ID
-rcn-agent watch --operation-id YOUR_OPERATION_ID --timeout-s 60
-rcn-agent diagnostics --operation-id YOUR_OPERATION_ID
-rcn-agent collect --operation-id YOUR_OPERATION_ID
-```
+Keep the operation ID returned by `plan` and use it for `submit`, `watch`, `diagnostics` and `collect`. A watch timeout ends observation, not the job. Do not create another submission to recover an unknown reply.
 
-Use `rcn-agent instructions --output agent-instructions` to create a new local instruction directory for a supported Agent workflow. Agent access is a permissioned client; it does not grant general remote shell access or authorize arbitrary workloads.
+The legacy `configure` CLI remains available with a hidden prompt or named environment variable. New Agent setup uses the member client's automatic credential flow. No token belongs in a command-line argument. Agent access permits registered structured workloads, not an arbitrary remote shell.
 
 ## Contribute a machine
 

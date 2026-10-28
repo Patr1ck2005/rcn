@@ -58,6 +58,13 @@ def parser():
     commands = result.add_subparsers(dest="action", required=True)
     commands.add_parser("status")
     commands.add_parser("capabilities")
+    doctor = commands.add_parser("doctor", help="Check connection without submitting or starting compute")
+    doctor.add_argument("--repair", action="store_true", help="Explicitly restore only this owner's managed connection")
+    commands.add_parser("context", help="Current installation, help index and original operation references")
+    help_command = commands.add_parser("help", help="Read installed public help, including offline")
+    help_command.add_argument("help_action", choices=["list", "read"])
+    help_command.add_argument("slug", nargs="?")
+    help_command.add_argument("--format", choices=["json", "markdown"], default="markdown")
     configure = commands.add_parser("configure")
     configure.add_argument("--center-url", required=True)
     configure.add_argument("--token-env", default="RCN_PERSONAL_TOKEN", help="Environment variable NAME, never a token value")
@@ -92,11 +99,13 @@ def instruction_artifacts(broker, directory: Path) -> dict:
     session = broker.session()
     directory = Path(directory).absolute()
     directory.mkdir(parents=True, exist_ok=False)
+    from .member_agent_launcher import command_prefix
+    prefix, launcher_kind = command_prefix(broker)
     config = {"schema_version": 1, "kind": "rcn-agent-access", "module": MODULE,
-              "command_prefix": [sys.executable, "-B", "-m", MODULE, "--state-root", str(broker.root)],
+              "command_prefix": prefix, "launcher_kind": launcher_kind,
               "center_url": session.get("center_url", ""), "credential_storage": "windows-current-user-dpapi",
               "token_argv_supported": False, "submission_format": "rcn-data-package-v1",
-              "commands": ["status", "capabilities", "configure", "plan", "submit", "watch", "cancel", "collect", "diagnostics", "pool"]}
+              "commands": ["status", "capabilities", "doctor", "context", "help", "configure", "plan", "submit", "watch", "cancel", "collect", "diagnostics", "pool"]}
     (directory / "rcn-agent-access.json").write_text(json.dumps(config, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
     text = """# RCN personal Agent access
 
@@ -104,12 +113,13 @@ Use `rcn-agent-access.json` for the installed interpreter, module and local stat
 root. This interface works with any Agent that can call a local command and
 read JSON lines. The personal credential remains in Windows CurrentUser DPAPI.
 
-1. Run `status`, then `capabilities`. Check the returned person, allowed
+1. Run `context`, `doctor`, then `capabilities`. Read `help list` and
+   `help read member-getting-started` for this installed release. Check the returned person, allowed
    Profiles and quota before planning. A cached identity alone is not online.
-2. If login is needed, the human configures `configure --center-url HTTPS_URL`.
-   It reads the named token environment variable or a hidden interactive
-   prompt. Never put a token in a command argument, artifact, prompt or log.
-3. Produce a registered data-only RCN submission ZIP through the origin-side
+2. If login is needed, open the member client and import the person's private
+   connection bundle, then select this Agent. No manual token is needed in the
+   normal flow. Never put a token in a command argument, artifact, prompt or log.
+3. Read `help read member-task-package`. Produce a registered data-only RCN submission ZIP through the origin-side
    compiler. Never invent scientific inputs, Unit counts or duration estimates.
 4. Call `plan --package PATH`. Keep the returned operation UUID. The same
    package recovers its existing operation by default. A deliberately supplied
@@ -150,7 +160,29 @@ execution types or already running work.
 
 
 def execute(args, broker):
-    if args.action == "status":
+    if args.action == "doctor":
+        from .member_doctor import diagnose
+        value = diagnose(broker, repair=args.repair)
+        _emit(value)
+        return 0 if value["ok"] else 2
+    elif args.action == "context":
+        from .help import HelpCatalog
+        from .member_agent_launcher import command_prefix
+        session = broker.session()
+        operations = []
+        if broker.login:
+            for path in sorted((broker.root / "operations").glob("*.json")):
+                try:
+                    operation = broker.read_operation(path.stem)
+                except (ValueError, OSError, HTTPException):
+                    continue
+                operations.append({key: operation.get(key) for key in ("operation_id", "job_id", "phase", "updated_at")})
+        _emit({"schema_version": 1, "kind": "rcn-agent-context", "command_prefix": command_prefix(broker)[0],
+               "session": session, "help": HelpCatalog().list_public(), "operations": operations,
+               "next_steps": ["doctor", "help read member-getting-started", "help read member-task-package", "capabilities"],
+               "resume_policy": "Continue the original operation UUID; never resubmit to recover an unknown reply.",
+               "secrets_included": False})
+    elif args.action == "status":
         _emit(broker.session(refresh=bool(broker.login)))
     elif args.action == "configure":
         token = os.environ.get(args.token_env) or getpass.getpass("RCN personal token: ")
@@ -161,7 +193,7 @@ def execute(args, broker):
         _emit(instruction_artifacts(broker, args.output))
     elif args.action == "capabilities":
         value = {"schema_version": 1, "kind": "rcn-agent-access", "credential_storage": "windows-current-user-dpapi",
-                 "token_argv_supported": False, "commands": ["status", "capabilities", "configure", "plan", "submit", "watch", "cancel", "collect", "diagnostics", "pool"],
+                 "token_argv_supported": False, "commands": ["status", "capabilities", "doctor", "context", "help", "configure", "plan", "submit", "watch", "cancel", "collect", "diagnostics", "pool"],
                  "session": broker.session(refresh=bool(broker.login))}
         if broker.login and value["session"].get("online"):
             for key, path in [("submission_policy", "/v1/me/submission-policy"), ("credits", "/v1/me/credits"), ("profiles", "/v1/profiles")]:
@@ -189,8 +221,9 @@ def execute(args, broker):
             broker.refresh(args.operation_id)
         broker.start_transfer(args.operation_id, collect=args.action == "collect")
         # A one-shot CLI must keep its process alive until the transfer receipt
-        # is written. close() waits for the broker's existing transfer worker.
-        broker.close()
+        # is written. Stop future retries but let this original transfer finish;
+        # ordinary UI shutdown still cancels active downloads for safe draining.
+        broker.close(cancel_active=False)
         receipt = broker.present(broker.read_operation(args.operation_id))
         _emit(receipt)
         if receipt.get("error"):
@@ -240,19 +273,54 @@ def execute(args, broker):
     return 0
 
 
+def help_command(args):
+    from .help import HelpCatalog
+    catalog = HelpCatalog()
+    if args.help_action == "list":
+        value = catalog.list_public()
+        if args.format == "json":
+            _emit({"public": value, "source": "installed-client", "offline_available": True})
+        else:
+            print("# RCN 安装版帮助\n")
+            for article in value:
+                print(f"- {article['slug']}: {article['title']} — {article['summary']}")
+        return 0
+    if not args.slug:
+        raise AgentAccessError("help_slug_required")
+    value = catalog.public_markdown(args.slug)
+    if value is None:
+        # Protected content is never read directly from the local package.
+        broker = MemberBroker(args.state_root or default_client_root())
+        try:
+            value = broker.client()._request("GET", "/v1/help/protected/" + quote(args.slug, safe="") + "?format=markdown")
+        finally:
+            broker.close()
+    if args.format == "json":
+        _emit(value)
+    elif "markdown" in value:
+        print(value["markdown"])
+    else:
+        raise AgentAccessError("help_markdown_unavailable")
+    return 0
+
+
 def main(argv=None):
     args = parser().parse_args(argv)
     broker = None
     try:
+        if args.action == "help":
+            return help_command(args)
         broker = MemberBroker(args.state_root or default_client_root())
         return execute(args, broker)
     except KeyboardInterrupt:
         _emit({"reason_code": "agent_action_interrupted", "resume_same_operation": True})
         return 130
-    except (RcnApiError, HTTPException, CredentialUnavailable, ValueError, OSError) as exc:
+    except (RcnApiError, HTTPException, CredentialUnavailable, ValueError, OSError, RuntimeError) as exc:
         # Network/native exception text can contain response bodies or secrets.
-        code = getattr(exc, "reason_code", None) or "agent_access_unavailable"
-        _emit({"reason_code": code, "resume_same_operation": args.action in {"plan", "submit", "watch", "cancel", "collect", "diagnostics"}})
+        from .member_doctor import error_detail
+        detail = error_detail(exc)
+        code = getattr(exc, "reason_code", None) or detail["reason_code"]
+        _emit({**detail, "reason_code": code, "resume_same_operation": args.action in {"plan", "submit", "watch", "cancel", "collect", "diagnostics"}})
         return 2
     finally:
         if broker is not None and not broker.closed:

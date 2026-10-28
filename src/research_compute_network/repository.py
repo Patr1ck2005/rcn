@@ -30,6 +30,7 @@ from sqlalchemy.orm import DeclarativeBase, Mapped, Session, mapped_column, sess
 from sqlalchemy.pool import StaticPool
 
 from .connection_health import merge_channel_evidence
+from .disk_guard import disk_snapshot_fresh, update_disk_snapshot
 from .failure_diagnostics import sanitize_failure_text
 from .models import (
     AlertStatus,
@@ -48,6 +49,7 @@ from .models import (
     DispatcherStatus,
     DemoCleanupPreview,
     ExecutionProfile,
+    ExecutionDiskSnapshot,
     EnrollmentRecord,
     FeatureSettings,
     JobEnvelope,
@@ -1455,6 +1457,7 @@ class MetadataRepository:
     def _init_schema_once(self) -> None:
         self._backup_sqlite_before_migration()
         from . import metadata_actions  # Register additive durable metadata receipts.
+        from . import agent_credentials  # Durable, owner-bound personal Agent credentials.
         Base.metadata.create_all(self.engine)
         ReadModelBase.metadata.create_all(self.engine)
         if self.engine.dialect.name == "sqlite":
@@ -2144,6 +2147,42 @@ class MetadataRepository:
             session.execute(select(MachineRow.machine_id).where(
                 MachineRow.machine_id == machine_id,
             ).with_for_update())
+
+    def put_machine_execution_disk(
+        self, machine_id: str, snapshot: ExecutionDiskSnapshot | None, *,
+        checked_at: datetime, reserve_mb: int, c_drive_reserve_mb: int,
+        clear_after_s: int,
+    ) -> bool:
+        """Merge authenticated supplementary disk evidence on its own clock.
+
+        Read and mutate under the existing machine-health write lock. No CPU,
+        heartbeat, runtime, usage, status or raw-sample field is manufactured.
+        """
+        if snapshot is None or not disk_snapshot_fresh(snapshot, checked_at):
+            return False
+        probe = snapshot.model_copy(deep=True)
+
+        def write() -> bool:
+            with self._session() as session, session.begin():
+                self._lock_machine_health_write(session, machine_id)
+                row = session.get(MachineRow, machine_id)
+                if row is None:
+                    raise KeyError(f"machine not found: {machine_id}")
+                payload = copy.deepcopy(row.payload)
+                previous_raw = payload.get("metrics", {}).get("execution_disk")
+                previous = ExecutionDiskSnapshot.model_validate(previous_raw) if previous_raw else None
+                if previous is not None and _aware_datetime(probe.observed_at) <= _aware_datetime(previous.observed_at):
+                    return False
+                merged = update_disk_snapshot(
+                    probe, previous, reserve_mb=reserve_mb,
+                    c_drive_reserve_mb=c_drive_reserve_mb, clear_after_s=clear_after_s,
+                )
+                payload["metrics"]["execution_disk"] = merged.model_dump(mode="json")
+                row.payload = payload
+                session.add(row)
+            return True
+
+        return self._retry_sqlite_write(write)
 
     def put_machine_operational_status(self, status: MachineOperationalStatus) -> None:
         def write() -> None:

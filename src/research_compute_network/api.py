@@ -501,6 +501,8 @@ def create_app(
 
     from .personal_access_api import build_personal_access_router
     app.include_router(build_personal_access_router(repository=repository, auth=auth))
+    from .agent_credentials import build_agent_credentials_router
+    app.include_router(build_agent_credentials_router(repository=repository, auth=auth))
 
     def job_visibility(context):
         if UserRole.ADMIN in context.roles:
@@ -956,8 +958,8 @@ def create_app(
         return help_catalog.list_public()
 
     @app.get("/v1/help/public/{slug}")
-    def public_help_article(slug: str) -> dict:
-        article = help_catalog.public(slug)
+    def public_help_article(slug: str, format: str = "html") -> dict:
+        article = help_catalog.public_markdown(slug) if format == "markdown" else help_catalog.public(slug)
         if article is None:
             raise HTTPException(status_code=404, detail="help article not found")
         return article
@@ -974,8 +976,8 @@ def create_app(
         }
 
     @app.get("/v1/help/protected/{slug}")
-    def protected_help_article(slug: str, context: AuthContext = Depends(auth.actor)) -> dict:
-        article = help_catalog.protected(slug, context.roles)
+    def protected_help_article(slug: str, format: str = "html", context: AuthContext = Depends(auth.actor)) -> dict:
+        article = help_catalog.protected_markdown(slug, context.roles) if format == "markdown" else help_catalog.protected(slug, context.roles)
         if article is None:
             raise HTTPException(status_code=404, detail="help article not found")
         return article
@@ -1029,6 +1031,7 @@ def create_app(
         return {
             "submission_operation_schema": 1,
             "person_submission_policy_schema": 1,
+            "personal_agent_credentials_schema": 1,
             "metadata_operation_schema": 1,
             "machine_policy_cas_schema": 1,
             "compute_credit_schema": 1,

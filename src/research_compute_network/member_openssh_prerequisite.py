@@ -22,7 +22,8 @@ def inspect_openssh() -> dict:
     """Unprivileged, read-only probe; a historical receipt never substitutes for files."""
     try:
         result = subprocess.run([_powershell(), '-NoProfile', '-NonInteractive', '-Command', PROBE_SCRIPT],
-                                capture_output=True, timeout=30, check=False)
+                                capture_output=True, timeout=30, check=False,
+                                creationflags=getattr(subprocess, 'CREATE_NO_WINDOW', 0))
         if result.returncode or len(result.stdout) > 8192:
             raise ValueError('probe failed')
         value = storage._json_document(result.stdout)
@@ -81,6 +82,59 @@ def ensure_member_openssh(*, state_root: Path, accept_supply: bool = False) -> d
         raise storage.MemberRegistrationError('member_openssh_installation_outcome_pending') from None
     except (OSError, ValueError, TypeError, subprocess.SubprocessError):
         raise storage.MemberRegistrationError('member_openssh_supply_unconfirmed_preserve_state') from None
+
+
+def ensure_member_ssh_client(*, state_root: Path, accept_supply: bool = False) -> dict:
+    """Submit-only onboarding needs the inbox client, never an SSH server."""
+    if accept_supply is not True:
+        raise storage.MemberRegistrationError('member_openssh_supply_consent_required')
+    root = Path(state_root) / 'openssh-client-prerequisite'
+    storage._private_directory(root)
+    raw = CLIENT_INSTALL_SCRIPT.encode('utf-8-sig')
+    helper = root / 'install-windows-openssh-client.ps1'
+    with storage._exclusive(root):
+        storage._check_private_file(helper)
+        if helper.exists():
+            if storage._read_bytes(helper, maximum=262144) != raw:
+                raise storage.MemberRegistrationError('member_openssh_supply_helper_changed')
+        else:
+            storage._publish(helper, raw, maximum=262144)
+        try:
+            result = run_elevated_snapshot(helper, raw, timeout_s=600)
+        except subprocess.TimeoutExpired:
+            raise storage.MemberRegistrationError('member_openssh_installation_outcome_pending') from None
+        if result.returncode == 3010:
+            raise storage.MemberRegistrationError('member_openssh_restart_required_rerun_original_installer')
+        if result.returncode == 75:
+            raise storage.MemberRegistrationError('member_openssh_original_installation_running')
+        if result.returncode:
+            raise storage.MemberRegistrationError('member_openssh_supply_unconfirmed_preserve_state')
+    return {'openssh_ready': True, 'client_only': True, 'grants_execution': False}
+
+
+CLIENT_INSTALL_SCRIPT = r'''
+$ErrorActionPreference='Stop';$ProgressPreference='SilentlyContinue'
+$id=[Security.Principal.WindowsIdentity]::GetCurrent()
+if(-not([Security.Principal.WindowsPrincipal]::new($id)).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)){exit 5}
+$mutex=[Threading.Mutex]::new($false,'Global\RCN-Windows-OpenSSH-Client-Supply')
+$locked=$false
+try {
+ try{$locked=$mutex.WaitOne(0)}catch [Threading.AbandonedMutexException]{$locked=$true}
+ if(-not $locked){exit 75}
+ $name='OpenSSH.Client~~~~0.0.1.0'
+ $state=Get-WindowsCapability -Online -Name $name
+ if($state.State -in @('InstallPending','UninstallPending')){exit 3010}
+ if($state.State -eq 'NotPresent'){
+  $result=Add-WindowsCapability -Online -Name $name
+  if($result.RestartNeeded){exit 3010}
+ }
+ if((Get-WindowsCapability -Online -Name $name).State -ne 'Installed'){exit 1}
+ $path=Join-Path ([Environment]::SystemDirectory) 'OpenSSH\ssh.exe'
+ $signature=Get-AuthenticodeSignature -LiteralPath $path
+ if($signature.Status -ne 'Valid' -or $signature.SignerCertificate.Subject -notmatch 'O=Microsoft Corporation(?:,|$)'){exit 1}
+ exit 0
+}finally{if($locked){$mutex.ReleaseMutex()};$mutex.Dispose()}
+'''
 
 
 COMMON = r'''

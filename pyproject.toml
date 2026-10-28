@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "research-compute-network"
-version = "0.15.0a4"
+version = "0.15.0a5"
 description = "Multi-submitter shared research compute network"
 readme = "README.md"
 license = {text = "MIT"}
@@ -49,6 +49,7 @@ rcn-member = "research_compute_network.member_client_lifecycle:main"
 
 [tool.setuptools.package-data]
 research_compute_network = [
+    "member_agent_launcher.cs",
     "help_content/**/*.md",
     "web_dist/**/*",
     "build_identity.json",

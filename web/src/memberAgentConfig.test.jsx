@@ -21,7 +21,7 @@ describe("installed member connection and Agent setup", () => {
     expect(memberIdentityVerified({ ...session, remote_actions_available: false })).toBe(false);
     expect(memberIdentityVerified({ ...session, actor: null })).toBe(false);
   });
-  it.each(["codex", "claude", "dsh"])("accepts only the selected %s adapter bound to the current person", (target) => {
+  it.each(["codex", "claude", "dsh", "generic"])("accepts only the selected %s adapter bound to the current person", (target) => {
     const value = bundle(target);
     expect(validateMemberAgentBundle(value, session, target, agentId)).toBe(value);
     expect(() => validateMemberAgentBundle(value, { ...session, actor: { actor_id: "member-b" } }, target, agentId)).toThrow();
@@ -31,10 +31,15 @@ describe("installed member connection and Agent setup", () => {
     expect(() => validateMemberAgentBundle({ ...value, files: [...value.files, "secret.txt"] }, session, target, agentId)).toThrow();
     expect(() => validateMemberAgentBundle({ ...value, independent_credential: false }, session, target, agentId)).toThrow();
     expect(() => validateMemberAgentBundle({ ...value, agent_id: "another-agent" }, session, target, agentId)).toThrow();
+    expect(validateMemberAgentBundle({ ...value, files: [...value.files, "guidance/RECOVERY.md"] }, session, target, agentId).files).toContain("guidance/RECOVERY.md");
+    expect(() => validateMemberAgentBundle({ ...value, token: "never-export-this" }, session, target, agentId)).toThrow();
+    expect(() => validateMemberAgentBundle({ ...value, setup_instructions: "Bearer do-not-export-a-real-secret" }, session, target, agentId)).toThrow();
   });
   it("renders identity confirmation, a real self-check action and all three export targets", () => {
     const html = renderToStaticMarkup(<MemoryRouter><MemberAgentSetup session={session} onSession={() => {}} /></MemoryRouter>);
     for (const text of ["member-a", "中心已核验", "重新自检", "我确认使用上方个人身份", "Codex", "Claude Code", "DSH", "配置不包含个人 token", "保留原有项目规则"]) expect(html).toContain(text);
     expect(html).toMatch(/disabled=""[^>]*>生成 Codex 配置/);
+    expect(html).toContain("其他 Agent");
+    expect(html).not.toContain('aria-label="独立 Agent token"');
   });
 });

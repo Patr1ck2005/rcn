@@ -5,7 +5,8 @@ import { Link, Navigate, NavLink, Route, Routes, useLocation, useNavigate } from
 
 import { api } from "./api";
 import { MyPersonalAccess } from "./PersonalAccess";
-import MemberAgentSetup from "./MemberAgentSetup";
+import MemberConnectionSetup from "./MemberConnectionSetup";
+import { connectionError } from "./memberConnectionModel";
 import { usePageRefresh } from "./usePageRefresh";
 import { DATA_REFRESH_EVENT, watchPageReturn } from "./freshness";
 import { HelpCenter, rememberHelpReturn } from "./HelpSystem";
@@ -31,83 +32,59 @@ export default function MemberClient({ capabilities }) {
   const [error, setError] = useState("");
   const [navOpen, setNavOpen] = useState(false);
   const [loading, setLoading] = useState(true);
+  const sessionRevision = useRef(0);
   const navigate = useNavigate();
   const location = useLocation();
   const mutation = useMutationGuard();
   const refreshSession = usePageRefresh(async ({ signal, isCurrent }) => {
+    const revision = sessionRevision.current;
     try {
       const value = await api("/local/v1/session", { signal });
-      if (isCurrent()) { setSession(value); setError(""); }
-    } catch (failure) { if (isCurrent()) setError(errorMessage(failure)); }
+      if (isCurrent() && revision === sessionRevision.current) { setSession(value); setError(""); }
+    } catch (failure) { if (isCurrent() && revision === sessionRevision.current) setError(connectionError(failure)); }
     finally { if (isCurrent()) setLoading(false); }
   }, { initial: true, intervalMs: 15000, listen: false });
   useEffect(() => watchPageReturn(() => { void refreshSession(); window.dispatchEvent(new Event(DATA_REFRESH_EVENT)); }), [refreshSession]);
   const logout = () => mutation.run(async () => {
-    try { await api("/local/v1/session", { method: "DELETE" }); setSession((previous) => ({ ...previous, connected: false, actor: null })); navigate("/connect"); }
+    try { await api("/local/v1/session", { method: "DELETE" }); sessionRevision.current += 1; setSession((previous) => ({ ...previous, connected: false, actor: null })); navigate("/connect"); }
     catch (failure) { setError(errorMessage(failure)); }
   });
-  if (loading) return <main className="member-loading" role="status">正在读取本机客户端状态…</main>;
-  if (!session?.connected) return <MemberConnect session={session} error={error} onRetry={refreshSession} onConnect={(value) => { setSession(value); navigate("/app/setup"); }} />;
   const actor = sessionActor(session);
-  const online = session.online !== false && session.remote_actions_available !== false;
+  const connected = session?.connected === true;
+  const online = connected && session.online !== false && session.remote_actions_available !== false;
+  const setup = <MemberConnectionSetup session={session} error={error} onRetry={refreshSession} onSession={(value) => { sessionRevision.current += 1; setSession(value); setError(""); if (value?.connected && location.pathname === "/connect") navigate("/app/setup"); }} />;
+  const requireConnection = (element) => loading ? <main className="member-loading" role="status">正在读取本机客户端状态…</main> : connected ? element : <Navigate to="/app/setup" replace />;
   return <div className="app-shell member-client"><aside className={`app-nav${navOpen ? " open" : ""}`}>
     <MemberBrand /><nav>
       <NavLink to="/app/setup" onClick={() => setNavOpen(false)}><KeyRound size={18} />连接与 Agent 配置</NavLink>
+      {connected && <>
       <NavLink to="/app/submit" onClick={() => setNavOpen(false)}><Upload size={18} />提交任务</NavLink>
       <NavLink to="/app/runs" end onClick={() => setNavOpen(false)}><Boxes size={18} />我的任务</NavLink>
       <NavLink to="/app/contribution" onClick={() => setNavOpen(false)}><Cpu size={18} />贡献计算</NavLink>
       <NavLink to="/app/overview" onClick={() => setNavOpen(false)}><Gauge size={18} />集群总览</NavLink>
+      </>}
       <NavLink to="/app/help" onClick={() => setNavOpen(false)}><BookOpen size={18} />帮助与文档</NavLink>
-    </nav><div className="nav-account"><div><span>{actor.actor_id || actor.user_id || "已连接"}</span><small>个人身份 · {capabilities.client_version || "成员客户端"}</small></div><button title="退出个人登录" aria-label="退出个人登录" disabled={mutation.busy} onClick={logout}><LogOut size={17} /></button></div>
+    </nav><div className="nav-account"><div><span>{actor.actor_id || actor.user_id || "尚未连接个人身份"}</span><small>个人身份 · {capabilities?.client_version || "成员客户端"}</small></div>{connected && <button title="退出个人登录" aria-label="退出个人登录" disabled={mutation.busy} onClick={logout}><LogOut size={17} /></button>}</div>
   </aside><section className="app-workspace"><header className="workspace-header">
     <button className="nav-toggle" aria-label="打开导航" aria-expanded={navOpen} onClick={() => setNavOpen(!navOpen)}><Menu size={19} /></button>
-    <div className={`member-center${online ? "" : " offline"}`}><CheckCircle2 size={16} /><span>{online ? "中心已连接" : "中心连接未确认"}</span><small>{session.configured_connection ? "管理员预配置的中心连接" : session.center_url}</small></div>
+    <div className={`member-center${online ? "" : " offline"}`}><CheckCircle2 size={16} /><span>{loading ? "正在读取本机状态" : online ? "中心已连接" : connected ? "中心连接未确认" : "等待导入个人连接"}</span><small>{session?.configured_connection ? "管理员预配置的中心连接" : session?.center_url}</small></div>
     <button className="icon-button" aria-label="刷新连接" onClick={() => { void refreshSession(); window.dispatchEvent(new Event(DATA_REFRESH_EVENT)); }}><RefreshCw size={17} /></button>
   </header>{error && <div className="inline-error" role="alert">{error}</div>}
-    {!online && <div className="member-offline" role="status"><b>当前离线，保留本机身份与提交记录。</b><p>{session.connection_error?.message || "可以查看本机记录或暂停自己的计算。提交、上传、下载与恢复接活需要重新连接中心。"}</p><Link to="/app/contribution">管理本机计算与暂停</Link></div>}
+    {connected && !online && <div className="member-offline" role="status"><b>当前离线，保留本机身份与提交记录。</b><p>{session.connection_error?.message || "可以查看本机记录或暂停自己的计算。提交、上传、下载与恢复接活需要重新连接中心。"}</p><Link to="/app/setup">连接自检与恢复</Link> · <Link to="/app/contribution">管理本机计算与暂停</Link></div>}
     <Suspense fallback={<main className="member-loading" role="status">正在加载…</main>}><Routes>
-      <Route path="/connect" element={<Navigate to="/app/setup" replace />} />
-      <Route path="/app/setup" element={<MemberAgentSetup session={session} onSession={setSession} />} />
-      <Route path="/app/submit" element={<MemberSubmission actor={actor} online={online} />} />
-      <Route path="/app/runs" element={<MemberOperations online={online} />} />
-      <Route path="/app/runs/:jobId" element={<JobDetail />} />
-      <Route path="/app/contribution" element={<MemberContribution key={`${actor.actor_id}:${session.center_url}`} session={session} online={online} />} />
-      <Route path="/app/overview" element={<main className="app-page"><ClusterInsights /></main>} />
+      <Route path="/connect" element={connected ? <Navigate to="/app/setup" replace /> : setup} />
+      <Route path="/app/setup" element={setup} />
+      <Route path="/app/submit" element={requireConnection(<MemberSubmission actor={actor} online={online} />)} />
+      <Route path="/app/runs" element={requireConnection(<MemberOperations online={online} />)} />
+      <Route path="/app/runs/:jobId" element={requireConnection(<JobDetail />)} />
+      <Route path="/app/contribution" element={requireConnection(<MemberContribution key={`${actor.actor_id}:${session?.center_url}`} session={session} online={online} />)} />
+      <Route path="/app/overview" element={requireConnection(<main className="app-page"><ClusterInsights /></main>)} />
       <Route path="/app/help" element={<HelpCenter embedded />} />
       <Route path="/app/help/:slug" element={<HelpCenter embedded />} />
       <Route path="/help/*" element={<Navigate to={`/app${location.pathname}${location.search}${location.hash}`} replace />} />
-      <Route path="*" element={<Navigate to="/app/submit" replace state={{ from: location.pathname }} />} />
+      <Route path="*" element={loading ? <main className="member-loading" role="status">正在读取本机客户端状态…</main> : <Navigate to={connected ? "/app/submit" : "/app/setup"} replace state={{ from: location.pathname }} />} />
     </Routes></Suspense>
   </section></div>;
-}
-
-function MemberConnect({ session, error: externalError, onRetry, onConnect }) {
-  const configured = ["https", "managed-ssh"].includes(session?.configured_connection?.mode)
-    ? session.configured_connection : null;
-  const [center, setCenter] = useState(session?.center_url?.startsWith("https://") ? session.center_url : "");
-  const [personalToken, setPersonalToken] = useState("");
-  const [error, setError] = useState("");
-  const [busy, setBusy] = useState(false);
-  const mutation = useMutationGuard();
-  const submit = (event) => mutation.run(async () => {
-    event.preventDefault(); setBusy(true); setError("");
-    try {
-      const connected = await api("/local/v1/session", { method: "POST", body: JSON.stringify({ center_url: configured?.center_reference || center.trim(), token: personalToken.trim() }) });
-      setPersonalToken(""); onConnect(connected);
-    } catch (failure) { setError(errorMessage(failure)); }
-    finally { setBusy(false); }
-  }, event);
-  return <div className="connect-page member-client"><header className="public-header"><MemberBrand /><span className="member-badge">本机客户端</span></header><main className="connect-main">
-    <section><div className="eyebrow"><KeyRound size={16} />个人身份</div><h1>连接课题组计算中心</h1><p>使用个人登录信息提交获授权项目的任务。登录信息由本机客户端加密保存。</p>
-      <form onSubmit={submit}>{configured
-        ? <label>管理员预配置的中心连接<input value="课题组计算中心" readOnly /></label>
-        : <label>中心 HTTPS 地址<input type="url" name="center_url" value={center} onChange={(event) => setCenter(event.target.value)} placeholder="https://compute.example.org" pattern="https://.*" required autoComplete="url" /></label>}
-        <label>个人访问 token<input type="password" name="personal_token" value={personalToken} onChange={(event) => setPersonalToken(event.target.value)} required autoComplete="off" /></label>
-        {(error || externalError) && <div className="form-error" role="alert">{error || externalError}</div>}
-        <button className="button button-primary" disabled={busy}><KeyRound size={16} />{busy ? "正在连接" : "连接并进入"}</button>
-      </form>{externalError && <button className="button small" onClick={onRetry}>恢复本机连接</button>}
-    </section><aside><h2>安装后的两个入口</h2><dl><div><dt>提交任务</dt><dd>导入项目侧准备的任务包，查看进度并下载核验结果。</dd></div><div><dt>贡献计算（可选）</dt><dd>另行使用私密机器邀请接入，设置资源预算、允许时间和暂停。</dd></div></dl></aside>
-  </main></div>;
 }
 
 function PackagePreview({ preview, filename }) {

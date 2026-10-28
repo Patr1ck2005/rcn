@@ -102,7 +102,19 @@
     "docs/evidence/storage-algorithms-20261024/run-4.json",
     "docs/evidence/storage-algorithms-20261024/variance-and-throughput.json",
     "docs/evidence/storage-algorithms-20261024/occupancy-progress-native-boundaries.json",
-    "docs/evidence/storage-algorithms-20261024/occupancy-progress-verification.json"
+    "docs/evidence/storage-algorithms-20261024/occupancy-progress-verification.json",
+    "src/research_compute_network/agent_access.py",
+    "src/research_compute_network/agent_credentials.py",
+    "src/research_compute_network/member_agent_launcher.py",
+    "src/research_compute_network/member_agent_launcher.cs",
+    "src/research_compute_network/member_connection_bundle.py",
+    "src/research_compute_network/member_doctor.py",
+    "web/src/MemberConnectionSetup.jsx",
+    "web/src/memberConnectionModel.js",
+    "web/src/memberConnectionModel.test.jsx",
+    "web/src/memberAgentConfig.test.jsx",
+    "web/tests/member-agent-setup.spec.js",
+    "web/tests/member-connection-setup.spec.js"
   ],
   "required_files": [
     "docs/member-task-package-guide.zh.md",

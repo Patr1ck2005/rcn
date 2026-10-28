@@ -12,6 +12,7 @@ function bundle(target, actor = "member-alice", agentId = "11111111-2222-4333-84
 
 test("HTTPS login enters identity/self-check/Agent export and requires explicit identity confirmation", async ({ page }) => {
   const fixture = await memberApiFixture(page, { connected: false });
+  await page.route("**/local/v1/doctor", (route) => route.fulfill({ json: { ok: true, checks: [{ stage: "identity", status: "passed" }], next_actions: [] } }));
   const generated = [];
   const agents = [];
   await page.route("**/local/v1/agent-configurations**", (route) => {
@@ -39,10 +40,12 @@ test("HTTPS login enters identity/self-check/Agent export and requires explicit 
   await page.getByRole("button", { name: "重新自检", exact: true }).click();
   await expect.poll(() => fixture.calls.filter((call) => call.pathname === "/local/v1/session" && call.method === "GET").length).toBeGreaterThan(reads);
   await page.getByLabel("我确认使用上方个人身份配置 Agent。").check();
-  for (const [target, label] of [["codex", "Codex"], ["claude", "Claude Code"], ["dsh", "DSH"]]) {
+  for (const [target, label] of [["codex", "Codex"], ["claude", "Claude Code"], ["dsh", "DSH"], ["generic", "其他 Agent"]]) {
     await page.getByLabel("Agent 实例", { exact: true }).selectOption("new");
+    await page.getByLabel("Agent 名称", { exact: true }).fill(`研究助手 ${target}`);
     await page.getByLabel("使用的 Agent", { exact: true }).selectOption(target);
-    await page.getByLabel("独立 Agent token", { exact: true }).fill(`synthetic-independent-${target}-token`);
+    await expect(page.getByLabel("Agent 名称", { exact: true })).toHaveValue(`研究助手 ${target}`);
+    await expect(page.getByLabel("独立 Agent token", { exact: true })).toHaveCount(0);
     const generate = page.getByRole("button", { name: `生成 ${label} 配置`, exact: true });
     await generate.evaluate((button) => { button.click(); button.click(); });
     await expect(page.getByRole("button", { name: "下载配置 ZIP", exact: true })).toBeVisible();
@@ -50,19 +53,19 @@ test("HTTPS login enters identity/self-check/Agent export and requires explicit 
     await page.getByRole("button", { name: "下载配置 ZIP", exact: true }).click();
     expect((await download).suggestedFilename()).toBe(`RCN-Agent-${target}.zip`);
   }
-  expect(generated.map((item) => item.target)).toEqual(["codex", "claude", "dsh"]);
-  expect(new Set(generated.map((item) => item.agent_id)).size).toBe(3);
-  expect(new Set(generated.map((item) => item.token)).size).toBe(3);
+  expect(generated.map((item) => item.target)).toEqual(["codex", "claude", "dsh", "generic"]);
+  expect(generated.map((item) => item.label)).toEqual(["研究助手 codex", "研究助手 claude", "研究助手 dsh", "研究助手 generic"]);
+  expect(new Set(generated.map((item) => item.agent_id)).size).toBe(4);
+  expect(generated.every((item) => !Object.hasOwn(item, "token"))).toBe(true);
   await page.getByLabel("Agent 实例", { exact: true }).selectOption(generated[0].agent_id);
   await expect(page.getByText("token-codex", { exact: true })).toBeVisible();
   await expect(page.getByLabel("独立 Agent token", { exact: true })).toHaveCount(0);
   await page.getByRole("button", { name: "生成 Codex 配置", exact: true }).click();
-  await expect.poll(() => generated.length).toBe(4);
-  expect(generated[3].agent_id).toBe(generated[0].agent_id);
-  expect(generated[3]).not.toHaveProperty("token");
+  await expect.poll(() => generated.length).toBe(5);
+  expect(generated[4].agent_id).toBe(generated[0].agent_id);
+  expect(generated[4]).not.toHaveProperty("token");
   await page.getByRole("button", { name: "移除此 Agent 的本机登录", exact: true }).click();
-  await expect(page.getByText("已移除此 Agent 的本机加密登录。中心 token 仍需管理员按原签发记录单独撤销。")).toBeVisible();
-  await expect(page.getByLabel("独立 Agent token", { exact: true })).toHaveValue("");
+  await expect(page.getByText("已移除此 Agent 的本机加密登录。中心凭据仍有效；如需停用，请单独撤销中心凭据。")).toBeVisible();
   expect(await page.evaluate(() => ({ ...sessionStorage }))).toEqual({});
   expect(await page.evaluate(() => ({ ...localStorage }))).toEqual({});
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1)).toBe(true);
@@ -75,12 +78,12 @@ test("failed live self-check hides a generated bundle and disables further expor
   await page.route("**/local/v1/agent-instructions", (route) => route.fulfill({ json: bundle("codex", "member-alice", route.request().postDataJSON().agent_id) }));
   await page.goto("/app/setup");
   await page.getByLabel("我确认使用上方个人身份配置 Agent。").check();
-  await page.getByLabel("独立 Agent token", { exact: true }).fill("synthetic-independent-token");
   await page.getByRole("button", { name: "生成 Codex 配置", exact: true }).click();
   await expect(page.getByRole("button", { name: "下载配置 ZIP", exact: true })).toBeVisible();
   await page.route("**/local/v1/session", (route) => route.fulfill({ json: { connected: true,
     actor: { actor_id: "member-alice", roles: ["member"] }, center_url: "https://compute.example.org",
     online: false, remote_actions_available: false, connection_error: { reason_code: "center_login_required" } } }));
+  await page.route("**/local/v1/doctor", (route) => route.fulfill({ json: { ok: false, checks: [{ stage: "identity", status: "failed", message: "个人身份或中心连接尚未确认，请重新登录或恢复网络后自检。" }], next_actions: [] } }));
   await page.getByRole("button", { name: "重新自检", exact: true }).click();
   await expect(page.getByText("个人身份或中心连接尚未确认，请重新登录或恢复网络后自检。")).toBeVisible();
   await expect(page.getByRole("button", { name: "下载配置 ZIP", exact: true })).toHaveCount(0);
@@ -92,7 +95,6 @@ test("a reply for another personal identity cannot become a downloadable configu
   await page.route("**/local/v1/agent-instructions", (route) => route.fulfill({ json: bundle("codex", "member-bob", route.request().postDataJSON().agent_id) }));
   await page.goto("/app/setup");
   await page.getByLabel("我确认使用上方个人身份配置 Agent。").check();
-  await page.getByLabel("独立 Agent token", { exact: true }).fill("synthetic-independent-token");
   await page.getByRole("button", { name: "生成 Codex 配置", exact: true }).click();
   await expect(page.getByText("配置与当前已核验身份不一致，请重新自检后生成。")).toBeVisible();
   await expect(page.getByRole("button", { name: "下载配置 ZIP", exact: true })).toHaveCount(0);

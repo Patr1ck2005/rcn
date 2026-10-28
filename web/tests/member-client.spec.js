@@ -104,7 +104,7 @@ test("member connection uses the local session and never persists a personal tok
   expect(await page.evaluate(() => ({ ...localStorage }))).toEqual({});
   if (await page.getByRole("button", { name: "打开导航", exact: true }).isVisible()) await page.getByRole("button", { name: "打开导航", exact: true }).click();
   await page.getByRole("button", { name: "退出个人登录" }).click();
-  await expect(page.getByRole("heading", { name: "连接课题组计算中心" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "连接与 Agent 配置", exact: true })).toBeVisible();
   await expect(page.getByLabel("个人访问 token")).toHaveValue("");
 });
 

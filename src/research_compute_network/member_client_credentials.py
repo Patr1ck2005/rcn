@@ -18,6 +18,21 @@ class CredentialUnavailable(RuntimeError):
     pass
 
 
+class UnavailableCredentialStore:
+    """Allow offline UI/help without touching an unreadable credential root."""
+    def __init__(self, reason_code):
+        self.reason_code = reason_code
+
+    def load(self):
+        raise CredentialUnavailable(self.reason_code)
+
+    def save(self, **kwargs):
+        raise CredentialUnavailable(self.reason_code)
+
+    def clear(self):
+        raise CredentialUnavailable(self.reason_code)
+
+
 def _crypt(data: bytes, *, decrypt: bool = False) -> bytes:
     if os.name != "nt":
         raise CredentialUnavailable("member_credentials_require_windows_dpapi")

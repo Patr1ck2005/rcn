@@ -23,6 +23,8 @@ from .member_installer import _makensis
 from .universal_installer import _regular, _validate_archive_paths, _wheel_identity, _sha
 from .member_release_catalog import PUBLIC_RELEASE
 
+MEMBER_NOTICE = 'Research Compute Network 成员客户端\n\n安装 → 导入本人私密接入包 → 选择 Agent 并生成接续说明。\n本 Setup 已包含运行环境与离线帮助，无需旁置 runtime ZIP、准备 CMD 或第二份 Agent token。\n通用安装包不含个人秘密；个人接入包仅私发本人。连接、自检和恢复均在客户端完成。\n贡献电脑为可选流程，需要已有 COMSOL 6.4；重装或重新登录不会解除机主暂停。\n升级保留原身份、Agent、任务和下载操作；卸载先排空并保留身份及结果。\n\n陌生 Windows、UAC、重启和新成员真实科学试算尚待现场验收。\n本包未购买代码签名证书，请核对管理员公布的 SHA-256。\n\nPublic preview: no scientific runtime, model, solver installation or operator approval is bundled. Operators supply approved execution separately. Third-party components retain their own license notices.\n'
+
 
 NSIS = r'''!include "MUI2.nsh"
 !include "LogicLib.nsh"
@@ -348,6 +350,8 @@ def build_member_client_installer(*, wheel_path, wheelhouse_dir, embeddable_zip,
         if any(path.suffix.lower() in {".mph", ".zip"} for path in (python / "Lib/site-packages/research_compute_network").rglob("*")):
             raise ValueError("public_client_contains_scientific_asset")
         _sanitize_public_runtime(python)
+        from .member_agent_launcher import build_launcher
+        build_launcher(runtime)
         files = {path.relative_to(runtime).as_posix(): _sha(path) for path in sorted(runtime.rglob("*")) if path.is_file()}
         payload_id = "member-" + hashlib.sha256(json.dumps(files, sort_keys=True, separators=(",", ":")).encode()).hexdigest()[:24]
         manifest = {"schema_version": 1, "kind": "rcn-public-member-client-v1", "payload_id": payload_id,
@@ -363,7 +367,7 @@ def build_member_client_installer(*, wheel_path, wheelhouse_dir, embeddable_zip,
                     archive.write(path, path.relative_to(release_root).as_posix())
         # Also deliver the exact raw snapshot for independent/offline acceptance.
         shutil.copy2(stage / "member-runtime.zip", output_exe.with_suffix(".runtime.zip"))
-        (stage / "notice.txt").write_text("Research Compute Network public preview\n\nMIT-licensed client software. Contains no personal token, invitation, model, COMSOL installation or scientific runtime. Connect to your own managed center with an administrator-issued personal token. Compute contribution requires a separately configured operator-approved runtime. Unsigned preview: check the published SHA-256. Third-party components retain their own license notices.\n", encoding="utf-8-sig")
+        (stage / "notice.txt").write_text(MEMBER_NOTICE, encoding="utf-8-sig")
         (stage / "installer.nsi").write_text(NSIS.replace("@ID@", payload_id).replace("@VERSION@", version), encoding="utf-8-sig")
         subprocess.run([makensis or _makensis(), "/V2", str(stage / "installer.nsi")], cwd=stage, check=True, capture_output=True, timeout=300)
         shutil.copy2(stage / "__setup__.exe", output_exe)

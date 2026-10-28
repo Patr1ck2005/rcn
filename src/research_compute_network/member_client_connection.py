@@ -92,6 +92,7 @@ class SshChannel(PrivateModel):
     known_hosts: FilePin
     upstream_port: int = Field(ge=1, le=65535)
     center_port: int = Field(ge=1, le=65535)
+    isolated_config: bool = False
 
     @model_validator(mode="after")
     def fixed_separate_port(self):
@@ -110,16 +111,21 @@ class ConnectionSpec(PrivateModel):
     schema_version: Literal[1]
     connection_id: str = Field(pattern=r"^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$")
     client_root: str
-    machine_id: str = Field(min_length=1, max_length=128)
+    # A submit-only client has no enrolled worker identity.
+    machine_id: str | None = Field(default=None, min_length=1, max_length=128)
     owner_user_id: str = Field(min_length=1, max_length=128)
     owner_account: str = Field(min_length=1, max_length=256)
     mode: Literal["unselected", "https", "managed-ssh"]
     https_url: str | None = None
     ssh: SshChannel | None = None
     legacy: LegacyConsole | None = None
+    center_id: str | None = Field(default=None, pattern=r"^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$")
+    center_name: str | None = Field(default=None, min_length=1, max_length=128)
 
     @model_validator(mode="after")
     def selected_fields(self):
+        if not self.machine_id and (self.legacy or not self.center_id):
+            _fail("member_identity_required")
         if self.https_url is not None:
             https_center(self.https_url)
         if self.mode == "https" and (not self.https_url or self.ssh is not None):
@@ -174,12 +180,17 @@ def _ssh_command(channel, *, local_port=None):
     channel.executable.verify()
     identity = channel.identity.verify(private=True)
     hosts = channel.known_hosts.verify(private=True)
-    return [channel.executable.path, "-N", "-L",
+    command = [channel.executable.path, "-N", "-L",
             f"127.0.0.1:{local_port or channel.upstream_port}:127.0.0.1:{channel.center_port}",
             "-p", str(channel.port), "-i", str(identity), "-o", "UserKnownHostsFile=" + str(hosts),
             "-o", "BatchMode=yes", "-o", "IdentitiesOnly=yes", "-o", "ExitOnForwardFailure=yes",
             "-o", "StrictHostKeyChecking=yes", "-o", "ServerAliveInterval=30", "-o", "ServerAliveCountMax=3",
             channel.user + "@" + channel.host]
+    if channel.isolated_config:
+        command[-1:-1] = ["-F", "none", "-o", "ProxyCommand=none", "-o", "ProxyJump=none",
+                         "-o", "PermitLocalCommand=no", "-o", "ControlMaster=no", "-o", "ControlPath=none",
+                         "-o", "GlobalKnownHostsFile=none", "-o", "UpdateHostKeys=no"]
+    return command
 
 
 def _snapshot(process):

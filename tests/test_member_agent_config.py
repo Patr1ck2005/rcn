@@ -48,6 +48,7 @@ def isolated_store(monkeypatch):
     monkeypatch.setattr(config_module, 'PersonalCredentialStore', FakeStore)
     # These are contract tests. Native DPAPI/ACL behavior has separate acceptance.
     monkeypatch.setattr(config_module.storage, '_private_directory', lambda path: Path(path).mkdir(parents=True, exist_ok=True))
+    monkeypatch.setattr(config_module.storage, '_check_private_file', lambda path: None)
 
 
 class Broker:

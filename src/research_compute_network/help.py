@@ -105,11 +105,22 @@ class HelpCatalog:
         article = self._articles.get(slug)
         return article.payload() if article and article.audience == "public" else None
 
+    def public_markdown(self, slug: str) -> dict | None:
+        article = self._articles.get(slug)
+        return ({**article.metadata(), "markdown": article.markdown}
+                if article and article.audience == "public" else None)
+
     def protected(self, slug: str, roles: frozenset[UserRole]) -> dict | None:
         article = self._articles.get(slug)
         if not article or article.audience != "protected" or not self._can_read(article, roles):
             return None
         return article.payload()
+
+    def protected_markdown(self, slug: str, roles: frozenset[UserRole]) -> dict | None:
+        article = self._articles.get(slug)
+        if not article or article.audience != "protected" or not self._can_read(article, roles):
+            return None
+        return {**article.metadata(), "markdown": article.markdown}
 
     def _ordered(self) -> list[HelpArticle]:
         return sorted(self._articles.values(), key=lambda article: (article.order, article.title))
